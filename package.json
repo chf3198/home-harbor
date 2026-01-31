@@ -1,0 +1,21 @@
+{
+  "name": "home-harbor",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace apps/web",
+    "dev:api": "npm run dev --workspace apps/api",
+    "build": "npm run build --workspace apps/web && npm run build --workspace apps/api",
+    "test": "npm run test:e2e",
+    "test:e2e": "playwright test",
+    "lint": "npm run lint --workspace apps/web"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "typescript": "^5.7.3"
+  }
+}
