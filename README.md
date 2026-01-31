@@ -35,11 +35,23 @@ npm run lint
 
 ## ✨ Features Implemented
 
+### 🤖 AI-Powered Intelligence (NEW!)
+- **Vision Analysis**: Property photo analysis using free OpenRouter Molmo2-8B
+  - Exterior condition assessment (excellent/good/fair/poor)
+  - Architectural style recognition (Colonial, Ranch, Victorian, etc.)
+  - Amenity detection (garage, porch, deck, pool)
+  - Curb appeal scoring (1-10 AI rating)
+- **Chat Assistant**: Q&A about app features using 40+ free LLMs with cascading fallback
+- **Property Photos**: Google Street View Static API integration ($200/mo free tier)
+- **Cost**: **$0** - 100% free tier usage with production-grade capabilities
+- **[Full AI Features Documentation](docs/AI_FEATURES_OVERVIEW.md)**
+
 ### Real Data Integration ✅
 - **Dataset**: Connecticut Real Estate Sales (2001-2023)
 - **Source**: [data.ct.gov](https://data.ct.gov/Housing-and-Development/Real-Estate-Sales-2001-2023-GL/5mzw-sjtu) (Public Domain)
 - **Size**: 1M+ property records
 - **Attributes**: Address, price, assessed value, property type, sale date, coordinates
+- **Photos**: Google Street View (universal address coverage)
 
 ### Search & Filters ✅
 - City search (case-insensitive)
@@ -83,6 +95,14 @@ src/property-search/
 ```
 
 ## 💡 Skills Demonstrated
+
+### AI/ML Engineering (NEW!)
+- ✅ Vision-language model integration (Molmo2-8B)
+- ✅ Multi-model orchestration (40+ LLM cascade)
+- ✅ Prompt engineering for vision tasks
+- ✅ Cost optimization (free tier maximization)
+- ✅ API fallback/retry logic
+- ✅ Image analysis pipeline design
 
 ### Software Engineering
 - ✅ Test-Driven Development (TDD)
