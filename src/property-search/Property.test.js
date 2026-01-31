@@ -75,5 +75,42 @@ describe('Property Validation', () => {
       expect(result.isSuccess).toBe(false);
       expect(result.error).toContain('bedrooms');
     });
+
+    test('fails with zero price', () => {
+      const invalidData = {
+        address: '123 Main St',
+        city: 'Columbus',
+        price: 0,
+        bedrooms: 3,
+        bathrooms: 2
+      };
+
+      const result = Property.create(invalidData);
+
+      expect(result.isSuccess).toBe(false);
+      expect(result.error).toContain('price');
+    });
+
+    test('fails with negative bathrooms', () => {
+      const invalidData = {
+        address: '123 Main St',
+        city: 'Columbus',
+        price: 250000,
+        bedrooms: 3,
+        bathrooms: -1
+      };
+
+      const result = Property.create(invalidData);
+
+      expect(result.isSuccess).toBe(false);
+      expect(result.error).toContain('bathrooms');
+    });
+
+    test('cannot get value from failed result', () => {
+      const invalidData = { address: '', price: 250000, bedrooms: 3, bathrooms: 2 };
+      const result = Property.create(invalidData);
+
+      expect(() => result.getValue()).toThrow('Cannot get value from failed result');
+    });
   });
 });
