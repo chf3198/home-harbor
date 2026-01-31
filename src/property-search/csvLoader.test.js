@@ -31,12 +31,12 @@ describe('csvLoader', () => {
       expect(properties[0].address).not.toContain('Address');
     });
 
-    it('should handle all 50 sample records', async () => {
+    it('should handle all sample records', async () => {
       const result = await loadCsvFile(samplePath);
 
-      // CSV has 51 lines (1 header + 50 data rows)
+      // CSV has 52 lines (1 header + 51 data rows)
       expect(result.value.length).toBeGreaterThanOrEqual(40); // Allow for some invalid rows
-      expect(result.value.length).toBeLessThanOrEqual(50);
+      expect(result.value.length).toBeLessThanOrEqual(51);
     });
 
     it('should skip invalid rows and continue processing', async () => {
