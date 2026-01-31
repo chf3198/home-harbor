@@ -286,3 +286,50 @@ This proves filters are truly independent (good design).
 ---
 
 **Last Updated**: January 31, 2026, Session 2
+
+---
+
+## Session 3 - January 31, 2026
+
+### Real-World Data Discovery
+
+**Decision**: Use Connecticut Real Estate Sales 2001-2023 dataset
+- **Source**: https://data.ct.gov (open data portal)
+- **License**: Public Domain
+- **Size**: 1M+ property sales records
+- **Fields**: Address, town, sale price, assessed value, property type, residential type, sale date, location coordinates
+- **Format**: CSV with API access
+- **Quality**: Government-maintained, annually updated, comprehensive
+
+**Why This Dataset**:
+- ✅ Real-world data (not mock/synthetic)
+- ✅ Public domain (no licensing issues)
+- ✅ Rich attributes (14 columns)
+- ✅ Large enough to demonstrate performance
+- ✅ Geographic diversity (all CT towns)
+- ✅ Historical data (2001-2023)
+- ✅ Professional provenance (CT Office of Policy & Management)
+
+**Alternatives Considered**:
+- Zillow API: Requires API key, rate limits
+- Kaggle datasets: Various licenses, unknown quality
+- HUD data: Focused on housing affordability, not property search
+- Philadelphia/Allegheny datasets: Smaller, regional
+
+**Architecture Implications**:
+- Need CSV data loader (new component)
+- Property entity must map to CT schema
+- Add filtering: property type, residential type, town
+- Add sorting: sale date, price, assessed value
+- Consider caching strategy for 1M+ records
+
+**Next Steps**:
+1. Download sample CT data for testing
+2. Design data mapper (CT schema → Property entity)
+3. Implement CSV loader with TDD
+4. Extend search/filter features
+5. Add performance optimization (indexing)
+
+---
+
+**Last Updated**: January 31, 2026, Session 3
