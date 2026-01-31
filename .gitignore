@@ -169,3 +169,4 @@ local/
 service-account-*.json
 gcp-credentials.json
 firebase-adminsdk-*.json
+data/*.csv

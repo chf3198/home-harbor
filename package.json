@@ -27,7 +27,13 @@
     "jest": "^29.7.0",
     "prettier": "^3.2.5"
   },
+<<<<<<< HEAD
   "dependencies": {},
+=======
+  "dependencies": {
+    "csv-parse": "^6.1.0"
+  },
+>>>>>>> 033e3a104480fcd2c6fc3ecd267c57130241a5c9
   "engines": {
     "node": ">=18.0.0"
   }
