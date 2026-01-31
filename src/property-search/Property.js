@@ -12,6 +12,10 @@ class Result {
     this.error = error;
   }
 
+  get value() {
+    return this._value;
+  }
+
   getValue() {
     if (!this.isSuccess) {
       throw new Error('Cannot get value from failed result');
@@ -37,6 +41,7 @@ class Property {
     this.price = props.price;
     this.bedrooms = props.bedrooms;
     this.bathrooms = props.bathrooms;
+    this.metadata = props.metadata || {}; // Optional extended data
   }
 
   static create(props) {
@@ -50,13 +55,12 @@ class Property {
       return Result.fail('Property price must be positive');
     }
 
-    // Validate bedrooms
-    if (props.bedrooms == null || props.bedrooms < 0) {
+    // Bedrooms/bathrooms optional for CT data (not in schema)
+    if (props.bedrooms !== undefined && props.bedrooms < 0) {
       return Result.fail('Property bedrooms must be non-negative');
     }
 
-    // Validate bathrooms
-    if (props.bathrooms == null || props.bathrooms < 0) {
+    if (props.bathrooms !== undefined && props.bathrooms < 0) {
       return Result.fail('Property bathrooms must be non-negative');
     }
 
