@@ -31,7 +31,13 @@ From API response at `/api/v1/models`, free models (`pricing.prompt: "0"`) inclu
 
 **Specialized**:
 - `nvidia/nemotron-3-nano-30b-a3b:free` - Trial only, logged prompts (privacy warning)
-- `allenai/molmo-2-8b:free` - Vision-language, image/video understanding
+- `allenai/molmo-2-8b:free` - **VISION-LANGUAGE MODEL** (image/video understanding)
+  - **Capabilities**: Image analysis, object detection, counting, captioning, spatial grounding
+  - **Context**: 36.9K tokens
+  - **Performance**: State-of-the-art among open-weight vision models
+  - **Use Cases**: Property photo analysis, condition assessment, amenity detection, curb appeal scoring
+  - **Input**: Accepts image URLs in message content
+  - **Cost**: $0 (completely free)
 - `google/gemma-3-4b-it:free` - 128K context, multimodal, 140+ languages
 - `google/gemma-3-27b-it:free` - Larger Gemma, structured outputs, function calling
 
@@ -61,6 +67,95 @@ From API response at `/api/v1/models`, free models (`pricing.prompt: "0"`) inclu
 3. `google/gemma-3-27b-it:free` - Multimodal, structured outputs
 4. `liquid/lfm-2.5-1.2b-thinking:free` - Reasoning fallback
 5. `openai/gpt-oss-120b:free` - Coding tasks
+
+**Vision Model (Separate Pipeline)**:
+- `allenai/molmo-2-8b:free` - Used exclusively for image analysis tasks
+- Input format: `{type: "image_url", image_url: {url: "..."}}`
+- Automatically selected when user asks about property photos or amenity detection
+
+## Property Image Strategy
+
+### Image Source: Google Street View Static API
+
+**Decision Rationale**: (text)
+├── visionService.js           # Vision-specific service (Molmo2-8B)
+├── streetViewService.js       # Google Street View API client
+├── config.js                  # Environment config (API keys** (only transaction metadata)
+- Google Street View provides free exterior photos for any address
+- Free tier: $200/month credit (~28,000 requests, more than sufficient for demo)
+- Static API = no JavaScript required, simple HTTPS GET requests
+- Covers most US addresses with street-level photography
+
+**API Details**:
+```javascript
+// Google Street View Static API
+const url = `https://maps.googleapis.com/maps/api/streetview` +
+  `?size=600x400` +
+  `&location=${encodeURIComponent(address)}` +
+  `&key=${GOOGLE_MAPS_API_KEY}` +
+  `&fov=90` +
+  `&heading=0` +
+  `&pitch=0`;
+```
+
+**Cost Structure**:
+- Free tier: $200/month = ~28,000 requests
+- After free: $0.007 per request
+- Strategy: Cache image URLs in property metadata, fetch on-demand only
+
+**Alternatives Considered & Rejected**:
+- ❌ Real estate listing APIs (Zillow, Realtor.com): Require paid API keys, complex rate limits, legal restrictions
+- ❌ Manual photo uploads: Not scalable, defeats "real-world data" demo value
+- ❌ Mock/placeholder images: Unprofessional for portfolio showcase
+
+### Vision AI Analysis Pipeline
+
+**Use Cases**:
+1. **Exterior Condition Assessment**: "Well-maintained" vs "Needs work"
+2. **Amenity Detection**: Garage, porch, deck, pool, landscaping features
+3. **Architectural Style**: Colonial, Ranch, Victorian, Contemporary, Cape Cod
+4. **Story/Floor Count**: Verify listing data accuracy
+5. **Curb Appeal Score**: AI-generated 1-10 rating based on appearance
+6. **Neighborhood Context**: Street quality, nearby structures, tree coverage
+
+**Implementation**:
+```javascript
+// 1. Fetch Street View image URL
+const imageUrl = await getStreetViewUrl(property.address);
+
+// 2. Send to Molmo2-8B vision model for analysis
+const visionAnalysis = await visionService.analyzeProperty(imageUrl, {
+  prompt: `Analyze this property photo and provide:
+    1. Exterior condition (excellent/good/fair/poor)
+    2. Architectural style
+    3. Visible amenities (garage, porch, deck, etc.)
+    4. Number of visible stories/floors
+    5. Curb appeal score (1-10)
+    6. Notable features or issues`
+});
+
+// 3. Augment property metadata
+property.metadata.imageUrl = imageUrl;
+property.metadata.visionAnalysis = visionAnalysis;
+```
+
+**Example Vision Response**:
+```json
+{
+  "condition": "good",
+  "architecturalStyle": "Colonial",
+  "amenities": ["2-car garage", "front porch", "mature trees"],
+  "stories": 2,
+  "curbAppeal": 7,
+  "notes": "Well-maintained siding, recent roof, landscaping needs attention"
+}
+```
+
+**Benefits for User Experience**:
+- **Enhanced Search**: Filter by "homes with garages" or "2-story properties"
+- **Visual Confidence**: See property before scheduling viewing
+- **AI Insights**: Automated condition reports supplement listing data
+- **Comparative Analysis**: "Show me properties with curb appeal >7"
 
 ## Architecture Design
 
@@ -211,6 +306,10 @@ if (!OPENROUTER_API_KEY) {
 ### .env File (NEVER COMMIT)
 ```bash
 # .env
+
+GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_KEY_HERE
+# Get your key at https://console.cloud.google.com/google/maps-apis
+# Enable: Street View Static API
 OPENROUTER_API_KEY=sk-or-v1-YOUR_KEY_HERE
 # Get your key at https://openrouter.ai/keys
 ```
@@ -263,13 +362,9 @@ environment:
 
 **Fallback to Paid Models** (Future):
 - If all free models fail, optionally try cheap paid models
-- Set cost ceiling (e.g., max $0.01 per request)
-- Track cumulative costs in CloudWatch
+- Set cost ceiling (e., visionService, streetViewService } from './src/ai-assistant';
 
-## Example Usage
-
-```javascript
-import { chatAssistant } from './src/ai-assistant';
+// === TEXT CHAT EXAMPLES ===
 
 // Simple question
 const response = await chatAssistant.ask('How do I search for properties in Avon?');
@@ -281,9 +376,60 @@ const techResponse = await chatAssistant.ask('Explain the repository pattern use
 console.log(techResponse.model); // 'arcee-ai/trinity-large-preview:free'
 console.log(techResponse.content);
 
+// === VISION AI EXAMPLES ===
+
+// Get Street View image for property
+const property = { address: '123 Main St, Hartford, CT 06103' };
+const imageUrl = await streetViewService.getImageUrl(property.address);
+console.log(imageUrl);
+// "https://maps.googleapis.com/maps/api/streetview?size=600x400&location=..."
+
+// Analyze property image with AI
+const analysis = await visionService.analyzeProperty(imageUrl);
+console.log(analysis);
+// {
+//   condition: 'good',
+//   architecturalStyle: 'Colonial',
+//   amenities: ['garage', 'front porch'],
+//   stories: 2,
+//   curbAppeal: 8,
+//   notes: 'Well-maintained, recent updates visible'
+// }
+
+// Bulk enhance properties with vision data
+const enhancedProperties = await Promise.all(
+  properties.map(async (prop) => {
+    const imgUrl = await streetViewService.getImageUrl(prop.address);
+    const vision = await visionService.analyzeProperty(imgUrl);
+    return { ...prop, imageUrl: imgUrl, visionAnalysis: vision };
+  })
+);
+
+// === ERROR HANDLING ===
+// "To search for properties in Avon, use the searchByCity function..."
+
+// Technical question
+const techResponse = await chatAssistant.ask('Explain the repository pattern used in this app');
+console.log(techResponse.model); // 'arcee-ai/trinity-large-preview:free'
+console.log(techResponse.content);
+
 // Error handling
 try {
   const response = await chatAssistant.ask(veryLongQuestion);
+8. **Video Analysis**: Use Molmo2-8B for property walkthrough videos
+9. **Multi-Image Analysis**: Compare multiple property photos simultaneously
+10. **Satellite View**: Integrate Google Maps satellite imagery for lot size analysis
+11. **Interior Photos**: If listing APIs become available, analyze interior condition
+12. **Comparative Analysis**: "Which of these 3 properties has the best curb appeal?"
+
+## Data Sources Summary
+
+| Data Type | Source | Cost | Coverage | Notes |
+|-----------|--------|------|----------|-------|
+| Transaction Data | Connecticut Open Data Portal | Free | 1M+ properties (2001-2023) | Address, price, sale date, type |
+| Exterior Photos | Google Street View Static API | $200/mo free tier | Most US addresses | Street-level photography |
+| Vision Analysis | OpenRouter Molmo2-8B (free) | $0 | Unlimited | Condition, style, amenities |
+| Text Chat | OpenRouter Free LLMs | $0 | Unlimited (rate limited) | Q&A, app guidance |
 } catch (error) {
   if (error instanceof NoAvailableModelsError) {
     console.error('All free models failed');
