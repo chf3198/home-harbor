@@ -1,17 +1,16 @@
 # Security Guidelines - HomeHarbor
 
-**CRITICAL:** This document outlines security practices to protect sensitive data.
+**CRITICAL:** This document outlines security practices to protect sensitive data in cloud-based applications.
 
 ---
 
 ## 🔒 Protected Information
 
 ### AWS Account Information
-**Your AWS Account Details (NEVER COMMIT):**
-- Account ID: `8407-9735-8426`
-- Account Name: `ColonelCu`
-- Region: `US East (Ohio)` / `us-east-2`
-- Free Tier: $100 USD credits, expires July 30, 2026
+**Your AWS Account (NEVER COMMIT):**
+- Account ID, Account Name, Region
+- Free Tier status and credits
+- Access keys and credentials
 
 ### What NEVER to Commit
 - ❌ AWS Access Keys / Secret Keys
@@ -381,6 +380,5 @@ console.log('✓ All required variables set');
 
 ---
 
-**Last Updated:** January 30, 2026  
-**Account:** ColonelCu (8407-9735-8426)  
-**Region:** us-east-2 (US East Ohio)
+**Last Updated:** January 30, 2026
+

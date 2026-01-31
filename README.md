@@ -1,6 +1,6 @@
 # HomeHarbor
 
-HomeHarbor is a simple, staff-level demo app for a real-estate marketplace.
+HomeHarbor is a full-stack real estate marketplace demo showcasing modern web application architecture, AI-powered search, and cloud infrastructure best practices.
 
 ## Quick start
 
@@ -46,12 +46,14 @@ git status
 # (.env should NOT appear)
 ```
 
-## What this demo shows
+## What this demo showcases
 
-- SEO-first React app (Next.js with SSR/ISR, metadata, sitemap, robots)
-- Node.js API with REST + GraphQL
-- A minimal ML stub for recommendations
-- Simple E2E tests (Playwright)
+- **Frontend**: SEO-optimized React app with Next.js (SSR/ISR, PWA, Core Web Vitals)
+- **Backend**: Node.js API with REST + GraphQL endpoints
+- **AI/ML**: Python-based recommendation engine and natural language search
+- **Testing**: Comprehensive E2E tests with Playwright
+- **Infrastructure**: AWS deployment with IaC (Terraform/CDK)
+- **DevOps**: CI/CD pipeline, monitoring, and observability
 
 ## Project layout
 
@@ -59,8 +61,29 @@ git status
 - `apps/api` — Node.js API (REST + GraphQL)
 - `apps/ml` — Python ML stub
 - `infra` — AWS/IaC placeholders
-- `tests` — E2E tests
+- `Technology Stack
+
+- **Frontend**: React, Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Node.js, NestJS, GraphQL (Apollo), REST
+- **Database**: PostgreSQL (RDS), Redis (ElastiCache)
+- **ML/AI**: Python, scikit-learn, natural language processing
+- **Cloud**: AWS (S3, CloudFront, ECS/Fargate, Lambda, RDS)
+- **IaC**: Terraform / AWS CDK
+- **Testing**: Playwright, Jest, Supertest
+- **CI/CD**: GitHub Actions
+
+## Architecture Principles
+
+This project demonstrates:
+- **12-Factor App** methodology
+- **Event-driven architecture** with message queues
+- **Microservices** (minimal, focused services)
+- **Security-first** design (encryption, IAM, secrets management)
+- **Observability** (logging, metrics, tracing)
+- **Performance optimization** (caching, CDN, lazy loading)
 
 ## Notes
+
+This is a training and educational project showcasing production-ready patterns and best practices for modern web applications
 
 This repo is intentionally small and focused. Replace the stubbed data and infrastructure with real services as needed.
