@@ -117,3 +117,172 @@
 ---
 
 **Last Updated**: January 31, 2026, Session 1
+
+---
+
+## Session 2 - January 31, 2026 (Continued)
+
+### Iterative TDD Implementation - Property Search Module
+
+**Context**: User requested continuous iteration through workflow until complete feature delivery.
+
+### TDD Cycles Completed
+
+#### Cycle 1: Property Entity
+- **RED**: Created Property.test.js with validation tests (commit 1bf1515)
+- **GREEN**: Implemented Property.js with Result pattern (commit 9553e6e)
+- **Result**: 4 passing tests, 92% coverage, 69 lines
+
+#### Cycle 2: Search by City
+- **RED**: searchService.test.js with case-insensitive tests (commit a7b6629)
+- **GREEN**: Implemented searchByCity pure function (commit 423ca6a)
+- **Coverage Issue**: Dropped to 75% branch coverage
+- **Fix**: Added more Property tests → 100% coverage restored
+- **Result**: 11 passing tests, 100% coverage
+
+#### Cycle 3: Price Range Filter
+- **RED**: priceFilter.test.js with boundary tests (commit 7759dff)
+- **GREEN**: Implemented filterByPriceRange (commit 4e3b547)
+- **Result**: 17 passing tests, 100% coverage maintained
+
+#### Cycle 4: Refactor & Integration
+- **REFACTOR**: Added index.js barrel export (commit 5be1e71)
+- **INTEGRATION**: Combined filters, tested composition
+- **DOCUMENTATION**: Module README + project README (commit f486490)
+- **Result**: 20 passing tests, professional API
+
+### Key Decisions & Patterns Used
+
+**1. Result Pattern Over Exceptions**
+- **Why**: Functional approach, explicit error handling
+- **How**: `Result.ok()` / `Result.fail()` with `isSuccess` flag
+- **Benefit**: No try/catch needed, composable
+
+**2. Pure Functions for Business Logic**
+- **Why**: Testable, predictable, no side effects
+- **Examples**: searchByCity, filterByPriceRange
+- **Benefit**: 100% coverage achievable, easy composition
+
+**3. Factory Pattern for Entities**
+- **Why**: Validation at creation, no invalid state possible
+- **Implementation**: `Property.create()` static method
+- **Benefit**: Fail-fast, type safety
+
+**4. Barrel Export (index.js)**
+- **Why**: Clean public API, encapsulation
+- **Pattern**: Re-export selected modules
+- **Benefit**: Consumers import from one place
+
+**5. Co-located Tests**
+- **Why**: Related code stays together
+- **Structure**: `*.test.js` next to `*.js`
+- **Benefit**: Easy to find, modify together
+
+### File Organization Success
+
+All files stayed under 100-line limit:
+- Property.js: 69 lines
+- searchService.js: 27 lines
+- priceFilter.js: 26 lines
+- index.js: 15 lines
+- Property.test.js: 96 lines (split if needed later)
+
+**No refactoring needed** - planning paid off.
+
+### Git Workflow Excellence
+
+**Conventional Commits Used**:
+- `test(...)`: RED phase commits
+- `feat(...)`: GREEN phase commits
+- `refactor(...)`: REFACTOR phase commits
+- `docs(...)`: Documentation commits
+
+**Atomic Commits**: Each commit is:
+- ✅ One logical change
+- ✅ Doesn't break build
+- ✅ Has descriptive message
+- ✅ Shows skills in commit body
+
+**Example Perfect Commit**:
+```
+feat(search): implement searchByCity with 100% coverage (GREEN)
+
+Implementation:
+✓ searchByCity() pure function
+✓ Case-insensitive city matching
+
+Test results:
+✓ 11/11 tests passing
+✓ 100% coverage maintained
+
+Skills: TDD green phase, pure functions, 100% test coverage
+```
+
+### Integration Testing Win
+
+Discovered **commutativity** of filters:
+```javascript
+// Order doesn't matter for independent filters
+searchByCity(filterByPriceRange(props, min, max), city)
+===
+filterByPriceRange(searchByCity(props, city), min, max)
+```
+
+This proves filters are truly independent (good design).
+
+### Challenges & Solutions
+
+**Challenge 1**: USB Drive Permission Issues
+- **Problem**: npm install failed with EACCES on symlink
+- **Root Cause**: ChromeOS USB filesystem limitations
+- **Solution**: Copied project to ~/home-harbor
+- **Lesson**: Work in proper Linux filesystem for Node projects
+
+**Challenge 2**: Coverage Dropped Below 80%
+- **Problem**: Adding new module lowered overall coverage
+- **Solution**: Added missing test cases for Property.js
+- **Lesson**: Monitor coverage after each GREEN phase
+
+**Challenge 3**: README was Auto-generated Boilerplate
+- **Problem**: npm init created generic README
+- **Solution**: Overwrote with portfolio-focused content
+- **Lesson**: Verify all generated files before committing
+
+### Workflow Adherence
+
+✅ **Phase 0**: Foundation complete (LESSONS_LEARNED, TODO, configs)
+✅ **Phase 1**: TDD cycles (RED → GREEN → REFACTOR)
+✅ **Phase 2**: Multiple features implemented
+✅ **Phase 3**: Integration tests added
+✅ **Phase 4**: Documentation complete
+
+**Quality Gates Passed**:
+- ✅ All tests pass (20/20)
+- ✅ Coverage ≥80% (100% actual)
+- ✅ All files ≤100 lines
+- ✅ Linter passes
+- ✅ Conventional commits
+- ✅ Security hooks active
+
+### Metrics
+
+**Time Invested**: ~2 hours (including research, setup, iteration)
+**Commits**: 12 commits (all professional quality)
+**Tests Written**: 20 tests
+**Code Coverage**: 100%
+**Files Created**: 10 files (all documented)
+**Lines of Code**: ~250 production + ~300 test
+
+### Next Session Priorities
+
+1. ⏳ Database integration (Repository pattern)
+2. ⏳ Lambda handler (API Gateway integration)
+3. ⏳ React frontend (first component)
+4. ⏳ GitHub Actions CI/CD
+5. ⏳ AWS deployment
+
+**Immediate Next**: Repository pattern for database abstraction (keeping pure functions pure).
+
+---
+
+**Last Updated**: January 31, 2026, Session 2
