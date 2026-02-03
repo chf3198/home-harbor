@@ -46,6 +46,33 @@ home-harbor/
 ├── 📂 public/                             # Single-file UI (no server required)
 │   └── index.html                         # All UI/JS inline
 │
+├── 📂 frontend/                           # React UI Application (NEW)
+│   ├── index.html                         # Vite HTML template
+│   ├── vite.config.js                     # Vite build configuration
+│   ├── vitest.config.js                   # Testing configuration
+│   │
+│   ├── 📂 src/
+│   │   ├── App.jsx                        # Root React component
+│   │   ├── main.jsx                       # React application entry
+│   │   ├── index.css                      # Global styles & Tailwind
+│   │   │
+│   │   ├── 📂 components/                 # React components
+│   │   │   ├── Header.jsx                 # App header with branding
+│   │   │   ├── SearchSection.jsx          # Property search form
+│   │   │   ├── ResultsSection.jsx         # Search results display
+│   │   │   ├── AIChatSection.jsx          # AI assistant interface
+│   │   │   ├── HelpModal.jsx              # Help & documentation modal
+│   │   │   └── *.test.jsx                 # Component test files
+│   │   │
+│   │   ├── 📂 hooks/                      # Custom React hooks
+│   │   │   ├── usePropertySearch.js       # Property search logic
+│   │   │   └── useAIChat.js               # AI chat functionality
+│   │   │
+│   │   ├── 📂 utils/                      # Utility functions
+│   │   └── 📂 types/                      # TypeScript definitions (future)
+│   │
+│   └── 📂 public/                         # Static assets
+│
 └── 📂 src/                                # Optional backend utilities
   ├── property-search/
   └── ai-assistant/
