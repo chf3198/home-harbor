@@ -1,6 +1,6 @@
 # AI Agent Development Workflow: Portfolio Project Optimization
 
-**Project**: HomeHarbor - Real estate listing aggregator demo
+**Project**: HomeHarbor - Real estate search demo with legal public data sources
 **Agent**: GitHub Copilot AI Agent (solo developer)
 **Audience**: Realtor.com recruiter evaluating Staff Software Engineer skills
 **Budget**: AWS free tier + $100 credits (4+ years runway)
@@ -10,11 +10,20 @@
 ## Mission Statement
 
 Build a production-quality portfolio project that demonstrates:
-1. **AWS expertise**: Lambda, RDS, API Gateway, CloudWatch
-2. **Modern frontend**: React, responsive design, accessibility
+1. **AWS expertise**: Lambda, DynamoDB, S3, CloudFront, EventBridge, CloudWatch
+2. **Modern frontend**: single-file HTML, responsive design, accessibility
 3. **Testing rigor**: 80%+ coverage, TDD discipline
 4. **Professional practices**: Git workflow, CI/CD, security
-5. **Architectural thinking**: Testable functional design, scalability considerations
+5. **Architectural thinking**: Serverless data pipelines, caching, scalability considerations
+
+---
+
+## Non-Negotiable UI Constraint
+
+- **Single-file UI**: The app must run directly from one HTML file via file://
+- **No local server**: The user should never need a server to use the UI
+- **Optional API only**: API Gateway is optional and configured via inline `HOME_HARBOR_CONFIG`
+ - **Do not instruct users to run a server** for the UI; file:// is the required delivery mode
 
 ---
 

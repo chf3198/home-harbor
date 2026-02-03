@@ -2,16 +2,16 @@
 
 ## Overview
 
-Implement an AI chat assistant using OpenRouter API with intelligent model selection, cascading fallback, and cost optimization through free tier models.
+Implement AI vision analysis and AI-generated property descriptions using OpenRouter API with cost optimization through free tier models. A chat assistant remains planned for a later phase.
 
 ## Requirements
 
-1. **Dynamic Model Selection**: Query OpenRouter API for available free models
-2. **Quality Ranking**: Order models by online review ratings/performance
-3. **Cascade Logic**: Fallback to next best model on failure/timeout
-4. **Cost Optimization**: Prioritize free models (`pricing.prompt = "0"`)
-5. **Security**: Environment variable for API key (never commit)
-6. **Purpose**: Answer questions about app + enhance functions with LLM access
+1. **Vision Analysis**: Analyze property images with a free vision model
+2. **Description Generation**: Produce compelling listing descriptions
+3. **Cost Optimization**: Prioritize free models (`pricing.prompt = "0"`)
+4. **Security**: Secrets Manager for API key storage (never commit)
+5. **Caching**: Store outputs in DynamoDB with TTL
+6. **Purpose**: Enhance property browsing with AI insights
 
 ## Research Findings
 
@@ -31,7 +31,7 @@ From API response at `/api/v1/models`, free models (`pricing.prompt: "0"`) inclu
 
 **Specialized**:
 - `nvidia/nemotron-3-nano-30b-a3b:free` - Trial only, logged prompts (privacy warning)
-- `allenai/molmo-2-8b:free` - **VISION-LANGUAGE MODEL** (image/video understanding)
+- `allenai/molmo-72b-0924` - **VISION-LANGUAGE MODEL** (image/video understanding)
   - **Capabilities**: Image analysis, object detection, counting, captioning, spatial grounding
   - **Context**: 36.9K tokens
   - **Performance**: State-of-the-art among open-weight vision models
@@ -69,7 +69,7 @@ From API response at `/api/v1/models`, free models (`pricing.prompt: "0"`) inclu
 5. `openai/gpt-oss-120b:free` - Coding tasks
 
 **Vision Model (Separate Pipeline)**:
-- `allenai/molmo-2-8b:free` - Used exclusively for image analysis tasks
+- `allenai/molmo-72b-0924` - Used exclusively for image analysis tasks
 - Input format: `{type: "image_url", image_url: {url: "..."}}`
 - Automatically selected when user asks about property photos or amenity detection
 
@@ -78,7 +78,7 @@ From API response at `/api/v1/models`, free models (`pricing.prompt: "0"`) inclu
 ### Image Source: Google Street View Static API
 
 **Decision Rationale**: (text)
-├── visionService.js           # Vision-specific service (Molmo2-8B)
+├── visionService.js           # Vision-specific service (Molmo 72B)
 ├── streetViewService.js       # Google Street View API client
 ├── config.js                  # Environment config (API keys** (only transaction metadata)
 - Google Street View provides free exterior photos for any address
@@ -123,7 +123,7 @@ const url = `https://maps.googleapis.com/maps/api/streetview` +
 // 1. Fetch Street View image URL
 const imageUrl = await getStreetViewUrl(property.address);
 
-// 2. Send to Molmo2-8B vision model for analysis
+// 2. Send to Molmo 72B vision model for analysis
 const visionAnalysis = await visionService.analyzeProperty(imageUrl, {
   prompt: `Analyze this property photo and provide:
     1. Exterior condition (excellent/good/fair/poor)
@@ -159,17 +159,25 @@ property.metadata.visionAnalysis = visionAnalysis;
 
 ## Architecture Design
 
-### Components
+### Implemented Lambda Services
+
+```
+lambda/src/
+├── ai-vision-analysis.ts        # Molmo 72B vision analysis
+└── ai-description-generator.ts  # Llama 3.3 70B descriptions
+```
+
+### Planned Chat Assistant (Future)
 
 ```
 src/ai-assistant/
-├── openRouterClient.js       # Low-level API client (model list, chat)
-├── modelSelector.js           # Model ranking/filtering logic
-├── cascadingService.js        # Retry/fallback orchestration
-├── chatAssistant.js           # High-level chat interface
-├── config.js                  # Environment config (API key)
-├── errors.js                  # Custom error types
-└── index.js                   # Barrel export
+├── openRouterClient.js
+├── modelSelector.js
+├── cascadingService.js
+├── chatAssistant.js
+├── config.js
+├── errors.js
+└── index.js
 ```
 
 ### Data Flow
@@ -416,7 +424,7 @@ console.log(techResponse.content);
 // Error handling
 try {
   const response = await chatAssistant.ask(veryLongQuestion);
-8. **Video Analysis**: Use Molmo2-8B for property walkthrough videos
+8. **Video Analysis**: Use Molmo 72B for property walkthrough videos
 9. **Multi-Image Analysis**: Compare multiple property photos simultaneously
 10. **Satellite View**: Integrate Google Maps satellite imagery for lot size analysis
 11. **Interior Photos**: If listing APIs become available, analyze interior condition
@@ -428,7 +436,7 @@ try {
 |-----------|--------|------|----------|-------|
 | Transaction Data | Connecticut Open Data Portal | Free | 1M+ properties (2001-2023) | Address, price, sale date, type |
 | Exterior Photos | Google Street View Static API | $200/mo free tier | Most US addresses | Street-level photography |
-| Vision Analysis | OpenRouter Molmo2-8B (free) | $0 | Unlimited | Condition, style, amenities |
+| Vision Analysis | OpenRouter Molmo 72B (free) | $0 | Unlimited | Condition, style, amenities |
 | Text Chat | OpenRouter Free LLMs | $0 | Unlimited (rate limited) | Q&A, app guidance |
 } catch (error) {
   if (error instanceof NoAvailableModelsError) {

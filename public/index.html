@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HomeHarbor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body class="bg-slate-50 text-slate-900" style="font-family: 'Inter', sans-serif;">
+    <header class="bg-slate-900 text-white">
+      <div class="mx-auto flex w-[min(1120px,92vw)] flex-wrap items-center justify-between gap-6 py-8">
+        <div>
+          <p class="text-sm uppercase tracking-[0.3em] text-emerald-300">HomeHarbor</p>
+          <h1 class="mt-2 text-3xl font-semibold md:text-4xl">
+            AI-Powered Real Estate Search
+          </h1>
+          <p class="mt-2 max-w-2xl text-slate-300">
+            Beautiful, compliant real estate search using legal data sources and
+            free AI models.
+          </p>
+        </div>
+        <button
+          id="help-button"
+          class="rounded-full border border-emerald-400/40 px-5 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/10"
+          type="button"
+        >
+          Help &amp; Guides
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto w-[min(1120px,92vw)] space-y-8 py-10">
+      <section class="rounded-2xl bg-white p-6 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold">Search Properties</h2>
+            <p class="text-sm text-slate-500">
+              Filter by location, price, and property details.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+              Legal + Free Data
+            </span>
+            <span class="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">
+              Connecticut-only demo
+            </span>
+          </div>
+        </div>
+        <form id="search-form" class="mt-6 space-y-4">
+          <div class="grid gap-4 md:grid-cols-4">
+            <label class="text-sm font-medium text-slate-600">
+              City
+              <div class="relative">
+                <input
+                  class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                  type="text"
+                  name="city"
+                  placeholder="Hartford"
+                  list="city-suggestions"
+                  autocomplete="off"
+                />
+                <div
+                  id="city-dropdown"
+                  class="absolute z-10 mt-1 hidden w-full rounded-xl border border-slate-200 bg-white shadow-lg"
+                ></div>
+              </div>
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Min Price
+              <input
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                type="number"
+                name="minPrice"
+                placeholder="100000"
+              />
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Max Price
+              <input
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                type="number"
+                name="maxPrice"
+                placeholder="500000"
+              />
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Property Type
+              <input
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                type="text"
+                name="propertyType"
+                placeholder="Residential"
+              />
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Residential Type
+              <input
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                type="text"
+                name="residentialType"
+                placeholder="Single Family"
+              />
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Sort By
+              <select
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                name="sortBy"
+              >
+                <option value="">None</option>
+                <option value="price">Price</option>
+                <option value="assessedValue">Assessed Value</option>
+                <option value="saleDate">Sale Date</option>
+                <option value="city">City</option>
+              </select>
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Sort Order
+              <select
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                name="sortOrder"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </label>
+            <label class="text-sm font-medium text-slate-600">
+              Page Size
+              <select
+                class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                name="pageSize"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </label>
+          </div>
+          <button
+            class="rounded-full bg-emerald-600 px-6 py-2 text-sm font-semibold text-white shadow"
+            type="submit"
+          >
+            Search
+          </button>
+        </form>
+        <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <span class="font-semibold text-slate-600">Suggested cities:</span>
+          <div id="city-chips" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          <strong>Demo coverage:</strong> This prototype only includes Connecticut transactions.
+          Try Hartford, Stamford, or New Haven.
+        </div>
+        <datalist id="city-suggestions"></datalist>
+        <div
+          class="mt-4 text-sm text-slate-500"
+          id="status"
+          role="status"
+          aria-live="polite"
+        ></div>
+        <div
+          id="search-progress"
+          class="mt-2 hidden items-center gap-2 text-xs font-semibold text-emerald-700"
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            class="h-4 w-4 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-600"
+            aria-hidden="true"
+          ></span>
+          <span>Searching properties...</span>
+        </div>
+      </section>
+
+      <section class="rounded-2xl bg-white p-6 shadow-lg">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Results</h2>
+          <span class="text-sm text-slate-500">Live from CT data</span>
+        </div>
+        <div id="results" class="mt-4 grid gap-4 md:grid-cols-2"></div>
+        <div class="mt-4 flex items-center gap-3 text-sm text-slate-500" id="pagination"></div>
+      </section>
+
+      <section class="rounded-2xl bg-white p-6 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">Ask HomeHarbor</h2>
+            <p class="text-sm text-slate-500">AI assistance using OpenRouter.</p>
+          </div>
+          <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">AI</span>
+        </div>
+        <form id="chat-form" class="mt-4 space-y-3">
+          <textarea
+            class="w-full rounded-lg border border-slate-200 px-3 py-2"
+            name="message"
+            rows="3"
+            placeholder="Ask about the market or search tips..."
+          ></textarea>
+          <button
+            class="rounded-full bg-slate-900 px-6 py-2 text-sm font-semibold text-white"
+            type="submit"
+          >
+            Send
+          </button>
+        </form>
+        <div
+          id="chat-response"
+          class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700"
+        ></div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto w-[min(1120px,92vw)] space-y-2 py-6 text-sm text-slate-500">
+        <div>
+          Data sources: Redfin Data Center, Connecticut Open Data, Google Street View. AI
+          via OpenRouter free tier.
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+          <span class="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-500">
+            Official listing links
+          </span>
+          <span>
+            Links open Realtor.com listing pages. HomeHarbor is not affiliated with
+            Realtor.com.
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      id="help-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4"
+    >
+      <div class="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="text-xl font-semibold text-slate-900">HomeHarbor Help</h3>
+            <p class="text-sm text-slate-500">
+              Guides for users and recruiters.
+            </p>
+          </div>
+          <button
+            id="help-close"
+            class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600"
+          >
+            Close
+          </button>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button
+            id="help-tab-user"
+            class="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white"
+            type="button"
+          >
+            User Guide
+          </button>
+          <button
+            id="help-tab-dev"
+            class="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600"
+            type="button"
+          >
+            Developer Guide
+          </button>
+        </div>
+        <div id="help-content" class="mt-4 space-y-3 text-sm text-slate-600"></div>
+      </div>
+    </div>
+
+    <script>
+      window.HOME_HARBOR_CONFIG = {
+        apiBaseUrl: '',
+        mode: 'single-file',
+      };
+
+      window.HOME_HARBOR_HELP = {
+        user: {
+          title: 'User Guide',
+          sections: [
+            {
+              heading: 'Search properties',
+              body:
+                'Use the filters to narrow by city, price range, and property type. Click “Search” to refresh results.',
+            },
+            {
+              heading: 'City autocomplete',
+              body:
+                'The City field suggests Connecticut locations from the dataset. Start typing and choose a suggestion or press Tab to auto-complete.',
+            },
+            {
+              heading: 'Review results',
+              body:
+                'Each card shows price, city, and property type. Click “View details” to reveal sale date and metadata.',
+            },
+            {
+              heading: 'Single-file mode',
+              body:
+                'This demo runs entirely from this HTML file. No server is required.',
+            },
+            {
+              heading: 'Official listing links',
+              body:
+                'Listing cards include Realtor.com link-outs for official details. HomeHarbor is not affiliated with Realtor.com.',
+            },
+            {
+              heading: 'AI insights (optional)',
+              body:
+                'AI features require an API base URL and keys. In single-file mode they are disabled.',
+            },
+          ],
+        },
+        developer: {
+          title: 'Developer Guide (Recruiter Focus)',
+          sections: [
+            {
+              heading: 'Staff-level architecture',
+              body:
+                'Serverless pipeline with AWS Lambda, DynamoDB, S3, CloudFront, EventBridge, and Secrets Manager. Data ingestion is decoupled from API delivery with cache-aware AI workflows.',
+            },
+            {
+              heading: 'Data sourcing & compliance',
+              body:
+                'Uses legal public datasets (Redfin Data Center + CT Open Data) and Google Street View for imagery. No scraping or ToS violations.',
+            },
+            {
+              heading: 'Realtor.com link-outs',
+              body:
+                'Listing cards link to public Realtor.com results pages. HomeHarbor does not reuse Realtor.com data or imply affiliation.',
+            },
+            {
+              heading: 'AI integration',
+              body:
+                'OpenRouter for model orchestration: Molmo 72B vision analysis and Llama 3.3 70B descriptions. Outputs cached in DynamoDB with TTL.',
+            },
+            {
+              heading: 'Single-file UI delivery',
+              body:
+                'The app must run directly from a single HTML file (file://). No local server is required or assumed.',
+            },
+            {
+              heading: 'Quality & engineering practices',
+              body:
+                'TDD-first property search module, lint rules for <100-line files, and detailed documentation for onboarding and deployment.',
+            },
+            {
+              heading: 'What to review',
+              body:
+                'See QUICKSTART.md, IMPLEMENTATION_SUMMARY.md, docs/DATA_SOURCES.md, and the Lambda functions in lambda/src/.',
+            },
+          ],
+        },
+      };
+
+      window.HOME_HARBOR_DATA = [
+        {
+          id: '1000001',
+          address: '123 Main St',
+          city: 'Hartford',
+          price: 300000,
+          metadata: {
+            assessedValue: 180000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '01/15/2023',
+            serialNumber: '1000001',
+            location: '41.7637,-72.6851',
+          },
+        },
+        {
+          id: '1000002',
+          address: '45 Oak Ave',
+          city: 'Hartford',
+          price: 250000,
+          metadata: {
+            assessedValue: 140000,
+            propertyType: 'Residential',
+            residentialType: 'Condo',
+            saleDate: '02/10/2023',
+            serialNumber: '1000002',
+            location: '41.7648,-72.6734',
+          },
+        },
+        {
+          id: '1000003',
+          address: '78 Elm St',
+          city: 'West Hartford',
+          price: 375000,
+          metadata: {
+            assessedValue: 210000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '03/05/2023',
+            serialNumber: '1000003',
+            location: '41.7620,-72.7420',
+          },
+        },
+        {
+          id: '1000004',
+          address: '12 Chapel St',
+          city: 'New Haven',
+          price: 190000,
+          metadata: {
+            assessedValue: 95000,
+            propertyType: 'Residential',
+            residentialType: 'Condo',
+            saleDate: '03/22/2023',
+            serialNumber: '1000004',
+            location: '41.3083,-72.9279',
+          },
+        },
+        {
+          id: '1000005',
+          address: '800 Atlantic St',
+          city: 'Stamford',
+          price: 465000,
+          metadata: {
+            assessedValue: 265000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '04/11/2023',
+            serialNumber: '1000005',
+            location: '41.0534,-73.5387',
+          },
+        },
+        {
+          id: '1000006',
+          address: '9 Water St',
+          city: 'Norwalk',
+          price: 395000,
+          metadata: {
+            assessedValue: 220000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '05/02/2023',
+            serialNumber: '1000006',
+            location: '41.1177,-73.4082',
+          },
+        },
+        {
+          id: '1000007',
+          address: '300 Park Ave',
+          city: 'Bridgeport',
+          price: 210000,
+          metadata: {
+            assessedValue: 120000,
+            propertyType: 'Residential',
+            residentialType: 'Two Family',
+            saleDate: '05/19/2023',
+            serialNumber: '1000007',
+            location: '41.1865,-73.1952',
+          },
+        },
+        {
+          id: '1000008',
+          address: '25 Shore Rd',
+          city: 'Milford',
+          price: 320000,
+          metadata: {
+            assessedValue: 175000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '06/01/2023',
+            serialNumber: '1000008',
+            location: '41.2223,-73.0565',
+          },
+        },
+        {
+          id: '1000009',
+          address: '15 Maple Dr',
+          city: 'Danbury',
+          price: 285000,
+          metadata: {
+            assessedValue: 160000,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '06/18/2023',
+            serialNumber: '1000009',
+            location: '41.3948,-73.4540',
+          },
+        },
+        {
+          id: '1000010',
+          address: '210 High St',
+          city: 'New Britain',
+          price: 205000,
+          metadata: {
+            assessedValue: 110000,
+            propertyType: 'Residential',
+            residentialType: 'Condo',
+            saleDate: '07/07/2023',
+            serialNumber: '1000010',
+            location: '41.6612,-72.7795',
+          },
+        },
+      ];
+
+      window.HOME_HARBOR_CITIES = [
+        'Bridgeport',
+        'Danbury',
+        'Hartford',
+        'Milford',
+        'New Britain',
+        'New Haven',
+        'Norwalk',
+        'Stamford',
+        'West Hartford',
+      ];
+    </script>
+    <script>
+      const form = document.getElementById('search-form');
+      const statusEl = document.getElementById('status');
+      const resultsEl = document.getElementById('results');
+      const paginationEl = document.getElementById('pagination');
+      const chatForm = document.getElementById('chat-form');
+      const chatResponseEl = document.getElementById('chat-response');
+      const statusArea = document.getElementById('status');
+      const helpButton = document.getElementById('help-button');
+      const helpModal = document.getElementById('help-modal');
+      const helpClose = document.getElementById('help-close');
+      const helpTabUser = document.getElementById('help-tab-user');
+      const helpTabDev = document.getElementById('help-tab-dev');
+      const helpContent = document.getElementById('help-content');
+      const citySuggestions = document.getElementById('city-suggestions');
+      const cityDropdown = document.getElementById('city-dropdown');
+      const cityChips = document.getElementById('city-chips');
+      const cityInput = form?.querySelector('input[name="city"]');
+      const searchButton = form?.querySelector('button[type="submit"]');
+      const searchProgress = document.getElementById('search-progress');
+
+      let aiReady = false;
+
+      let currentPage = 1;
+      let currentQuery = {};
+
+      const localData = Array.isArray(window.HOME_HARBOR_DATA)
+        ? window.HOME_HARBOR_DATA
+        : [];
+
+      function getApiBase() {
+        return window.HOME_HARBOR_CONFIG?.apiBaseUrl || '';
+      }
+
+      function setStatus(message, tone = 'info') {
+        if (!statusEl) return;
+        statusEl.textContent = message || '';
+        statusEl.classList.remove('text-slate-500', 'text-emerald-700', 'text-rose-600');
+        if (tone === 'success') {
+          statusEl.classList.add('text-emerald-700');
+          return;
+        }
+        if (tone === 'error') {
+          statusEl.classList.add('text-rose-600');
+          return;
+        }
+        statusEl.classList.add('text-slate-500');
+      }
+
+      function setLoading(isLoading) {
+        if (searchButton) {
+          searchButton.disabled = isLoading;
+          searchButton.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+          searchButton.textContent = isLoading ? 'Searching...' : 'Search';
+          searchButton.classList.toggle('opacity-70', isLoading);
+          searchButton.classList.toggle('cursor-wait', isLoading);
+        }
+        if (searchProgress) {
+          searchProgress.classList.toggle('hidden', !isLoading);
+          searchProgress.classList.toggle('flex', isLoading);
+        }
+      }
+
+      function setAiStatus(message) {
+        if (statusArea) {
+          statusArea.textContent = message;
+        }
+      }
+
+      function renderHelpContent(type) {
+        const guide = window.HOME_HARBOR_HELP?.[type];
+        if (!guide || !helpContent) return;
+
+        helpContent.innerHTML = `
+          <h4 class="text-base font-semibold text-slate-900">${guide.title}</h4>
+          ${guide.sections
+            .map(
+              (section) => `
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p class="text-sm font-semibold text-slate-800">${section.heading}</p>
+                <p class="mt-1 text-sm text-slate-600">${section.body}</p>
+              </div>
+            `
+            )
+            .join('')}
+        `;
+      }
+
+      function openHelp(type) {
+        if (!helpModal) return;
+        helpModal.classList.remove('hidden');
+        helpModal.classList.add('flex');
+        renderHelpContent(type);
+
+        if (type === 'user') {
+          helpTabUser.className =
+            'rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white';
+          helpTabDev.className =
+            'rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600';
+        } else {
+          helpTabDev.className =
+            'rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white';
+          helpTabUser.className =
+            'rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600';
+        }
+      }
+
+      function closeHelp() {
+        if (!helpModal) return;
+        helpModal.classList.add('hidden');
+        helpModal.classList.remove('flex');
+      }
+
+      function formatCurrency(value) {
+        if (value === undefined || value === null) return 'N/A';
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0,
+        }).format(value);
+      }
+
+      function renderResults(data) {
+        resultsEl.innerHTML = '';
+
+        if (!data.length) {
+          resultsEl.innerHTML =
+            '<div class="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">No properties found. This demo uses Connecticut data—try Hartford, Stamford, or New Haven.</div>';
+          return;
+        }
+
+        data.forEach((property) => {
+          const card = document.createElement('div');
+          card.className =
+            'rounded-2xl border border-slate-200 bg-slate-50/60 p-5 shadow-sm';
+
+          const title = document.createElement('h3');
+          title.textContent = property.address;
+          title.className = 'text-base font-semibold text-slate-900';
+
+          const price = document.createElement('p');
+          price.textContent = `Price: ${formatCurrency(property.price)}`;
+          price.className = 'text-sm text-slate-600';
+
+          const details = document.createElement('p');
+          details.textContent = `City: ${property.city} | Type: ${property.metadata?.propertyType || 'N/A'}`;
+          details.className = 'text-sm text-slate-500';
+
+          const realtorLink = document.createElement('a');
+          realtorLink.href = `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(property.address)}`;
+          realtorLink.target = '_blank';
+          realtorLink.rel = 'noopener noreferrer';
+          realtorLink.textContent = 'View on Realtor.com';
+          realtorLink.className =
+            'text-xs font-semibold text-emerald-700 hover:underline';
+
+          const assessed = document.createElement('p');
+          assessed.textContent = `Assessed: ${formatCurrency(property.metadata?.assessedValue)}`;
+          assessed.className = 'text-sm text-slate-500';
+
+          const detailButton = document.createElement('button');
+          detailButton.type = 'button';
+          detailButton.textContent = 'View details';
+          detailButton.className =
+            'rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white';
+
+          const detailPanel = document.createElement('div');
+          detailPanel.className =
+            'mt-3 rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-600';
+          detailPanel.hidden = true;
+
+          const aiPanel = document.createElement('div');
+          aiPanel.className =
+            'mt-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-900';
+          aiPanel.hidden = true;
+
+          const visionButton = document.createElement('button');
+          visionButton.type = 'button';
+          visionButton.textContent = 'Analyze photo';
+          visionButton.className =
+            'rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white';
+
+          const descriptionButton = document.createElement('button');
+          descriptionButton.type = 'button';
+          descriptionButton.textContent = 'Generate description';
+          descriptionButton.className =
+            'rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white';
+
+          detailButton.addEventListener('click', async () => {
+            if (!detailPanel.hidden) {
+              detailPanel.hidden = true;
+              detailButton.textContent = 'View details';
+              return;
+            }
+
+            detailButton.textContent = 'Loading...';
+            if (!getApiBase()) {
+              detailPanel.innerHTML = `
+                <p><strong>Address:</strong> ${property.address}</p>
+                <p><strong>Sale Date:</strong> ${property.metadata?.saleDate || 'N/A'}</p>
+                <p><strong>Residential Type:</strong> ${property.metadata?.residentialType || 'N/A'}</p>
+                <p><strong>Serial Number:</strong> ${property.metadata?.serialNumber || 'N/A'}</p>
+              `;
+              detailPanel.hidden = false;
+              detailButton.textContent = 'Hide details';
+              return;
+            }
+            const response = await fetch(
+              `${getApiBase()}/api/properties/${property.id}`
+            );
+            const detailData = await response.json();
+
+            if (!response.ok) {
+              detailPanel.textContent =
+                detailData.error || 'Failed to load details';
+            } else {
+              detailPanel.innerHTML = `
+                <p><strong>Address:</strong> ${detailData.address}</p>
+                <p><strong>Sale Date:</strong> ${detailData.metadata?.saleDate || 'N/A'}</p>
+                <p><strong>Residential Type:</strong> ${detailData.metadata?.residentialType || 'N/A'}</p>
+                <p><strong>Serial Number:</strong> ${detailData.metadata?.serialNumber || 'N/A'}</p>
+              `;
+            }
+
+            detailPanel.hidden = false;
+            aiPanel.hidden = false;
+            detailButton.textContent = 'Hide details';
+          });
+
+          visionButton.addEventListener('click', async () => {
+            if (!aiReady || !getApiBase()) {
+              aiPanel.hidden = false;
+              aiPanel.textContent =
+                'AI is disabled in single-file mode. Configure an API base URL to enable it.';
+              return;
+            }
+            aiPanel.hidden = false;
+            aiPanel.innerHTML = 'Analyzing photo...';
+
+            const response = await fetch(`${getApiBase()}/api/vision`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ propertyId: property.id }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+              aiPanel.textContent = data.error || 'Vision analysis failed';
+              return;
+            }
+
+            aiPanel.innerHTML = `
+              <p><strong>Image URL:</strong> <a href="${data.imageUrl}" target="_blank">View</a></p>
+              <p><strong>Style:</strong> ${data.insights.architectural_style || 'N/A'}</p>
+              <p><strong>Condition:</strong> ${data.insights.exterior_condition || 'N/A'}</p>
+              <p><strong>Curb appeal:</strong> ${data.insights.curb_appeal_score || 'N/A'}</p>
+              <p><strong>Features:</strong> ${(data.insights.visible_features || []).join(', ')}</p>
+            `;
+          });
+
+          descriptionButton.addEventListener('click', async () => {
+            if (!aiReady || !getApiBase()) {
+              aiPanel.hidden = false;
+              aiPanel.textContent =
+                'AI is disabled in single-file mode. Configure an API base URL to enable it.';
+              return;
+            }
+            aiPanel.hidden = false;
+            aiPanel.innerHTML = 'Generating description...';
+
+            const response = await fetch(`${getApiBase()}/api/describe`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ propertyId: property.id }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+              aiPanel.textContent = data.error || 'Description failed';
+              return;
+            }
+
+            aiPanel.innerHTML = `
+              <h4>${data.description.headline || 'Listing Summary'}</h4>
+              <p>${data.description.summary || ''}</p>
+              <ul>${(data.description.highlights || [])
+                .map((item) => `<li>${item}</li>`)
+                .join('')}</ul>
+            `;
+          });
+
+          card.append(
+            title,
+            price,
+            details,
+            realtorLink,
+            assessed,
+            detailButton,
+            detailPanel,
+            visionButton,
+            descriptionButton,
+            aiPanel
+          );
+          resultsEl.appendChild(card);
+        });
+      }
+
+      function renderPagination(meta) {
+        paginationEl.innerHTML = '';
+
+        const info = document.createElement('span');
+        info.textContent = `Page ${meta.page} of ${meta.totalPages} (${meta.totalItems} results)`;
+
+        const prev = document.createElement('button');
+        prev.textContent = 'Prev';
+        prev.disabled = !meta.hasPrevPage;
+        prev.addEventListener('click', () => {
+          if (!meta.hasPrevPage) return;
+          currentPage -= 1;
+          fetchResults();
+        });
+
+        const next = document.createElement('button');
+        next.textContent = 'Next';
+        next.disabled = !meta.hasNextPage;
+        next.addEventListener('click', () => {
+          if (!meta.hasNextPage) return;
+          currentPage += 1;
+          fetchResults();
+        });
+
+        paginationEl.append(prev, info, next);
+      }
+
+      function filterLocalData(data, query) {
+        const cityQuery = query.city?.trim().toLowerCase();
+        const propertyQuery = query.propertyType?.trim().toLowerCase();
+        const residentialQuery = query.residentialType?.trim().toLowerCase();
+
+        return data.filter((item) => {
+          if (cityQuery && !item.city.toLowerCase().startsWith(cityQuery)) {
+            return false;
+          }
+          if (query.minPrice !== undefined && query.minPrice !== null) {
+            if (item.price < query.minPrice) return false;
+          }
+          if (query.maxPrice !== undefined && query.maxPrice !== null) {
+            if (item.price > query.maxPrice) return false;
+          }
+          if (propertyQuery) {
+            const typeValue = item.metadata?.propertyType?.toLowerCase() || '';
+            if (!typeValue.includes(propertyQuery)) return false;
+          }
+          if (residentialQuery) {
+            const residentialValue =
+              item.metadata?.residentialType?.toLowerCase() || '';
+            if (!residentialValue.includes(residentialQuery)) return false;
+          }
+          return true;
+        });
+      }
+
+      function sortLocalData(data, sortBy, sortOrder) {
+        if (!sortBy) return data;
+        const direction = sortOrder === 'desc' ? -1 : 1;
+
+        return [...data].sort((a, b) => {
+          let valueA;
+          let valueB;
+
+          switch (sortBy) {
+            case 'price':
+              valueA = a.price;
+              valueB = b.price;
+              break;
+            case 'assessedValue':
+              valueA = a.metadata?.assessedValue;
+              valueB = b.metadata?.assessedValue;
+              break;
+            case 'saleDate':
+              valueA = a.metadata?.saleDate
+                ? new Date(a.metadata.saleDate).getTime()
+                : 0;
+              valueB = b.metadata?.saleDate
+                ? new Date(b.metadata.saleDate).getTime()
+                : 0;
+              break;
+            case 'city':
+              valueA = a.city;
+              valueB = b.city;
+              break;
+            default:
+              valueA = a[sortBy];
+              valueB = b[sortBy];
+          }
+
+          if (valueA === valueB) return 0;
+          if (valueA === undefined || valueA === null) return 1;
+          if (valueB === undefined || valueB === null) return -1;
+
+          if (valueA > valueB) return direction;
+          if (valueA < valueB) return -direction;
+          return 0;
+        });
+      }
+
+      function paginateLocalData(data, page, pageSize) {
+        const totalItems = data.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+        const safePage = Math.min(Math.max(page, 1), totalPages);
+        const startIndex = (safePage - 1) * pageSize;
+        const pagedData = data.slice(startIndex, startIndex + pageSize);
+
+        return {
+          data: pagedData,
+          meta: {
+            page: safePage,
+            totalPages,
+            totalItems,
+            hasPrevPage: safePage > 1,
+            hasNextPage: safePage < totalPages,
+          },
+        };
+      }
+
+      async function fetchResults() {
+        setStatus('Searching properties...', 'info');
+        setLoading(true);
+
+        if (!getApiBase()) {
+          window.setTimeout(() => {
+            try {
+              const filtered = filterLocalData(localData, currentQuery);
+              const sorted = sortLocalData(
+                filtered,
+                currentQuery.sortBy,
+                currentQuery.sortOrder
+              );
+              const { data, meta } = paginateLocalData(
+                sorted,
+                currentPage,
+                currentQuery.pageSize || 10
+              );
+              renderResults(data);
+              renderPagination(meta);
+              setStatus(
+                meta.totalItems
+                  ? `Loaded ${meta.totalItems} properties`
+                  : 'No properties found. Adjust filters and try again.',
+                meta.totalItems ? 'success' : 'error'
+              );
+            } catch (error) {
+              setStatus(
+                `Search failed: ${error.message || 'Unexpected error.'}`,
+                'error'
+              );
+            } finally {
+              setLoading(false);
+            }
+          }, 120);
+          return;
+        }
+
+        try {
+          const params = new URLSearchParams({
+            ...currentQuery,
+            page: currentPage,
+          });
+
+          const response = await fetch(
+            `${getApiBase()}/api/properties?${params.toString()}`
+          );
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(data.error || 'Failed to load properties', 'error');
+            return;
+          }
+
+          renderResults(data.data);
+          renderPagination(data);
+          setStatus(`Loaded ${data.data.length} properties`, 'success');
+        } catch (error) {
+          setStatus(`Failed to load properties: ${error.message}`, 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      async function fetchConfig() {
+        if (!getApiBase()) {
+          aiReady = false;
+          setAiStatus('AI disabled in single-file mode.');
+          return;
+        }
+
+        try {
+          const response = await fetch(`${getApiBase()}/api/config`);
+          const data = await response.json();
+          aiReady = Boolean(data.aiReady);
+
+          if (!aiReady) {
+            setAiStatus(
+              `AI disabled. Missing keys: ${data.missingKeys.join(', ')}`
+            );
+          }
+        } catch (error) {
+          setAiStatus('Unable to load AI configuration.');
+        }
+      }
+
+      const fallbackCities = Array.isArray(window.HOME_HARBOR_CITIES)
+        ? window.HOME_HARBOR_CITIES
+        : Array.from(new Set(localData.map((item) => item.city))).sort();
+
+      let availableCities = [...fallbackCities];
+
+      function normalizeCity(value) {
+        return value.trim().toLowerCase();
+      }
+
+      function hideCityDropdown() {
+        if (!cityDropdown) return;
+        cityDropdown.classList.add('hidden');
+        cityDropdown.innerHTML = '';
+      }
+
+      function setCityValue(value) {
+        if (!cityInput) return;
+        cityInput.value = value;
+        hideCityDropdown();
+        cityInput.focus();
+      }
+
+      function getCityMatches(query) {
+        if (!query) return [];
+        const normalized = normalizeCity(query);
+        return availableCities.filter((city) =>
+          city.toLowerCase().startsWith(normalized)
+        );
+      }
+
+      function renderCityDropdown(matches) {
+        if (!cityDropdown) return;
+
+        if (!matches.length) {
+          hideCityDropdown();
+          return;
+        }
+
+        cityDropdown.innerHTML = '';
+        matches.slice(0, 6).forEach((city) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className =
+            'flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-700 hover:bg-emerald-50';
+          button.dataset.city = city;
+          button.textContent = city;
+          button.addEventListener('click', () => setCityValue(city));
+          cityDropdown.appendChild(button);
+        });
+
+        cityDropdown.classList.remove('hidden');
+      }
+
+      function updateCityDropdown() {
+        if (!cityInput) return;
+        const query = cityInput.value.trim();
+
+        if (!query) {
+          hideCityDropdown();
+          return;
+        }
+
+        const matches = getCityMatches(query);
+        renderCityDropdown(matches);
+      }
+
+      function renderCitySuggestions(cities) {
+        if (!citySuggestions) return;
+        citySuggestions.innerHTML = cities
+          .map((city) => `<option value="${city}"></option>`)
+          .join('');
+      }
+
+      function renderCityChips(cities) {
+        if (!cityChips) return;
+
+        const topCities = cities.slice(0, 8);
+        cityChips.innerHTML = topCities
+          .map(
+            (city) =>
+              `<button type="button" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-200" data-city="${city}">${city}</button>`
+          )
+          .join('');
+
+        cityChips.querySelectorAll('button').forEach((button) => {
+          button.addEventListener('click', () => {
+            const selectedCity = button.dataset.city || '';
+            setCityValue(selectedCity);
+          });
+        });
+      }
+
+      function setCityList(cities) {
+        availableCities =
+          Array.isArray(cities) && cities.length ? cities : fallbackCities;
+        renderCitySuggestions(availableCities);
+        renderCityChips(availableCities);
+      }
+
+      async function fetchCitySuggestions() {
+        if (!citySuggestions) return;
+
+        if (!getApiBase()) {
+          setCityList(fallbackCities);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${getApiBase()}/api/cities`);
+          const data = await response.json();
+
+          if (!response.ok || !Array.isArray(data.cities) || !data.cities.length) {
+            setCityList(fallbackCities);
+            return;
+          }
+
+          setCityList(data.cities);
+        } catch (error) {
+          setCityList(fallbackCities);
+        }
+      }
+
+      function parseNumberValue(value) {
+        if (value === '' || value === undefined || value === null) return null;
+        const parsed = Number(value);
+        return Number.isNaN(parsed) ? null : parsed;
+      }
+
+      function validateQuery(query) {
+        const errors = [];
+        if (query.minPrice !== null && query.minPrice < 0) {
+          errors.push('Min price cannot be negative.');
+        }
+        if (query.maxPrice !== null && query.maxPrice < 0) {
+          errors.push('Max price cannot be negative.');
+        }
+        if (
+          query.minPrice !== null &&
+          query.maxPrice !== null &&
+          query.minPrice > query.maxPrice
+        ) {
+          errors.push('Min price must be less than or equal to max price.');
+        }
+        return errors;
+      }
+
+      if (cityInput) {
+        if (cityInput.hasAttribute('list')) {
+          cityInput.removeAttribute('list');
+        }
+
+        cityInput.addEventListener('input', updateCityDropdown);
+        cityInput.addEventListener('focus', updateCityDropdown);
+        cityInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Tab') {
+            const query = cityInput.value.trim();
+            const matches = getCityMatches(query);
+            if (matches.length) {
+              const nextCity = matches[0];
+              if (normalizeCity(nextCity) !== normalizeCity(query)) {
+                event.preventDefault();
+                setCityValue(nextCity);
+              }
+            }
+            return;
+          }
+
+          if (event.key === 'Escape') {
+            hideCityDropdown();
+          }
+        });
+
+        cityInput.addEventListener('blur', () => {
+          setTimeout(hideCityDropdown, 120);
+        });
+      }
+
+      if (cityDropdown) {
+        cityDropdown.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+        });
+      }
+
+      document.addEventListener('click', (event) => {
+        if (!cityInput || !cityDropdown) return;
+        const target = event.target;
+        if (
+          target &&
+          (cityInput.contains(target) || cityDropdown.contains(target))
+        ) {
+          return;
+        }
+        hideCityDropdown();
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const query = {};
+
+        formData.forEach((value, key) => {
+          if (value !== '') {
+            query[key] = value;
+          }
+        });
+
+        const normalizedQuery = {
+          ...query,
+          minPrice: parseNumberValue(query.minPrice),
+          maxPrice: parseNumberValue(query.maxPrice),
+          pageSize: Number(query.pageSize || 10),
+        };
+
+        const errors = validateQuery(normalizedQuery);
+        if (errors.length) {
+          setStatus(errors.join(' '), 'error');
+          setLoading(false);
+          return;
+        }
+
+        currentQuery = normalizedQuery;
+
+        currentPage = 1;
+        fetchResults();
+      });
+
+      chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!getApiBase()) {
+          chatResponseEl.textContent =
+            'Chat is disabled in single-file mode. Configure an API base URL to enable it.';
+          return;
+        }
+
+        chatResponseEl.textContent = 'Thinking...';
+
+        const message = chatForm.message.value.trim();
+        if (!message) {
+          chatResponseEl.textContent = 'Please enter a question.';
+          return;
+        }
+
+        const response = await fetch(`${getApiBase()}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          chatResponseEl.textContent = data.error || 'Chat failed.';
+          return;
+        }
+
+        chatResponseEl.textContent = `${data.message} (model: ${data.model})`;
+      });
+
+      if (helpButton) {
+        helpButton.addEventListener('click', () => openHelp('user'));
+      }
+
+      if (helpClose) {
+        helpClose.addEventListener('click', closeHelp);
+      }
+
+      if (helpTabUser) {
+        helpTabUser.addEventListener('click', () => openHelp('user'));
+      }
+
+      if (helpTabDev) {
+        helpTabDev.addEventListener('click', () => openHelp('developer'));
+      }
+
+      fetchConfig();
+      fetchCitySuggestions();
+      fetchResults().catch((error) => {
+        setStatus(`Failed to load properties: ${error.message}`, 'error');
+        setLoading(false);
+      });
+    </script>
+  </body>
+</html>

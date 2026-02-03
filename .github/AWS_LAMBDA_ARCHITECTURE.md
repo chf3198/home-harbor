@@ -44,39 +44,39 @@
                │ HTTPS Requests
                ▼
 ┌─────────────────────────────────────┐
-│   AWS Lambda Function URLs          │
-│   - Direct HTTP endpoints           │
-│   - No API Gateway needed           │
-│   - ~$0.20/million requests         │
+│   AWS Lambda + API Gateway          │
+│   - HTTP endpoints                  │
+│   - Scheduled ETL via EventBridge   │
 ├─────────────────────────────────────┤
 │   Lambda Functions:                 │
-│   ├─ getProperties()                │
-│   ├─ searchProperties()             │
-│   ├─ createProperty()               │
-│   ├─ uploadImage()                  │
-│   └─ getUserFavorites()             │
+│   ├─ redfin-ingestion()             │
+│   ├─ ct-socrata-etl()               │
+│   ├─ street-view-fetch()            │
+│   ├─ ai-vision-analysis()           │
+│   └─ ai-description-generator()     │
 └──────────────┬──────────────────────┘
                │
-               │ Data Access
+               │ Data Access + Cache
                ▼
 ┌─────────────────────────────────────┐
-│   Amazon RDS PostgreSQL             │
-│   - Managed database                │
-│   - Automated backups               │
-│   - ~$15/month (db.t3.micro)        │
+│   Amazon DynamoDB                   │
+│   - properties, market_metrics      │
+│   - ai_insights cache (TTL)         │
+│   - ~$0 (free tier)                 │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
-│   Amazon S3 (Images)                │
-│   - Property photos                 │
-│   - ~$1/month                       │
+│   Amazon S3 + CloudFront            │
+│   - Raw datasets + cached images    │
+│   - Global CDN for photos           │
+│   - ~$1/month (mostly free)         │
 └─────────────────────────────────────┘
 ```
 
-**Total Monthly Cost**: ~$17/month  
-**AWS Services Used**: 4 core services  
-**Demonstrates**: Serverless, databases, storage, CDN  
-**Free Tier**: First 12 months mostly free with your credits
+**Total Monthly Cost**: ~$1–$2/month  
+**AWS Services Used**: Lambda, API Gateway, DynamoDB, S3, CloudFront, EventBridge, Secrets Manager  
+**Demonstrates**: Serverless ETL, caching, CDN delivery, AI integration  
+**Free Tier**: Nearly all usage within free tier
 
 ---
 
@@ -87,11 +87,12 @@
 **Best for**: Demonstrating Lambda fundamentals without API Gateway complexity
 
 **Stack:**
-- Frontend: S3 static website
-- Backend: Lambda with Function URLs (direct HTTP)
-- Database: RDS PostgreSQL (or Aurora Serverless)
-- Storage: S3 for images
-- Deployment: AWS SAM CLI
+- Frontend: S3 static website + CloudFront
+- Backend: Lambda + API Gateway
+- Database: DynamoDB (properties + metrics + AI cache)
+- Storage: S3 for raw data + images
+- Scheduling: EventBridge for ETL
+- Deployment: AWS SAM or scripts
 
 **Key Advantages:**
 - ✅ No API Gateway needed (saves money & complexity)

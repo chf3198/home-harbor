@@ -1,0 +1,182 @@
+<h1>HomeHarbor Instruction Document</h1>
+<h2>Purpose</h2>
+<p>This document provides a comprehensive, end-to-end view of the HomeHarbor project: the app design, tools used, and the iterative workflow that drives delivery from concept to production.</p>
+<hr>
+<h1>1. App Design (Big Picture)</h1>
+<h2>1.1 Goals</h2>
+<ul>
+<li>Build a professional-grade real estate search experience using <strong>real-world data</strong>.</li>
+<li>Demonstrate staff-level engineering practices: <strong>TDD, clean architecture, strong docs, and automation</strong>.</li>
+<li>Enhance the product with <strong>AI-powered assistance</strong> and <strong>vision-based property insights</strong> at <strong>$0 cost</strong> using free-tier services.</li>
+</ul>
+<h2>1.2 Core Capabilities</h2>
+<ul>
+<li><strong>Property search and filtering</strong> (city, price range, property type, residential type)</li>
+<li><strong>Sorting and pagination</strong> (price, date, assessed value)</li>
+<li><strong>Real-world dataset integration</strong> (CT transactions + Redfin market metrics)</li>
+<li><strong>AI-powered property descriptions</strong> (OpenRouter LLM)</li>
+<li><strong>Property photo analysis</strong> (Google Street View + OpenRouter vision model)</li>
+<li><strong>Serverless data pipeline</strong> (Lambda ETL → DynamoDB → S3/CloudFront)</li>
+</ul>
+<h2>1.3 Data Sources</h2>
+<ul>
+<li><strong>Redfin Data Center</strong>: Market analytics (monthly CSVs, non-commercial use)</li>
+<li><strong>Connecticut Open Data Portal</strong>: Real Estate Sales 2001–2023 (public domain)</li>
+<li><strong>Google Street View Static API</strong>: Exterior property photos (free tier)</li>
+<li><strong>OpenRouter</strong>: Free LLM and vision models (text + image analysis)</li>
+</ul>
+<h2>1.4 Architecture Overview</h2>
+<h3>Backend (Serverless)</h3>
+<ul>
+<li><strong>AWS Lambda ETL + API</strong><ul>
+<li>Data ingestion from Redfin + CT Open Data</li>
+<li>On-demand Street View + AI endpoints</li>
+<li>Caching with DynamoDB + S3</li>
+</ul>
+</li>
+</ul>
+<pre><code>lambda/src/
+├── redfin-ingestion.ts
+├── ct-socrata-etl.ts
+├── street-view-fetch.ts
+├── ai-vision-analysis.ts
+└── ai-description-generator.ts
+</code></pre>
+<h3>Single-File UI (No Server Required)</h3>
+<ul>
+<li>The UI must run directly from a single HTML file via file://</li>
+<li>No local server is required or assumed for the user</li>
+<li>Sample CT data is embedded in the HTML for offline use</li>
+</ul>
+<pre><code>public/
+└── index.html
+</code></pre>
+<h3>Data Storage</h3>
+<pre><code>DynamoDB
+├── home-harbor-properties-dev
+├── home-harbor-market-metrics-dev
+└── home-harbor-ai-insights-dev
+
+S3
+├── home-harbor-data-sources-dev
+└── home-harbor-images-dev
+</code></pre>
+<h3>AI Flow (E2E)</h3>
+<ol>
+<li><strong>Property data requested</strong> → DynamoDB</li>
+<li><strong>Street View photo</strong> → S3/CloudFront</li>
+<li><strong>Vision model</strong> → Analyze property exterior</li>
+<li><strong>LLM</strong> → Generate listing description</li>
+<li><strong>Cache results</strong> → DynamoDB (TTL)</li>
+</ol>
+<h3>Vision Flow (E2E)</h3>
+<ol>
+<li><strong>Property address → Street View photo</strong></li>
+<li><strong>Photo → Vision model (Molmo 72B)</strong></li>
+<li><strong>AI insight → metadata augmentation</strong> (condition, style, amenities)</li>
+</ol>
+<hr>
+<h1>2. Tools &amp; Technologies</h1>
+<h2>2.1 Core Stack</h2>
+<ul>
+<li><strong>Node.js</strong> (runtime)</li>
+<li><strong>Jest</strong> (testing)</li>
+<li><strong>ESLint + Prettier</strong> (lint/format)</li>
+<li><strong>Playwright</strong> (E2E testing)</li>
+</ul>
+<h2>2.1.1 AWS Stack (Realtor.com-Ready)</h2>
+<ul>
+<li><strong>AWS Lambda</strong> (ETL + AI analysis functions)</li>
+<li><strong>Amazon API Gateway</strong> (HTTP API + routing)</li>
+<li><strong>Amazon DynamoDB</strong> (properties, market metrics, AI caches)</li>
+<li><strong>Amazon S3</strong> (raw datasets + image cache)</li>
+<li><strong>Amazon CloudFront</strong> (CDN for property photos)</li>
+<li><strong>Amazon EventBridge</strong> (scheduled ingestion)</li>
+<li><strong>Amazon CloudWatch</strong> (logs, metrics, alarms)</li>
+<li><strong>AWS IAM</strong> (least-privilege access control)</li>
+<li><strong>AWS Secrets Manager</strong> (API keys for OpenRouter + Google Maps)</li>
+</ul>
+<h2>2.2 AI &amp; Data</h2>
+<ul>
+<li><strong>OpenRouter API</strong> (LLM orchestration)</li>
+<li><strong>AllenAI Molmo 72B</strong> (vision model)</li>
+<li><strong>Google Street View Static API</strong> (property photos)</li>
+<li><strong>Connecticut Open Data (Socrata API)</strong> (real estate transactions)</li>
+<li><strong>Redfin Data Center (CSV)</strong> (market analytics)</li>
+</ul>
+<h2>2.3 Engineering Practices</h2>
+<ul>
+<li><strong>TDD</strong>: RED → GREEN → REFACTOR</li>
+<li><strong>Conventional commits</strong></li>
+<li><strong>Pre-commit security hooks</strong></li>
+<li><strong>Architecture Decision Records</strong></li>
+</ul>
+<hr>
+<h1>3. Iterative Workflow (E2E Project Execution)</h1>
+<h2>3.1 Phase 0 — Foundation</h2>
+<ul>
+<li>Configure repository structure</li>
+<li>Add linting, formatting, tests</li>
+<li>Establish architectural guidelines</li>
+</ul>
+<h2>3.2 Phase 1 — Data Pipeline (Serverless)</h2>
+<ul>
+<li>Implement Redfin CSV ingestion (Lambda)</li>
+<li>Implement CT Socrata ETL (Lambda)</li>
+<li>Store properties + metrics in DynamoDB</li>
+<li>Cache images in S3 + CloudFront</li>
+</ul>
+<h2>3.3 Phase 2 — AI Architecture &amp; Design</h2>
+<ul>
+<li>Document OpenRouter model strategy</li>
+<li>Design vision pipeline (Street View + Molmo 72B)</li>
+<li>Add Secrets Manager configuration</li>
+</ul>
+<h2>3.4 Phase 3 — AI Implementation (TDD)</h2>
+<ul>
+<li>Vision analysis Lambda (Molmo 72B)</li>
+<li>Description generator Lambda (Llama 3.3 70B)</li>
+<li>DynamoDB caching + TTL</li>
+</ul>
+<h2>3.5 Phase 4 — UI &amp; Delivery</h2>
+<ul>
+<li>UI search experience</li>
+<li>Property cards with AI insights</li>
+<li>API Gateway integration</li>
+</ul>
+<h2>3.6 Phase 5 — Deployment</h2>
+<h3>3.6 Phase 5 — Deployment (AWS)</h3>
+<ul>
+<li><strong>Lambda + API Gateway</strong>: <code>/properties</code>, <code>/search</code>, <code>/analyze</code>, <code>/describe</code></li>
+<li><strong>DynamoDB</strong>: properties, market metrics, AI analyses (TTL)</li>
+<li><strong>S3</strong>: raw datasets + Street View images</li>
+<li><strong>CloudFront</strong>: CDN for property photos</li>
+<li><strong>CloudWatch</strong>: error alarms, latency, and cost metrics</li>
+<li><strong>IAM + Secrets Manager</strong>: secure key storage and rotation</li>
+</ul>
+<hr>
+<h1>4. E2E Project Narrative</h1>
+<p><strong>Idea → Real Data → Core Features → AI Enhancements → UI → Deployment</strong></p>
+<ol>
+<li><strong>Start with real data</strong> to prove real-world relevance.</li>
+<li><strong>Build core search capabilities</strong> with strict TDD.</li>
+<li><strong>Design AI integration</strong> to add strategic differentiation.</li>
+<li><strong>Implement AI features</strong> with free-tier services to stay cost-effective.</li>
+<li><strong>Polish UI and deploy</strong> for recruiter-grade presentation.</li>
+</ol>
+<hr>
+<h1>5. References (Design Docs)</h1>
+<ul>
+<li>OpenRouter LLM architecture: <a href="docs/OPENROUTER_LLM_ARCHITECTURE.md">docs/OPENROUTER_LLM_ARCHITECTURE.md</a></li>
+<li>AI feature overview: <a href="docs/AI_FEATURES_OVERVIEW.md">docs/AI_FEATURES_OVERVIEW.md</a></li>
+<li>Lessons learned: <a href="LESSONS_LEARNED.md">LESSONS_LEARNED.md</a></li>
+</ul>
+<hr>
+<h2>6. What’s Next</h2>
+<ul>
+<li>Create API Gateway endpoints</li>
+<li>Build React UI for search + AI insights</li>
+<li>Add map-based browsing and filters</li>
+</ul>
+<hr>
+<p><strong>Last Updated</strong>: January 31, 2026</p>

@@ -39,11 +39,13 @@ sudo ./aws/install
 3. User name: `homeharbor-dev`
 4. Select: **Access key - Programmatic access**
 5. Attach policies (for development):
-   - `AmazonS3FullAccess`
-   - `AmazonRDSFullAccess`
-   - `AmazonEC2ContainerServiceFullAccess`
-   - `CloudWatchLogsFullAccess`
-   - Or create a custom policy with least-privilege access
+  - `AmazonS3FullAccess`
+  - `AmazonDynamoDBFullAccess`
+  - `AWSLambdaFullAccess`
+  - `AmazonEventBridgeFullAccess`
+  - `CloudWatchLogsFullAccess`
+  - `SecretsManagerReadWrite`
+  - Or create a custom policy with least-privilege access
 
 6. **Download credentials CSV** (access key ID and secret)
 7. **Store securely** - you won't see the secret again!
@@ -155,6 +157,22 @@ AWS_ACCOUNT_ID=your-account-id-here
 # AWS_SECRET_ACCESS_KEY=
 ```
 
+## Step 7: Provision HomeHarbor Resources
+
+Run the infrastructure script to create all required resources:
+
+```bash
+cd infrastructure
+./aws-setup.sh
+```
+
+This creates:
+- S3 buckets for data + images
+- DynamoDB tables for properties, market metrics, and AI insights
+- IAM role for Lambda functions
+- Secrets Manager placeholder for API keys
+- CloudWatch log groups
+
 ---
 
 ## Required AWS Permissions for HomeHarbor
@@ -172,26 +190,35 @@ AWS_ACCOUNT_ID=your-account-id-here
 - `cloudfront:UpdateDistribution`
 - `cloudfront:DeleteDistribution`
 
-### ECS/Fargate (API)
-- `ecs:CreateCluster`
-- `ecs:CreateService`
-- `ecs:RegisterTaskDefinition`
-- `ecs:RunTask`
+### Lambda (Compute)
+- `lambda:CreateFunction`
+- `lambda:UpdateFunctionCode`
+- `lambda:UpdateFunctionConfiguration`
+- `lambda:InvokeFunction`
 
-### RDS (Database)
-- `rds:CreateDBInstance`
-- `rds:DescribeDBInstances`
-- `rds:ModifyDBInstance`
-- `rds:DeleteDBInstance`
+### DynamoDB (Database)
+- `dynamodb:CreateTable`
+- `dynamodb:DescribeTable`
+- `dynamodb:UpdateTable`
+- `dynamodb:PutItem`
+- `dynamodb:BatchWriteItem`
+- `dynamodb:Query`
+- `dynamodb:Scan`
 
-### ElastiCache (Redis)
-- `elasticache:CreateCacheCluster`
-- `elasticache:DescribeCacheClusters`
+### EventBridge (Scheduling)
+- `events:PutRule`
+- `events:PutTargets`
+- `events:DescribeRule`
 
 ### IAM (Service Roles)
 - `iam:CreateRole`
 - `iam:AttachRolePolicy`
 - `iam:PassRole`
+
+### Secrets Manager (API Keys)
+- `secretsmanager:CreateSecret`
+- `secretsmanager:GetSecretValue`
+- `secretsmanager:UpdateSecret`
 
 ### CloudWatch (Logging/Monitoring)
 - `logs:CreateLogGroup`

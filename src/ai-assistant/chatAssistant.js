@@ -4,10 +4,21 @@ const CascadingService = require('./cascadingService');
 const { validateConfig } = require('./config');
 
 /**
- * High-level AI chat assistant interface
- * Orchestrates client, selector, and cascading service
+ * @fileoverview Chat Assistant
+ * @description High-level AI chat assistant interface for real estate queries.
+ * @semantic ai, orchestration, chat
+ * @intent Orchestrates AI client, model selection, and cascading fallbacks for reliable responses.
+ * @dependencies OpenRouterClient, ModelSelector, CascadingService, config
+ * @example
+ * const assistant = new ChatAssistant();
+ * const response = await assistant.ask('Describe this property');
  */
 class ChatAssistant {
+  /**
+   * @constructor
+   * @description Initializes the assistant with validated config and components.
+   * @semantic initialization, validation
+   */
   constructor() {
     // Validate configuration on initialization
     validateConfig();
@@ -20,10 +31,13 @@ class ChatAssistant {
   }
 
   /**
-   * Send a message and get AI response
+   * @method ask
+   * @async
    * @param {string} userMessage - User's message
-   * @param {Object} options - Additional options
+   * @param {Object} [options] - Additional options
    * @returns {Promise<Object>} AI response with metadata
+   * @semantic ai-interaction, chat
+   * @intent Sends message to AI with cascading fallbacks and returns response.
    */
   async ask(userMessage, options = {}) {
     // Add user message to history

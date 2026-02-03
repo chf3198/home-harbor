@@ -380,5 +380,24 @@ console.log('✓ All required variables set');
 
 ---
 
+## 🤖 AI-Specific Security Considerations
+
+### OpenRouter API Keys
+- Store in AWS Secrets Manager, not in code or .env.
+- Rotate keys regularly; monitor usage for anomalies.
+- Use least-privilege access; limit to necessary models.
+
+### AI-Generated Content
+- Validate AI outputs for security (e.g., no injection in property descriptions).
+- Avoid exposing AI prompts with sensitive data.
+- Implement rate limiting on AI endpoints to prevent abuse.
+
+### Copilot and AI Tools
+- Do not commit AI-generated code without review for vulnerabilities.
+- Use AI feedback loops but validate suggestions against security guidelines.
+- Ensure AI tools do not access sensitive repos or data.
+
+---
+
 **Last Updated:** January 30, 2026
 

@@ -4,7 +4,7 @@
 
 ---
 
-## Phase 0: Project Foundation ⏳ IN PROGRESS
+## Phase 0: Project Foundation ✅ COMPLETE
 
 - [x] Repository setup & security
 - [x] AWS CLI configuration
@@ -13,55 +13,52 @@
 - [x] File organization standards
 - [x] Create LESSONS_LEARNED.md
 - [x] Create TODO.md
-- [ ] Commit architecture documents
-- [ ] Initialize Node.js project (package.json)
-- [ ] Configure testing framework (Jest)
-- [ ] Set up project structure (src/, tests/)
-- [ ] Configure linter (ESLint)
-- [ ] Configure formatter (Prettier)
+- [x] Commit architecture documents
+- [x] Initialize Node.js project (package.json)
+- [x] Configure testing framework (Jest)
+- [x] Set up project structure (src/, tests/)
+- [x] Configure linter (ESLint)
+- [x] Configure formatter (Prettier)
 - [ ] Install pre-commit hooks (file size, security)
 
 ---
 
-## Phase 1: Core Backend - Property Search 🎯 NEXT
+## Phase 1: Core Backend - Property Search ✅ COMPLETE
 
 ### Feature: Property Search API
-- [ ] Design: Property entity schema
-- [ ] Design: Search API contract (inputs/outputs)
-- [ ] Design: Repository interface
-- [ ] Test: Property validation tests (RED)
-- [ ] Code: Property validation (GREEN)
-- [ ] Test: Search service tests (RED)
-- [ ] Code: Search service (GREEN)
-- [ ] Test: Repository tests (RED)
-- [ ] Code: Repository implementation (GREEN)
-- [ ] Refactor: Extract pure functions if files >80 lines
-- [ ] Integration test: End-to-end search flow
+- [x] Design: Property entity schema
+- [x] Design: Search API contract (inputs/outputs)
+- [x] Design: Repository interface
+- [x] Test: Property validation tests (RED)
+- [x] Code: Property validation (GREEN)
+- [x] Test: Search service tests (RED)
+- [x] Code: Search service (GREEN)
+- [x] Test: Repository tests (RED)
+- [x] Code: Repository implementation (GREEN)
+- [x] Refactor: Extract pure functions if files >80 lines
+- [ ] Integration test: End-to-end search flow (API + UI)
 
 ### Infrastructure
-- [ ] Set up local PostgreSQL (Docker?)
-- [ ] Create database schema
-- [ ] Seed test data (realistic property listings)
-- [ ] Lambda handler for API Gateway
-- [ ] Environment variable management
+- [x] Environment variable management
+- [x] Local demo server (Express)
+- [x] AI demo endpoints (vision + description)
+- [x] Lambda handler for API Gateway
 
 ---
 
-## Phase 2: Frontend - Property Viewer
+## Phase 2: Frontend - Property Viewer ⏳ IN PROGRESS
 
 ### Feature: Property List View
-- [ ] Design: Component structure (feature folders)
-- [ ] Test: PropertyList component tests
-- [ ] Code: PropertyList component
-- [ ] Test: PropertyCard component tests
-- [ ] Code: PropertyCard component
-- [ ] Test: Search filter tests
-- [ ] Code: Search filters
-- [ ] Styling: Responsive design (mobile-first)
+- [x] Local HTML/CSS/JS demo UI
+- [x] Search filters + pagination (API-driven)
+- [x] Property detail panel
+- [x] AI analysis + description buttons
+- [ ] React UI rewrite (Vite)
+- [ ] Component tests (React Testing Library)
 - [ ] Accessibility: ARIA labels, keyboard nav
 
 ### Infrastructure
-- [ ] Initialize React app (Vite?)
+- [ ] Initialize React app (Vite)
 - [ ] Configure test framework (React Testing Library)
 - [ ] API client for backend
 - [ ] Error handling & loading states
