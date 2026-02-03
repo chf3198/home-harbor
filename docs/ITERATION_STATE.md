@@ -29,16 +29,73 @@
 - **Header.jsx**: Accessible header with help modal integration
 - **SearchSection.jsx**: Complete search form with city autocomplete
 - **HelpModal.jsx**: Tabbed help interface with user/developer content
-
-#### ⏳ Placeholder Components (Next Priority)
 - **ResultsSection.jsx**: Property results display with pagination
 - **AIChatSection.jsx**: AI assistant chat interface
+- **PropertyCard.jsx**: Individual property display with AI analysis
+- **Pagination.jsx**: Accessible pagination controls
+- **LoadingSpinner.jsx**: Reusable loading component
 
 #### ✅ Infrastructure Complete
 - **Vite Configuration**: Optimized build with API proxy
 - **Testing Setup**: Vitest configuration with jest-dom
 - **Component Registry**: Complete documentation of all components/hooks
 - **State Management**: PropertyProvider and AIProvider implemented
+- **Component Tests**: Comprehensive test suite for all components
+
+### API Integration Points
+
+#### Property Search API
+```
+GET /api/properties?city=Hartford&minPrice=100000&maxPrice=500000&page=1&limit=12
+Response: {
+  data: [Property],
+  pagination: { page, pageSize, total, totalPages }
+}
+```
+
+#### Property Details API
+```
+GET /api/properties/{id}
+Response: { id, address, metadata: { saleDate, residentialType, serialNumber } }
+```
+
+#### AI Chat API
+```
+POST /api/ai/chat
+Body: { message: string, propertyId?: string }
+Response: { response: string }
+```
+
+#### AI Analysis APIs
+```
+POST /api/ai/analyze/{propertyId}  # Vision analysis
+POST /api/ai/chat                  # Description generation
+```
+
+### Design Decisions (For Continuity)
+
+#### Component Architecture
+- **Atomic Design**: Small, focused components (PropertyCard, Pagination, LoadingSpinner)
+- **Compound Components**: Related functionality grouped (ResultsSection contains PropertyCard + Pagination)
+- **Custom Hooks**: Business logic separated from UI (usePropertySearch, useAIChat)
+- **Provider Pattern**: Global state managed through React Context
+
+#### State Management Choice
+- **Context API with useReducer**: Complex state logic for search filters and pagination
+- **Local Component State**: useState for UI-specific state (expanded cards, form inputs)
+- **Server State**: API responses managed through custom hooks
+- **Error Boundaries**: Recommended for production error handling
+
+#### Testing Strategy
+- **Component Testing**: Unit tests for rendering, interactions, accessibility
+- **Hook Testing**: Integration tests for state management and API calls
+- **Mocking**: fetch API mocked for reliable testing
+- **Accessibility**: Built-in a11y assertions in all component tests
+
+### Current Status: RED → GREEN
+**Iteration Complete**: All core React components implemented with comprehensive testing
+**Ready for**: Integration testing and accessibility audit
+**Next Phase**: E2E testing with Playwright, performance optimization
 
 ### API Integration Points
 
