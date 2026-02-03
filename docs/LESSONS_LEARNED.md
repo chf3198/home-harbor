@@ -1061,3 +1061,25 @@ Research covers 3+ sources per area, addresses cost/legal constraints, project a
 - Implement automated dependency updates with Dependabot
 - Add branch protection rules for main branch
 - Consider GitHub Pages for documentation deployment
+
+---
+
+## Branching Strategy Decision - February 3, 2026
+
+### Context
+- Project not yet at first release (Phase 2: Frontend in progress)
+- API Gateway integration successfully branched and merged
+- CI/CD infrastructure added directly to main
+- Upcoming React UI rewrite represents substantial feature work
+
+### Branching Guidelines Established
+- **Feature Branches**: Use for substantial features (API integrations, UI rewrites, new capabilities)
+- **Infrastructure to Main**: CI/CD, documentation, configuration changes can go directly to main
+- **Branch Naming**: `feature/feature-name` for features, `fix/issue-description` for bug fixes
+- **Pre-Release Branching**: Establish good habits now, don't wait for first release
+
+### Current Branch: feature/frontend-react-rewrite
+- Created for Phase 2 React UI rewrite
+- Will include: Vite setup, React components, testing, accessibility
+- Follows RED→GREEN→REFACTOR cycle with frequent commits
+- Will be merged to main when UI is production-ready
