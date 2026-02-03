@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: HomeHarbor Serverless API
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: nodejs18.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        PROPERTIES_TABLE: !Ref PropertiesTable
+        AI_INSIGHTS_TABLE: !Ref AiInsightsTable
+        IMAGES_BUCKET: !Ref ImagesBucket
+        SECRETS_NAME: !Ref Secrets
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - POST
+        AllowHeaders:
+          - content-type
+          - x-api-key
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttling:
+            BurstLimit: 10
+            RateLimit: 100
+          Quota:
+            Limit: 10000
+            Period: MONTH
+      DefaultRouteSettings:
+        Throttling:
+          BurstLimit: 10
+          RateLimit: 100
+
+  PropertiesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: properties.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PropertiesTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /properties
+            Method: GET
+
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: search.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PropertiesTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /search
+            Method: GET
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: analyze.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AiInsightsTable
+        - S3ReadPolicy:
+            BucketName: !Ref ImagesBucket
+        - SecretsManagerReadPolicy:
+            SecretName: !Ref Secrets
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /analyze
+            Method: POST
+
+  DescribeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: describe.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AiInsightsTable
+        - SecretsManagerReadPolicy:
+            SecretName: !Ref Secrets
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /describe
+            Method: POST
+
+  PropertiesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: home-harbor-properties-dev
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  AiInsightsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: home-harbor-ai-insights-dev
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: home-harbor-images-dev
+
+  Secrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: home-harbor-secrets-dev
+      SecretString: '{"openrouter_api_key": "placeholder"}'
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+  ApiKey:
+    Description: API Key for authentication
+    Value: !Ref ApiKey
