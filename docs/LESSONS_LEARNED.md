@@ -165,6 +165,23 @@
 
 ---
 
+## Real Property Data Integration (February 4, 2026)
+
+### Decision: CT Open Data Portal as Primary Source
+- **Source**: `https://data.ct.gov/resource/5mzw-sjtu.json` (Socrata API)
+- **License**: Public Domain - legal for any use
+- **Alternatives Evaluated**:
+  1. Realtor.com API - Requires partnership, ToS restrictions
+  2. Zillow/Redfin APIs - Rate limited, commercial restrictions
+  3. CT Open Data Portal - Public Domain, free, real government data ✓
+- **Trade-offs**: Limited to CT only, historical sales (not listings), no photos
+- **Why Chosen**: Legal compliance critical for Realtor.com interview demo
+- **Data**: 20 real September 2024 residential sales ≥$100k with coordinates
+- **Cities**: West Hartford, Shelton, South Windsor, Stratford, Torrington, etc.
+- **Validation**: API tested, data integrated into index.html, Realtor.com links verified
+
+---
+
 ## Library Simplification Achievements
 
 ### Backend Library Replacements (Phase 1-3 Complete)
