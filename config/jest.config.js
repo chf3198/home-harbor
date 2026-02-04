@@ -16,5 +16,10 @@ module.exports = {
   testMatch: [
     '**/__tests__/**/*.js',
     '**/*.test.js'
+  ],
+  // Exclude Playwright tests (use .spec.js naming convention)
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '.*\\.spec\\.js$'
   ]
 };
