@@ -7,7 +7,7 @@
 - ✅ **Legal data sourcing** (no web scraping violations)
 - ✅ **AWS serverless architecture** (Lambda, DynamoDB, S3, CloudFront)
 - ✅ **AI integration** (OpenRouter with Molmo 72B vision + Llama 3.3 LLM)
-- ✅ **Cost optimization** (~$1.50/month, mostly free tier)
+- ✅ **Cost optimization** ($0.00/month, 100% free tier)
 - ✅ **Production-ready patterns** (caching, error handling, monitoring)
 
 **Single-file UI requirement:** The UI must run directly from one HTML file via file://. Do not require or instruct users to run any local server to use the app.

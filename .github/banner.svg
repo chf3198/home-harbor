@@ -63,7 +63,7 @@
   <!-- Cost badge -->
   <g transform="translate(640, 560)">
     <rect x="-80" y="0" width="160" height="40" rx="20" fill="url(#accent)"/>
-    <text x="0" y="27" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="white" text-anchor="middle">$1.50/month</text>
+    <text x="0" y="27" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="white" text-anchor="middle">$0/month</text>
   </g>
   
   <!-- Corner accent -->

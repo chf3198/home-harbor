@@ -13,7 +13,7 @@
 - **API Gateway**: RESTful endpoints for property search and AI features
 - **Data Pipeline**: Redfin market data, CT property transactions, Google Street View
 - **AI Integration**: OpenRouter with Molmo2 vision and Llama 3.3 LLM models
-- **Cost**: $1.50/month (Secrets Manager only, all other services free)
+- **Cost**: $0.00/month (100% free tier — no paid services)
 
 #### Frontend (In Progress ⏳)
 - **Technology**: React 18 + Vite + Tailwind CSS

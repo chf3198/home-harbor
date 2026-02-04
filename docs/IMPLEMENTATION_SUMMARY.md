@@ -335,7 +335,7 @@ You now have a **production-ready AWS data pipeline** for the HomeHarbor real es
    - Show AI-generated property description
 
 4. **Cost Analysis** (1 min)
-   - "Entire system runs for $1.50/month"
+   - "Entire system runs for $0.00/month (100% free tier)"
    - Show free tier utilization
 
 5. **Scalability** (30 sec)
@@ -358,7 +358,7 @@ A: "Secrets Manager supports automatic rotation. I'd enable CloudWatch alarms fo
 ## Success Metrics
 
 ✅ **Technical Depth:** 5 Lambda functions, 3 databases, multi-source ETL pipeline  
-✅ **Cost Efficiency:** $1.50/month (99% cheaper than traditional architecture)  
+✅ **Cost Efficiency:** $0.00/month (100% free tier)  
 ✅ **Data Quality:** 50K+ market metrics, 5K+ property records, 100% legal sources  
 ✅ **AI Innovation:** Vision analysis + LLM descriptions with intelligent caching  
 ✅ **Production Ready:** Error handling, logging, monitoring, auto-scaling  

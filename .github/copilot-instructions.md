@@ -13,7 +13,7 @@ HomeHarbor: Real estate search platform with serverless AWS backend and dual fro
 - UI: Single-file HTML (file://) + React SPA (Vite, in development)
 - Data Flow: Scheduled Lambdas → DynamoDB/S3 → Optional API → Frontend UI
 
-Cost: $1.50/month using free tiers.
+Cost: $0.00/month (100% free tier).
 
 See [docs/INSTRUCTION_DOCUMENT.md](docs/INSTRUCTION_DOCUMENT.md) for detailed design.
 </architecture_overview>

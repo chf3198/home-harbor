@@ -52,7 +52,7 @@ High-level vision, goals, and architectural overview.
 - Molmo 72B (vision), Llama 3.3 (text)
 - Cascading fallbacks
 
-## 1.5 Cost: $1.50/month (free tiers)
+## 1.5 Cost: $0.00/month (100% free tier)
 
 ---
 

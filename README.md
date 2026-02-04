@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright">
   </p>
   
-  <p><strong>Cost: $1.50/month</strong> • <strong>44 Tests</strong> • <strong>31 Components</strong> • <strong>5 Lambda Functions</strong></p>
+  <p><strong>Cost: $0.00/month</strong> • <strong>44 Tests</strong> • <strong>31 Components</strong> • <strong>5 Lambda Functions</strong></p>
 </div>
 
 ---
@@ -34,7 +34,7 @@ HomeHarbor is a production-ready real estate application designed to showcase AW
 - ✅ **Serverless AWS architecture** (Lambda, DynamoDB, S3, CloudFront)
 - ✅ **Legal data sourcing** (Redfin, CT Open Data, Google Street View)
 - ✅ **AI integration** (OpenRouter with Molmo 72B vision + Llama 3.3 LLM)
-- ✅ **Cost optimization** (~$1.50/month operating cost)
+- ✅ **Cost optimization** ($0.00/month — 100% free tier)
 - ✅ **Production patterns** (caching, monitoring, auto-scaling)
 
 **Status:** ✅ Data pipeline complete | ✅ Single-file UI complete | ✅ React frontend complete
@@ -59,9 +59,9 @@ HomeHarbor is a production-ready real estate application designed to showcase AW
 | Google Street View | Property photos | 500+ images |
 | OpenRouter AI | Vision + descriptions | Unlimited |
 
-### Cost: $1.50/month
-- AWS Services: $1.20 (Secrets Manager only)
-- External APIs: $0.00 (all within free tiers)
+### Cost: $0.00/month (100% Free Tier)
+- AWS Services: $0.00 (Lambda, DynamoDB, S3, CloudFront — all free tier)
+- External APIs: $0.00 (OpenRouter, Google Maps — all free tier)
 
 ---
 
@@ -283,7 +283,7 @@ Generates compelling property descriptions with Llama 3.3 70B
    - Show AI-generated property description
 
 4. **Cost & Scalability** (1 min)
-   - $1.50/month total cost (99% free tier)
+   - $0.00/month total cost (100% free tier)
    - Auto-scaling to 10K+ concurrent users
    - Production-ready monitoring
 
