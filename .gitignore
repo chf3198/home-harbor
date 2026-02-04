@@ -2,7 +2,7 @@
 node_modules/
 .pnp
 .pnp.js
-package-lock.json
+# Note: package-lock.json is tracked for CI reproducibility
 yarn.lock
 pnpm-lock.yaml
 
