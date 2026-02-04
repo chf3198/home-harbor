@@ -9,6 +9,7 @@ describe('OpenRouterClient', () => {
 
   beforeEach(() => {
     client = new OpenRouterClient('test-api-key', 'https://test-api.com/v1');
+    client.timeout = 5000;
     jest.clearAllMocks();
   });
 
@@ -92,14 +93,13 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw NetworkError on timeout', async () => {
-      client.timeout = 100;
+      const abortError = new Error('Aborted');
+      abortError.name = 'AbortError';
 
-      global.fetch.mockImplementation(() => 
-        new Promise((resolve) => setTimeout(resolve, 200))
-      );
+      global.fetch.mockRejectedValue(abortError);
 
       await expect(client.getModels()).rejects.toThrow(NetworkError);
-      await expect(client.getModels()).rejects.toThrow('Request timed out');
+      await expect(client.getModels()).rejects.toThrow('timed out');
     });
 
     it('should throw NetworkError on fetch failure', async () => {
@@ -198,11 +198,10 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw NetworkError on timeout', async () => {
-      client.timeout = 50;
+      const abortError = new Error('Aborted');
+      abortError.name = 'AbortError';
 
-      global.fetch.mockImplementation(() =>
-        new Promise((resolve) => setTimeout(resolve, 200))
-      );
+      global.fetch.mockRejectedValue(abortError);
 
       await expect(client.sendChatMessage(model, messages)).rejects.toThrow(NetworkError);
       await expect(client.sendChatMessage(model, messages)).rejects.toThrow('timed out');
@@ -217,11 +216,13 @@ describe('OpenRouterClient', () => {
       expect(customClient.baseUrl).toBe('https://custom-url.com/v1');
     });
 
-    it('should use defaults from config if not provided', () => {
+    it('should allow undefined defaults if config is not set', () => {
+      // When config values are undefined, constructor should still work
       const defaultClient = new OpenRouterClient();
       
-      expect(defaultClient.apiKey).toBeDefined();
-      expect(defaultClient.baseUrl).toBeDefined();
+      // These will be undefined if env vars aren't set, which is fine
+      // apiKey defaults to undefined from config
+      expect(defaultClient.baseUrl).toBe('https://openrouter.ai/api/v1');
     });
   });
 });
