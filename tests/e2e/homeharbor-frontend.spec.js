@@ -7,8 +7,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('HomeHarbor Property Search', () => {
   test.beforeEach(async ({ page }) => {
-    // Start the development server
-    await page.goto('http://localhost:3000');
+    // Navigate to app - uses baseURL from playwright config
+    await page.goto('/');
   });
 
   test('loads application successfully', async ({ page }) => {
