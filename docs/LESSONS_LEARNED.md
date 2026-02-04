@@ -190,7 +190,8 @@
   4. Google site search (`site:realtor.com address`) - Always works ✓
 - **Solution**: Use Google Search with `site:realtor.com` filter
 - **Format**: `https://www.google.com/search?q=site:realtor.com+address+city+CT`
-- **UX**: Button text "Find on Realtor.com" - honest about indirection
+- **UX**: Button text updated to "🔍 Find on Google → Realtor.com" for transparency
+- **Validation**: Applied consistently to public/index.html and React PropertyCard component
 
 ---
 

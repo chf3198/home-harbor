@@ -12,7 +12,7 @@ HomeHarbor is a production-ready real estate application designed to showcase AW
 - ✅ **Cost optimization** (~$1.50/month operating cost)
 - ✅ **Production patterns** (caching, monitoring, auto-scaling)
 
-**Status:** ✅ Data pipeline implementation complete | ⏳ Frontend UI in progress
+**Status:** ✅ Data pipeline complete | ✅ Single-file UI complete | ✅ React frontend complete
 
 ---
 
@@ -23,7 +23,7 @@ HomeHarbor is a production-ready real estate application designed to showcase AW
 - **3 DynamoDB Tables** for properties, market metrics, and AI insights
 - **S3 + CloudFront** pipeline for image storage and delivery
 - **EventBridge Schedules** for automated data updates
-- **Realtor.com deep links** for users who want official listing pages
+- **Realtor.com search links** via Google site search for reliable property lookup
 - **City autocomplete helper** from the CT dataset
 
 ### Data Sources (100% Legal & Free)
@@ -116,19 +116,31 @@ home-harbor/
 ├── 📄 IMPLEMENTATION_SUMMARY.md      # What we built
 ├── 📄 PROJECT_STRUCTURE.md           # File organization
 │
-├── 📂 public/                        # Single-file UI
-│   └── index.html                   # All UI/JS inline (no server required)
+├── 📂 public/                        # Single-file UI (no server required)
+│   └── index.html                   # 1477 lines - complete UI with embedded data
+│
+├── 📂 frontend/                      # React frontend (Vite)
+│   └── src/
+│       ├── App.jsx                  # Root component
+│       ├── components/              # 31 React components
+│       │   ├── PropertyCard.jsx     # Property display with AI
+│       │   ├── SearchSection.jsx    # Search filters
+│       │   ├── ResultsSection.jsx   # Results grid
+│       │   └── AIChatSection.jsx    # AI assistant
+│       └── hooks/                   # Custom React hooks
 │
 ├── 📂 data/                          # Sample dataset
 │   └── ct-sample.csv                # Sample CT records
 │
-├── 📂 src/                           # Optional API services
-│   └── server.js                    # Express API (not required by single-file UI)
+├── 📂 src/                           # Backend services
+│   ├── server.js                    # Express API entry
+│   ├── property-search/             # Property domain logic
+│   └── ai-assistant/                # OpenRouter AI integration
 │
 ├── 📂 infrastructure/                # AWS provisioning
 │   └── aws-setup.sh                 # One-command setup
 │
-├── 📂 lambda/                        # Serverless functions
+├── 📂 lambda/                        # Serverless functions (10 TypeScript files)
 │   ├── src/
 │   │   ├── redfin-ingestion.ts     # Market data ETL
 │   │   ├── ct-socrata-etl.ts       # Property data ETL
@@ -139,9 +151,12 @@ home-harbor/
 │       ├── package-lambdas.sh      # Build packages
 │       └── deploy-lambdas.sh       # Deploy to AWS
 │
+├── 📂 tests/                         # E2E tests (Playwright)
+│
 └── 📂 docs/                          # Documentation
     ├── DATA_SOURCES.md              # Data strategy
-    └── INSTRUCTION_DOCUMENT.md      # Requirements
+    ├── LESSONS_LEARNED.md           # Development insights
+    └── CHANGELOG.md                 # Version history
 
 ## 🎨 Beautification (Low-Code)
 
@@ -149,7 +164,7 @@ The UI uses Tailwind CSS via CDN for a polished look while keeping the single-fi
 
 ## 🔗 Realtor.com Link-Outs
 
-Each listing includes a link to the corresponding Realtor.com results page. HomeHarbor does not scrape or reuse Realtor.com data.
+Each listing includes a "🔍 Find on Google → Realtor.com" link that uses Google site search to locate the property on Realtor.com. This approach is more reliable than direct URLs since CT government data lacks MLS IDs. HomeHarbor does not scrape or reuse Realtor.com data.
 ```
 
 ---
@@ -281,9 +296,11 @@ Generates compelling property descriptions with Llama 3.3 70B
 - [x] Data ingestion Lambda functions
 - [x] AI integration (vision + LLM)
 - [x] Comprehensive documentation
+- [x] Single-file HTML UI (works via file://)
+- [x] React frontend with 31 components
+- [x] Property search functionality
+- [x] 44 test files (Jest + Vitest + Playwright)
 - [ ] API Gateway REST endpoints
-- [ ] React frontend UI
-- [ ] Property search functionality
 - [ ] Map visualization (Mapbox)
 - [ ] CI/CD pipeline (GitHub Actions)
 
@@ -301,4 +318,4 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Built by Curtis Franks** | **For Realtor.com Staff SWE Position** | **January 2026**
+**Built by Curtis Franks** | **For Realtor.com Staff SWE Position** | **February 2026**

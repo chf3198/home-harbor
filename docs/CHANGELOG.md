@@ -14,16 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - E2E testing infrastructure with Playwright.
 - Modular frontend components (AIChatForm, PropertyCard, etc.).
 - Git workflow documentation (Conventional Commits, Trunk-Based Development).
+- React frontend with 31 components and comprehensive test coverage.
 
 ### Changed
 - Updated .github/copilot-instructions.md for workflow integration.
 - **BREAKING**: Replaced axios with native fetch in all Lambda functions.
 - Modularized public/index.html inline scripts into separate JS files.
 - app.js now only initializes when served via HTTP (not file://).
+- Realtor.com links now use Google site search for reliable property lookup.
+- Link text updated to "🔍 Find on Google → Realtor.com" for UX clarity.
 
 ### Fixed
 - HOME_HARBOR_DATA variable reference (was undefined HOME_HARBOR_SAMPLE).
-- Realtor.com URL format now uses city_state/address pattern.
+- Realtor.com URL format now uses Google site search (direct URLs unreliable without MLS IDs).
 - Duplicate initialization conflict between inline and modular scripts.
 
 ## [0.1.0] - 2026-02-03
