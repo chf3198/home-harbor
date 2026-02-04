@@ -1,11 +1,12 @@
 const path = require('path');
 
+// Use the smaller sample file that's in git
 process.env.DATA_FILE = path.join(
   __dirname,
   '..',
   '..',
   'data',
-  'ct-sample.csv'
+  'ct-sample-50.csv'
 );
 
 const { loadData, getHealth, queryProperties } = require('./dataService');

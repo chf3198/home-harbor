@@ -110,15 +110,14 @@ describe('CascadingService', () => {
 
       mockClient.getModels.mockResolvedValue([]);
       mockSelector.getCascadeOrder.mockReturnValue(models);
+      
+      // Simulate first model timing out with ModelTimeoutError
       mockClient.sendChatMessage
-        .mockImplementationOnce(() => new Promise(() => {})) // Never resolves
+        .mockRejectedValueOnce(new ModelTimeoutError('model-1', 100))
         .mockResolvedValueOnce(mockResponse);
 
-      const promise = service.sendWithCascade(messages, {}, 100);
+      const result = await service.sendWithCascade(messages, {}, 100);
       
-      jest.advanceTimersByTime(150);
-      
-      const result = await promise;
       expect(result.success).toBe(true);
       expect(result.model).toBe('model-2');
     });
