@@ -32,8 +32,8 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Run Playwright tests
-      run: npx playwright install && npm run test:e2e
+    # E2E tests are run in the separate e2e.yml workflow
+    # which has proper setup with --with-deps and frontend build
 
   lambda-deploy:
     runs-on: ubuntu-latest
