@@ -1,3 +1,28 @@
+<div align="center">
+  <img src=".github/banner.svg" alt="HomeHarbor Banner" width="100%">
+  
+  <p>
+    <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick%20Start-Guide-10b981?style=for-the-badge" alt="Quick Start"></a>
+    <a href="https://github.com/chf3198/home-harbor/releases"><img src="https://img.shields.io/github/v/release/chf3198/home-harbor?style=for-the-badge&color=10b981" alt="Release"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"></a>
+  </p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/AWS-Lambda-FF9900?style=flat-square&logo=awslambda&logoColor=white" alt="AWS Lambda">
+    <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React">
+    <img src="https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite">
+    <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+    <img src="https://img.shields.io/badge/Tailwind-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind">
+    <img src="https://img.shields.io/badge/DynamoDB-4053D6?style=flat-square&logo=amazondynamodb&logoColor=white" alt="DynamoDB">
+    <img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest">
+    <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright">
+  </p>
+  
+  <p><strong>Cost: $1.50/month</strong> • <strong>44 Tests</strong> • <strong>31 Components</strong> • <strong>5 Lambda Functions</strong></p>
+</div>
+
+---
+
 # HomeHarbor
 
 🏡 **AI-Powered Real Estate Search Platform** built with AWS serverless architecture and legal, free data sources.
