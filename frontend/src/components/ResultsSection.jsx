@@ -1,16 +1,23 @@
+/**
+ * @fileoverview Results Section Component
+ */
+
 import React, { useState } from 'react';
 import { usePropertySearch } from '../hooks/usePropertySearch';
 import { useAIChat } from '../hooks/useAIChat';
+import { usePropertyAnalysis } from '../hooks/usePropertyAnalysis';
 import PropertyCard from './PropertyCard';
 import Pagination from './Pagination';
-import LoadingSpinner from './LoadingSpinner';
+import ResultsLoading from './ResultsLoading';
+import ResultsError from './ResultsError';
+import EmptyResults from './EmptyResults';
 
 function ResultsSection() {
   const { results, loading, error, pagination, setPage } = usePropertySearch();
-  const { analyzeProperty, sendMessage, loading: aiLoading, response: aiResponse, error: aiError } = useAIChat();
+  const { response: aiResponse, error: aiError } = useAIChat();
+  const { handleAnalyzeProperty, isAnalyzing } = usePropertyAnalysis();
 
   const [expandedCards, setExpandedCards] = useState(new Set());
-  const [analyzingCards, setAnalyzingCards] = useState(new Set());
 
   const toggleCardExpansion = (propertyId) => {
     const newExpanded = new Set(expandedCards);
@@ -20,26 +27,6 @@ function ResultsSection() {
       newExpanded.add(propertyId);
     }
     setExpandedCards(newExpanded);
-  };
-
-  const handleAnalyzeProperty = async (propertyId, analysisType) => {
-    setAnalyzingCards(prev => new Set(prev).add(`${propertyId}-${analysisType}`));
-
-    try {
-      if (analysisType === 'vision') {
-        await analyzeProperty(propertyId);
-      } else if (analysisType === 'description') {
-        await sendMessage(`Generate a compelling real estate description for property ${propertyId}`, propertyId);
-      }
-    } catch (error) {
-      console.error('Analysis failed:', error);
-    } finally {
-      setAnalyzingCards(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(`${propertyId}-${analysisType}`);
-        return newSet;
-      });
-    }
   };
 
   const formatCurrency = (value) => {
@@ -52,26 +39,9 @@ function ResultsSection() {
     }).format(value);
   };
 
-  if (loading) {
-    return (
-      <section className="rounded-2xl bg-white p-6 shadow-lg">
-        <div className="flex items-center justify-center py-12">
-          <LoadingSpinner />
-          <span className="ml-3 text-slate-600">Searching properties...</span>
-        </div>
-      </section>
-    );
-  }
+  if (loading) return <ResultsLoading />;
 
-  if (error) {
-    return (
-      <section className="rounded-2xl bg-white p-6 shadow-lg">
-        <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-          <strong>Error:</strong> {error}
-        </div>
-      </section>
-    );
-  }
+  if (error) return <ResultsError error={error} />;
 
   return (
     <section className="rounded-2xl bg-white p-6 shadow-lg">
@@ -85,12 +55,7 @@ function ResultsSection() {
       </div>
 
       {results.length === 0 ? (
-        <div className="rounded-xl border border-amber-100 bg-amber-50 p-6 text-center">
-          <h3 className="text-lg font-medium text-amber-800 mb-2">No properties found</h3>
-          <p className="text-amber-700">
-            This demo uses Connecticut data—try searching for Hartford, Stamford, or New Haven.
-          </p>
-        </div>
+        <EmptyResults />
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 mb-6">
@@ -99,7 +64,7 @@ function ResultsSection() {
                 key={property.id}
                 property={property}
                 isExpanded={expandedCards.has(property.id)}
-                isAnalyzing={analyzingCards.has(`${property.id}-vision`) || analyzingCards.has(`${property.id}-description`)}
+                isAnalyzing={isAnalyzing(property.id, 'vision') || isAnalyzing(property.id, 'description')}
                 aiResponse={aiResponse}
                 aiError={aiError}
                 onToggleExpansion={() => toggleCardExpansion(property.id)}

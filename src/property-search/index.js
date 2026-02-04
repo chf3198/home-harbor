@@ -4,7 +4,7 @@
  * Public exports for property search functionality
  */
 
-const { Property, Result } = require('./Property');
+const { Property } = require('./Property');
 const { searchByCity } = require('./searchService');
 const { filterByPriceRange } = require('./priceFilter');
 const { filterByPropertyType, filterByResidentialType } = require('./typeFilter');
@@ -16,7 +16,6 @@ const { ctToProperty } = require('./ctDataMapper');
 module.exports = {
   // Core entities
   Property,
-  Result,
   
   // Search & Filter
   searchByCity,

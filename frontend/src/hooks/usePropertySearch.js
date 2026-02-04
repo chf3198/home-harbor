@@ -1,61 +1,10 @@
+/**
+ * @fileoverview Property Search Hook and Provider
+ */
+
 import { createContext, useContext, useReducer, useCallback } from 'react';
-
-// Types
-const PropertyActionTypes = {
-  SET_LOADING: 'SET_LOADING',
-  SET_RESULTS: 'SET_RESULTS',
-  SET_ERROR: 'SET_ERROR',
-  SET_FILTERS: 'SET_FILTERS',
-  SET_PAGE: 'SET_PAGE',
-  CLEAR_RESULTS: 'CLEAR_RESULTS',
-};
-
-// Initial state
-const initialState = {
-  loading: false,
-  results: [],
-  error: null,
-  filters: {
-    city: '',
-    minPrice: '',
-    maxPrice: '',
-    bedrooms: '',
-    bathrooms: '',
-    propertyType: '',
-  },
-  pagination: {
-    page: 1,
-    pageSize: 12,
-    total: 0,
-    totalPages: 0,
-  },
-};
-
-// Reducer
-function propertyReducer(state, action) {
-  switch (action.type) {
-    case PropertyActionTypes.SET_LOADING:
-      return { ...state, loading: action.payload };
-    case PropertyActionTypes.SET_RESULTS:
-      return {
-        ...state,
-        results: action.payload.data,
-        pagination: action.payload.pagination,
-        loading: false,
-        error: null,
-      };
-    case PropertyActionTypes.SET_ERROR:
-      return { ...state, error: action.payload, loading: false };
-    case PropertyActionTypes.SET_FILTERS:
-      return { ...state, filters: { ...state.filters, ...action.payload } };
-    case PropertyActionTypes.SET_PAGE:
-      return { ...state, pagination: { ...state.pagination, page: action.payload } };
-    case PropertyActionTypes.CLEAR_RESULTS:
-      return { ...state, results: [], pagination: { ...state.pagination, page: 1, total: 0, totalPages: 0 } };
-    default:
-      return state;
-  }
-}
+import { PropertyActionTypes, initialState } from './propertySearchTypes.js';
+import { propertyReducer } from './propertySearchReducer.js';
 
 // Context
 const PropertyContext = createContext();

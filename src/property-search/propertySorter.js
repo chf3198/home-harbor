@@ -4,6 +4,8 @@
  * Pure functions for sorting properties by various criteria
  */
 
+const { parse, isValid } = require('date-fns');
+
 /**
  * Parse MM/DD/YYYY date string to comparable number
  * @param {string} dateStr - e.g. "04/14/2021"
@@ -11,8 +13,8 @@
  */
 function parseDate(dateStr) {
   if (!dateStr) return 0;
-  const [month, day, year] = dateStr.split('/').map(Number);
-  return new Date(year, month - 1, day).getTime();
+  const date = parse(dateStr, 'MM/dd/yyyy', new Date());
+  return isValid(date) ? date.getTime() : 0;
 }
 
 /**

@@ -7,7 +7,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import axios from 'axios';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -188,17 +187,24 @@ Guidelines:
     response_format: { type: 'json_object' }
   };
   
-  const response = await axios.post(OPENROUTER_API_URL, requestBody, {
+  const response = await fetch(OPENROUTER_API_URL, {
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
       'HTTP-Referer': 'https://home-harbor.example.com',
       'X-Title': 'HomeHarbor AI Property Descriptions'
     },
-    timeout: 60000
+    body: JSON.stringify(requestBody),
+    signal: AbortSignal.timeout(60000)
   });
   
-  const content = response.data.choices[0].message.content;
+  if (!response.ok) {
+    throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  const content = data.choices[0].message.content;
   console.log('Raw AI response:', content);
   
   // Parse JSON response

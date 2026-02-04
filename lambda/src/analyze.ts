@@ -1,7 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import axios from 'axios';
 
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const secretsClient = new SecretsManagerClient({});
@@ -47,22 +46,32 @@ export const handler = async (event: any) => {
     const apiKey = secrets.openrouter_api_key;
 
     // Call OpenRouter
-    const response = await axios.post(OPENROUTER_API_URL, {
-      model: 'allenai/molmo-7b',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: 'Analyze this property exterior photo and provide insights on architectural style, condition, features, etc.' },
-            { type: 'image_url', image_url: { url: imageUrl } }
-          ]
-        }
-      ]
-    }, {
-      headers: { 'Authorization': `Bearer ${apiKey}` }
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'allenai/molmo-7b',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Analyze this property exterior photo and provide insights on architectural style, condition, features, etc.' },
+              { type: 'image_url', image_url: { url: imageUrl } }
+            ]
+          }
+        ]
+      })
     });
 
-    const insights = response.data.choices[0].message.content;
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const insights = data.choices[0].message.content;
 
     // Cache result
     const putCommand = new PutCommand({

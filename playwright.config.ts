@@ -10,6 +10,9 @@ export default defineConfig({
     baseURL: 'http://localhost:3001', // Mock server port
     actionTimeout: 10_000,
     navigationTimeout: 30_000,
+    trace: 'retain-on-failure', // Collect traces on failure
+    screenshot: 'only-on-failure', // Take screenshots on failure
+    video: 'retain-on-failure', // Record video on failure
   },
   projects: [
     {

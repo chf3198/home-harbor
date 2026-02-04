@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const { parse } = require('csv-parse');
-const { Result } = require('./Property');
+const { err, ok } = require('neverthrow');
 const { ctToProperty } = require('./ctDataMapper');
 
 /**
@@ -22,7 +22,7 @@ async function loadCsvFile(filePath) {
 
     // Check file exists
     if (!fs.existsSync(filePath)) {
-      resolve(Result.fail(`CSV file not found: ${filePath}`));
+      resolve(err(`CSV file not found: ${filePath}`));
       return;
     }
 
@@ -36,7 +36,7 @@ async function loadCsvFile(filePath) {
       .pipe(parser)
       .on('data', (row) => {
         const result = ctToProperty(row);
-        if (result.isSuccess) {
+        if (result.isOk()) {
           properties.push(result.value);
         } else {
           // Log error but continue processing
@@ -48,13 +48,13 @@ async function loadCsvFile(filePath) {
       })
       .on('end', () => {
         if (properties.length === 0) {
-          resolve(Result.fail('No valid properties loaded from CSV'));
+          resolve(err('No valid properties loaded from CSV'));
         } else {
-          resolve(Result.ok(properties));
+          resolve(ok(properties));
         }
       })
       .on('error', (error) => {
-        resolve(Result.fail(`CSV parsing error: ${error.message}`));
+        resolve(err(`CSV parsing error: ${error.message}`));
       });
   });
 }

@@ -1,4 +1,12 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @fileoverview Property Card Component
+ */
+
+import React from 'react';
+import PropertyCardDetails from './PropertyCardDetails';
+import PropertyCardAI from './PropertyCardAI';
+import PropertyCardActions from './PropertyCardActions';
+import { usePropertyDetails } from '../hooks/usePropertyDetails';
 
 function PropertyCard({
   property,
@@ -10,29 +18,7 @@ function PropertyCard({
   onAnalyze,
   formatCurrency
 }) {
-  const [details, setDetails] = useState(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState(null);
-
-  const loadPropertyDetails = async () => {
-    if (details) return; // Already loaded
-
-    setDetailsLoading(true);
-    setDetailsError(null);
-
-    try {
-      const response = await fetch(`/api/properties/${property.id}`);
-      if (!response.ok) {
-        throw new Error('Failed to load property details');
-      }
-      const data = await response.json();
-      setDetails(data);
-    } catch (error) {
-      setDetailsError(error.message);
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
+  const { details, detailsLoading, detailsError, loadPropertyDetails } = usePropertyDetails(property.id);
 
   const handleToggleExpansion = async () => {
     if (!isExpanded) {
@@ -80,67 +66,25 @@ function PropertyCard({
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        <button
-          onClick={handleToggleExpansion}
-          className="btn-secondary text-xs"
-          disabled={detailsLoading}
-        >
-          {detailsLoading ? 'Loading...' : isExpanded ? 'Hide details' : 'View details'}
-        </button>
-
-        <button
-          onClick={() => onAnalyze('vision')}
-          disabled={isAnalyzing}
-          className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isAnalyzing ? 'Analyzing...' : 'Analyze photo'}
-        </button>
-
-        <button
-          onClick={() => onAnalyze('description')}
-          disabled={isAnalyzing}
-          className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isAnalyzing ? 'Generating...' : 'Generate description'}
-        </button>
-      </div>
+      <PropertyCardActions
+        onToggleExpansion={handleToggleExpansion}
+        onAnalyze={onAnalyze}
+        isExpanded={isExpanded}
+        isAnalyzing={isAnalyzing}
+        detailsLoading={detailsLoading}
+      />
 
       {/* Details Panel */}
       {isExpanded && (
-        <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-600">
-          {detailsError ? (
-            <p className="text-red-600">{detailsError}</p>
-          ) : details ? (
-            <div className="space-y-1">
-              <p><strong>Address:</strong> {details.address}</p>
-              <p><strong>Sale Date:</strong> {details.metadata?.saleDate || 'N/A'}</p>
-              <p><strong>Residential Type:</strong> {details.metadata?.residentialType || 'N/A'}</p>
-              <p><strong>Serial Number:</strong> {details.metadata?.serialNumber || 'N/A'}</p>
-            </div>
-          ) : (
-            <p>Loading details...</p>
-          )}
-        </div>
+        <PropertyCardDetails
+          details={details}
+          detailsError={detailsError}
+          detailsLoading={detailsLoading}
+        />
       )}
 
       {/* AI Analysis Panel */}
-      {(aiResponse || aiError) && (
-        <div className={`mt-3 rounded-xl border p-3 text-sm ${
-          aiError
-            ? 'border-red-100 bg-red-50 text-red-900'
-            : 'border-emerald-100 bg-emerald-50 text-emerald-900'
-        }`}>
-          {aiError ? (
-            <p>{aiError}</p>
-          ) : (
-            <div>
-              <h4 className="font-medium mb-2">AI Analysis</h4>
-              <div className="whitespace-pre-wrap">{aiResponse}</div>
-            </div>
-          )}
-        </div>
-      )}
+      <PropertyCardAI aiResponse={aiResponse} aiError={aiError} />
     </div>
   );
 }

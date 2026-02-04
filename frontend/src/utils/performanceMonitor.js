@@ -3,6 +3,10 @@
  * Tracks Core Web Vitals and custom metrics for production monitoring
  */
 
+import { trackCoreWebVitals } from './coreWebVitals.js';
+import { trackNavigationTiming } from './navigationTiming.js';
+import { trackResourceTiming } from './resourceTiming.js';
+
 class PerformanceMonitor {
   constructor() {
     this.metrics = {};
@@ -11,100 +15,9 @@ class PerformanceMonitor {
 
   // Initialize Core Web Vitals tracking
   init() {
-    this.trackCoreWebVitals();
-    this.trackNavigationTiming();
-    this.trackResourceTiming();
-  }
-
-  // Track Core Web Vitals
-  trackCoreWebVitals() {
-    // Largest Contentful Paint (LCP)
-    if ('PerformanceObserver' in window) {
-      try {
-        const lcpObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const lastEntry = entries[entries.length - 1];
-          this.recordMetric('LCP', lastEntry.startTime);
-        });
-        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-        this.observers.push(lcpObserver);
-      } catch (e) {
-        console.warn('LCP tracking not supported');
-      }
-
-      // First Input Delay (FID)
-      try {
-        const fidObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          entries.forEach((entry) => {
-            this.recordMetric('FID', entry.processingStart - entry.startTime);
-          });
-        });
-        fidObserver.observe({ entryTypes: ['first-input'] });
-        this.observers.push(fidObserver);
-      } catch (e) {
-        console.warn('FID tracking not supported');
-      }
-
-      // Cumulative Layout Shift (CLS)
-      try {
-        let clsValue = 0;
-        const clsObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          entries.forEach((entry) => {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
-            }
-          });
-          this.recordMetric('CLS', clsValue);
-        });
-        clsObserver.observe({ entryTypes: ['layout-shift'] });
-        this.observers.push(clsObserver);
-      } catch (e) {
-        console.warn('CLS tracking not supported');
-      }
-    }
-  }
-
-  // Track navigation timing
-  trackNavigationTiming() {
-    if ('performance' in window && 'getEntriesByType' in performance) {
-      window.addEventListener('load', () => {
-        const navigation = performance.getEntriesByType('navigation')[0];
-        if (navigation) {
-          this.recordMetric('Navigation Timing', {
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
-            loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
-            totalTime: navigation.loadEventEnd - navigation.fetchStart
-          });
-        }
-      });
-    }
-  }
-
-  // Track resource timing for bundle analysis
-  trackResourceTiming() {
-    if ('PerformanceObserver' in window) {
-      try {
-        const resourceObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const jsResources = entries.filter(entry =>
-            entry.name.includes('.js') && entry.initiatorType === 'script'
-          );
-
-          jsResources.forEach((resource) => {
-            this.recordMetric(`Resource: ${resource.name.split('/').pop()}`, {
-              size: resource.transferSize,
-              loadTime: resource.responseEnd - resource.requestStart
-            });
-          });
-        });
-        resourceObserver.observe({ entryTypes: ['resource'] });
-        this.observers.push(resourceObserver);
-      } catch (e) {
-        console.warn('Resource timing tracking not supported');
-      }
-    }
+    trackCoreWebVitals(this.recordMetric.bind(this), this.observers);
+    trackNavigationTiming(this.recordMetric.bind(this));
+    trackResourceTiming(this.recordMetric.bind(this), this.observers);
   }
 
   // Record custom metrics

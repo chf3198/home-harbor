@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import UserGuide from './UserGuide';
+import DevInfo from './DevInfo';
 
 function HelpModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,46 +66,7 @@ function HelpModal() {
           </div>
 
           <div className="prose prose-sm max-w-none">
-            {activeTab === 'user' ? (
-              <div>
-                <h3>How to Use HomeHarbor</h3>
-                <p>HomeHarbor helps you search for real estate properties using legal, free data sources.</p>
-
-                <h4>Searching Properties</h4>
-                <ul>
-                  <li>Enter a city name in Connecticut</li>
-                  <li>Set price ranges and property details</li>
-                  <li>Click "Search Properties" to find matches</li>
-                </ul>
-
-                <h4>AI Features</h4>
-                <ul>
-                  <li>Ask questions about properties in the chat</li>
-                  <li>Get AI-powered analysis and descriptions</li>
-                  <li>All AI features use free, open-source models</li>
-                </ul>
-              </div>
-            ) : (
-              <div>
-                <h3>Technical Information</h3>
-                <p>This application demonstrates modern serverless architecture.</p>
-
-                <h4>Architecture</h4>
-                <ul>
-                  <li><strong>Frontend:</strong> React with Vite</li>
-                  <li><strong>Backend:</strong> AWS Lambda functions</li>
-                  <li><strong>Database:</strong> DynamoDB with TTL caching</li>
-                  <li><strong>AI:</strong> OpenRouter API with cascading fallbacks</li>
-                </ul>
-
-                <h4>Data Sources</h4>
-                <ul>
-                  <li>Redfin Market Analytics (public S3)</li>
-                  <li>Connecticut Open Data (government API)</li>
-                  <li>Google Street View (free tier)</li>
-                </ul>
-              </div>
-            )}
+            {activeTab === 'user' ? <UserGuide /> : <DevInfo />}
           </div>
         </div>
       </div>

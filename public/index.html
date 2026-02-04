@@ -1296,12 +1296,7 @@
         helpTabDev.addEventListener('click', () => openHelp('developer'));
       }
 
-      fetchConfig();
-      fetchCitySuggestions();
-      fetchResults().catch((error) => {
-        setStatus(`Failed to load properties: ${error.message}`, 'error');
-        setLoading(false);
-      });
     </script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

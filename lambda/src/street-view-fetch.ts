@@ -6,7 +6,6 @@
 
 import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import axios from 'axios';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 const s3Client = new S3Client({});
@@ -117,13 +116,19 @@ async function fetchStreetViewImage(
   
   console.log(`Fetching Street View image for: ${location}`);
   
-  const response = await axios.get(url, {
-    responseType: 'arraybuffer',
-    timeout: 15000
+  const response = await fetch(url, {
+    method: 'GET',
+    signal: AbortSignal.timeout(15000)
   });
   
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  const arrayBuffer = await response.arrayBuffer();
+  
   // Check if response is a valid image (Google returns a blank image if no Street View available)
-  const buffer = Buffer.from(response.data);
+  const buffer = Buffer.from(arrayBuffer);
   
   if (buffer.length < 1000) {
     throw new Error('No Street View imagery available for this location');

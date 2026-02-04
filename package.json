@@ -18,22 +18,30 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:full": "node scripts/run-e2e-tests.js",
     "lint": "eslint src/**/*.js",
     "format": "prettier --write \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\"",
+    "check-sizes": "find . -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' | grep -v node_modules | xargs wc -l | awk '$1 > 100 {print $2 \": \" $1 \" lines\"; exit 1}'",
     "start": "node src/server.js",
     "dev": "node src/server.js"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
+    "@playwright/test": "^1.40.0",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "prettier": "^3.2.5"
   },
   "dependencies": {
     "csv-parse": "^6.1.0",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "neverthrow": "^6.1.0",
+    "date-fns": "^3.6.0",
+    "joi": "^17.13.0"
   },
   "engines": {
     "node": ">=18.0.0"

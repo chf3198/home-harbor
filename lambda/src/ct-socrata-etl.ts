@@ -6,7 +6,6 @@
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
-import axios from 'axios';
 import { Context, ScheduledEvent } from 'aws-lambda';
 
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -67,9 +66,9 @@ async function fetchTransactions(
   offset: number = 0,
   limit: number = BATCH_SIZE
 ): Promise<CTTransaction[]> {
-  const params = {
-    $limit: limit,
-    $offset: offset,
+  const params = new URLSearchParams({
+    $limit: limit.toString(),
+    $offset: offset.toString(),
     $order: 'date_recorded DESC',
     $where: `
       date_recorded >= '2023-01-01' AND
@@ -77,21 +76,29 @@ async function fetchTransactions(
       property_type = 'Residential' AND
       (non_use_code IS NULL OR non_use_code = '')
     `.replace(/\s+/g, ' ').trim()
-  };
+  });
+  
+  const url = `${SOCRATA_ENDPOINT}?${params.toString()}`;
   
   console.log(`Fetching transactions: offset=${offset}, limit=${limit}`);
   
-  const response = await axios.get<CTTransaction[]>(SOCRATA_ENDPOINT, {
-    params,
-    timeout: 30000,
+  const response = await fetch(url, {
+    method: 'GET',
     headers: {
       'Accept': 'application/json',
       'User-Agent': 'HomeHarbor/1.0 (Educational Project)'
-    }
+    },
+    signal: AbortSignal.timeout(30000)
   });
   
-  console.log(`Fetched ${response.data.length} transactions`);
-  return response.data;
+  if (!response.ok) {
+    throw new Error(`Socrata API error: ${response.status} ${response.statusText}`);
+  }
+  
+  const data: CTTransaction[] = await response.json();
+  
+  console.log(`Fetched ${data.length} transactions`);
+  return data;
 }
 
 /**

@@ -28,7 +28,7 @@ describe('ctDataMapper', () => {
     it('should map CT row to Property entity successfully', () => {
       const result = ctToProperty(validCtRow);
 
-      expect(result.isSuccess).toBe(true);
+      expect(result.isOk()).toBe(true);
       const property = result.value;
       expect(property.address).toBe('323 BEAVER ST, Ansonia');
       expect(property.city).toBe('Ansonia');
@@ -58,7 +58,7 @@ describe('ctDataMapper', () => {
 
       const result = ctToProperty(commercial);
 
-      expect(result.isSuccess).toBe(true);
+      expect(result.isOk()).toBe(true);
       expect(result.value.metadata.propertyType).toBe('Commercial');
       expect(result.value.metadata.residentialType).toBe('');
     });
@@ -68,7 +68,7 @@ describe('ctDataMapper', () => {
 
       const result = ctToProperty(invalid);
 
-      expect(result.isSuccess).toBe(false);
+      expect(result.isErr()).toBe(true);
       expect(result.error).toContain('Address is required');
     });
 
@@ -77,7 +77,7 @@ describe('ctDataMapper', () => {
 
       const result = ctToProperty(invalid);
 
-      expect(result.isSuccess).toBe(false);
+      expect(result.isErr()).toBe(true);
       expect(result.error).toContain('Sale Amount');
     });
 
@@ -91,7 +91,7 @@ describe('ctDataMapper', () => {
 
       const result = ctToProperty(minimal);
 
-      expect(result.isSuccess).toBe(true);
+      expect(result.isOk()).toBe(true);
       expect(result.value.metadata.assessedValue).toBeUndefined();
       expect(result.value.metadata.residentialType).toBe('');
     });

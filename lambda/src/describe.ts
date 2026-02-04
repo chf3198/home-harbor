@@ -1,7 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import axios from 'axios';
 
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const secretsClient = new SecretsManagerClient({});
@@ -47,16 +46,26 @@ export const handler = async (event: any) => {
     const prompt = `Generate a compelling real estate listing description for this property: ${JSON.stringify(property_data)}. Market data: ${JSON.stringify(market_data || {})}. Vision insights: ${JSON.stringify(vision_insights || {})}`;
 
     // Call OpenRouter
-    const response = await axios.post(OPENROUTER_API_URL, {
-      model: 'meta-llama/llama-3.3-70b-instruct',
-      messages: [
-        { role: 'user', content: prompt }
-      ]
-    }, {
-      headers: { 'Authorization': `Bearer ${apiKey}` }
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.3-70b-instruct',
+        messages: [
+          { role: 'user', content: prompt }
+        ]
+      })
     });
 
-    const description = response.data.choices[0].message.content;
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const description = data.choices[0].message.content;
 
     // Cache result
     const putCommand = new PutCommand({

@@ -5,7 +5,8 @@
  * Source: https://data.ct.gov/Housing-and-Development/Real-Estate-Sales-2001-2023-GL
  */
 
-const { Property, Result } = require('./Property');
+const { Property } = require('./Property');
+const { err } = require('neverthrow');
 
 /**
  * Parse currency string to number
@@ -32,15 +33,15 @@ function ctToProperty(ctRow) {
 
   // Validate required fields
   if (!address) {
-    return Result.fail('Address is required');
+    return err('Address is required');
   }
 
   if (!town) {
-    return Result.fail('Town is required');
+    return err('Town is required');
   }
 
   if (saleAmount === undefined || saleAmount <= 0) {
-    return Result.fail('Sale Amount must be positive');
+    return err('Sale Amount must be positive');
   }
 
   // Build property object

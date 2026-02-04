@@ -1,39 +1,10 @@
+/**
+ * @fileoverview AI Chat Hook and Provider
+ */
+
 import { createContext, useContext, useReducer, useCallback } from 'react';
-
-// Types
-const AIActionTypes = {
-  SET_LOADING: 'SET_LOADING',
-  SET_RESPONSE: 'SET_RESPONSE',
-  SET_ERROR: 'SET_ERROR',
-  CLEAR_CHAT: 'CLEAR_CHAT',
-  SET_AI_READY: 'SET_AI_READY',
-};
-
-// Initial state
-const initialState = {
-  loading: false,
-  response: '',
-  error: null,
-  aiReady: false,
-};
-
-// Reducer
-function aiReducer(state, action) {
-  switch (action.type) {
-    case AIActionTypes.SET_LOADING:
-      return { ...state, loading: action.payload };
-    case AIActionTypes.SET_RESPONSE:
-      return { ...state, response: action.payload, loading: false, error: null };
-    case AIActionTypes.SET_ERROR:
-      return { ...state, error: action.payload, loading: false };
-    case AIActionTypes.CLEAR_CHAT:
-      return { ...state, response: '', error: null };
-    case AIActionTypes.SET_AI_READY:
-      return { ...state, aiReady: action.payload };
-    default:
-      return state;
-  }
-}
+import { AIActionTypes, initialState } from './aiChatTypes.js';
+import { aiReducer } from './aiChatReducer.js';
 
 // Context
 const AIContext = createContext();

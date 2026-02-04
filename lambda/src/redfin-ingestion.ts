@@ -7,7 +7,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
-import axios from 'axios';
 import { parse } from 'csv-parse/sync';
 import { Context, ScheduledEvent } from 'aws-lambda';
 
@@ -75,17 +74,23 @@ interface MarketMetric {
 async function downloadRedfinData(url: string): Promise<string> {
   console.log(`Downloading data from: ${url}`);
   
-  const response = await axios.get(url, {
-    responseType: 'arraybuffer',
-    timeout: 60000, // 60 second timeout
+  const response = await fetch(url, {
+    method: 'GET',
     headers: {
       'User-Agent': 'HomeHarbor/1.0 (Educational Project)'
-    }
+    },
+    signal: AbortSignal.timeout(60000) // 60 second timeout
   });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  const arrayBuffer = await response.arrayBuffer();
   
   // Decompress gzip
   const zlib = await import('zlib');
-  const decompressed = zlib.gunzipSync(Buffer.from(response.data));
+  const decompressed = zlib.gunzipSync(Buffer.from(arrayBuffer));
   
   return decompressed.toString('utf-8');
 }

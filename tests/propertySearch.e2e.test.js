@@ -18,7 +18,7 @@ describe('End-to-End Property Search', () => {
   beforeAll(async () => {
     const csvPath = path.join(__dirname, '../data/ct-sample-50.csv');
     const result = await loadCsvFile(csvPath);
-    expect(result.isSuccess).toBe(true);
+    expect(result.isOk()).toBe(true);
     allProperties = result.value;
   });
 
