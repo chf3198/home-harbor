@@ -23,7 +23,7 @@ describe('OpenRouterClient', () => {
         ok: true,
         status: 200,
         json: async () => ({ data: mockModels }),
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       const models = await client.getModels();
@@ -42,21 +42,13 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw RateLimitError on 429 response', async () => {
-      global.fetch.mockResolvedValueOnce({
+      global.fetch.mockResolvedValue({
         ok: false,
         status: 429,
         headers: { get: (key) => key === 'Retry-After' ? '60' : null },
       });
 
       await expect(client.getModels()).rejects.toThrow(RateLimitError);
-
-      // Setup mock again for second assertion
-      global.fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 429,
-        headers: { get: (key) => key === 'Retry-After' ? '60' : null },
-      });
-      
       await expect(client.getModels()).rejects.toThrow('Rate limit exceeded');
     });
 
@@ -71,16 +63,16 @@ describe('OpenRouterClient', () => {
         await client.getModels();
       } catch (error) {
         expect(error).toBeInstanceOf(RateLimitError);
-        expect(error.retryAfter).toBe(60000); // Default 60s
+        expect(error.retryAfter).toBe(60000);
       }
     });
 
     it('should throw NetworkError on non-200 response', async () => {
-      global.fetch.mockResolvedValueOnce({
+      global.fetch.mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       await expect(client.getModels()).rejects.toThrow(NetworkError);
@@ -88,11 +80,11 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw InvalidResponseError if response format is invalid', async () => {
-      global.fetch.mockResolvedValueOnce({
+      global.fetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: async () => ({ invalid: 'format' }),
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       await expect(client.getModels()).rejects.toThrow(InvalidResponseError);
@@ -100,9 +92,9 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw NetworkError on timeout', async () => {
-      client.timeout = 100; // 100ms timeout for test
+      client.timeout = 100;
 
-      global.fetch.mockImplementationOnce(() => 
+      global.fetch.mockImplementation(() => 
         new Promise((resolve) => setTimeout(resolve, 200))
       );
 
@@ -111,7 +103,7 @@ describe('OpenRouterClient', () => {
     });
 
     it('should throw NetworkError on fetch failure', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Connection refused'));
+      global.fetch.mockRejectedValue(new Error('Connection refused'));
 
       await expect(client.getModels()).rejects.toThrow(NetworkError);
       await expect(client.getModels()).rejects.toThrow('Network error');
@@ -133,7 +125,7 @@ describe('OpenRouterClient', () => {
         ok: true,
         status: 200,
         json: async () => mockResponse,
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       const response = await client.sendChatMessage(model, messages);
@@ -158,7 +150,7 @@ describe('OpenRouterClient', () => {
         ok: true,
         status: 200,
         json: async () => ({ choices: [{ message: { content: 'test' } }] }),
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       await client.sendChatMessage(model, messages, options);
@@ -175,19 +167,19 @@ describe('OpenRouterClient', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        headers: new Map([['Retry-After', '30']]),
+        headers: { get: (key) => key === 'Retry-After' ? '30' : null },
       });
 
       await expect(client.sendChatMessage(model, messages)).rejects.toThrow(RateLimitError);
     });
 
     it('should throw NetworkError on non-200 response with error message', async () => {
-      global.fetch.mockResolvedValueOnce({
+      global.fetch.mockResolvedValue({
         ok: false,
         status: 400,
         statusText: 'Bad Request',
         json: async () => ({ error: { message: 'Invalid model' } }),
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       await expect(client.sendChatMessage(model, messages)).rejects.toThrow(NetworkError);
@@ -199,7 +191,7 @@ describe('OpenRouterClient', () => {
         ok: true,
         status: 200,
         json: async () => ({ choices: [] }),
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       await expect(client.sendChatMessage(model, messages)).rejects.toThrow(InvalidResponseError);
@@ -208,7 +200,7 @@ describe('OpenRouterClient', () => {
     it('should throw NetworkError on timeout', async () => {
       client.timeout = 50;
 
-      global.fetch.mockImplementationOnce(() =>
+      global.fetch.mockImplementation(() =>
         new Promise((resolve) => setTimeout(resolve, 200))
       );
 
