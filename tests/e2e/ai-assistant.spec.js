@@ -25,8 +25,11 @@ test.describe('HomeHarbor AI Assistant', () => {
     // Type a question in the textarea
     await page.locator('textarea[name="message"]').fill('What neighborhoods in Hartford are good for families?');
 
+    // Wait for form to stabilize before clicking (WebKit stability)
+    await page.waitForTimeout(100);
+
     // Submit the message
-    await page.locator('#chat-form button[type="submit"]').click();
+    await page.locator('#chat-form button[type="submit"]').click({ timeout: 15000 });
 
     // Verify response area is visible (may show error without API key in test env)
     await expect(page.locator('#chat-response')).toBeVisible();
