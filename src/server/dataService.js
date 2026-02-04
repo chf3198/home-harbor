@@ -31,7 +31,7 @@ function buildCityCache(properties) {
 
 async function loadData() {
   const result = await loadCsvFile(DATA_FILE);
-  if (result.isSuccess) {
+  if (result.isOk()) {
     propertiesCache = assignIds(result.value);
     cityCache = buildCityCache(propertiesCache);
     dataLoadError = null;
