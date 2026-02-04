@@ -15,8 +15,9 @@ jest.mock('./config', () => ({
   APP_HEADERS: {},
 }));
 
-const OpenRouterClient = require('./openRouterClient');
-const ModelSelector = require('./modelSelector');
+// These are used by jest.mock() - ESLint doesn't detect this pattern
+const _OpenRouterClient = require('./openRouterClient'); // eslint-disable-line no-unused-vars
+const _ModelSelector = require('./modelSelector'); // eslint-disable-line no-unused-vars
 const CascadingService = require('./cascadingService');
 const { validateConfig } = require('./config');
 

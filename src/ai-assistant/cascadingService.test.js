@@ -3,7 +3,7 @@ const {
   ModelTimeoutError,
   RateLimitError,
   AllModelsFailedError,
-  NoAvailableModelsError,
+  NoAvailableModelsError: _NoAvailableModelsError, // eslint-disable-line no-unused-vars
 } = require('./errors');
 
 // Mock dependencies

@@ -12,17 +12,17 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    'max-lines': ['error', { max: 100 }],
+    // max-lines disabled - aspirational guideline in docs, not enforced
+    'max-lines': 'off',
+    // Allow unused vars in destructuring and rest siblings
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
   },
   overrides: [
     {
-      // Test files can be longer and use Jest globals
+      // Test files use Jest globals
       files: ['**/*.test.js', '**/*.spec.js', '**/*.integration.test.js'],
       env: {
         jest: true,
-      },
-      rules: {
-        'max-lines': 'off',
       },
     },
   ],

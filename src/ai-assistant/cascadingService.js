@@ -1,5 +1,5 @@
 const { ModelTimeoutError, AllModelsFailedError, RateLimitError } = require('./errors');
-const { sleep, retryWithBackoff, executeWithRetry } = require('./retryUtils');
+const { retryWithBackoff, executeWithRetry } = require('./retryUtils');
 
 /**
  * Cascading retry service - attempts requests across multiple models
