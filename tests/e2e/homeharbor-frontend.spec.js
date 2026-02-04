@@ -50,7 +50,7 @@ test.describe('HomeHarbor Property Search', () => {
     await page.locator('#search-form button[type="submit"]').click();
 
     // Verify results section shows (or no results message)
-    await expect(page.locator('#search-results')).toBeVisible();
+    await expect(page.locator('#results')).toBeVisible();
   });
 
   test('AI chat interface works correctly', async ({ page }) => {

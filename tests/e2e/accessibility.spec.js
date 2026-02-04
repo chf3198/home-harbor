@@ -117,7 +117,7 @@ test.describe('HomeHarbor Accessibility', () => {
   });
 
   test('loading states are announced', async ({ page }) => {
-    // Verify the search results container exists for results display
-    await expect(page.locator('#search-results')).toBeVisible();
+    // Verify the results container exists for results display
+    await expect(page.locator('#results')).toBeVisible();
   });
 });

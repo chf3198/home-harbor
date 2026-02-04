@@ -37,8 +37,8 @@ test.describe('HomeHarbor AI Assistant', () => {
     await page.locator('input[name="city"]').fill('Hartford');
     await page.locator('#search-form button[type="submit"]').click();
 
-    // Verify search results container is visible
-    await expect(page.locator('#search-results')).toBeVisible();
+    // Verify results container is visible
+    await expect(page.locator('#results')).toBeVisible();
   });
 
   test('maintains chat history', async ({ page }) => {
@@ -89,7 +89,7 @@ test.describe('HomeHarbor AI Assistant', () => {
     await page.locator('input[name="city"]').fill('Hartford');
     await page.locator('#search-form button[type="submit"]').click();
 
-    // Verify search results area is visible
-    await expect(page.locator('#search-results')).toBeVisible();
+    // Verify results area is visible
+    await expect(page.locator('#results')).toBeVisible();
   });
 });
