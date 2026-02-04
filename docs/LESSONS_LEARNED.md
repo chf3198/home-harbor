@@ -138,6 +138,33 @@
 
 ---
 
+## Git Workflow Standards
+
+### Conventional Commits (Adopted February 4, 2026)
+- **Source**: [conventionalcommits.org](https://www.conventionalcommits.org/en/v1.0.0/)
+- **Format**: `<type>[optional scope]: <description>`
+- **Types Used**:
+  - `fix:` Bug fixes (correlates with PATCH in SemVer)
+  - `feat:` New features (correlates with MINOR)
+  - `refactor:` Code restructuring without behavior change
+  - `docs:` Documentation only changes
+  - `test:` Adding or correcting tests
+  - `chore:` Maintenance tasks
+- **Breaking Changes**: Add `BREAKING CHANGE:` in commit body or `!` after type
+- **Why**: Automated changelog generation, clear commit history, SemVer alignment
+
+### Trunk-Based Development Pattern
+- **Source**: [trunkbaseddevelopment.com](https://trunkbaseddevelopment.com/)
+- **Pattern**: Short-lived feature branches (1-2 days max), frequent merges to trunk
+- **Why**: Reduces merge conflicts, enables continuous integration
+- **Implementation**:
+  - Feature work on `feature/*` branches
+  - Bug fixes on `fix/*` branches (merged same day)
+  - Delete branches after merge
+- **Evidence**: Successfully used `fix/real-data-and-links` branch for bug fixes
+
+---
+
 ## Library Simplification Achievements
 
 ### Backend Library Replacements (Phase 1-3 Complete)
