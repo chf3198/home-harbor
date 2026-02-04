@@ -6,8 +6,9 @@ function getApiBase() {
   return window.HOME_HARBOR_CONFIG?.apiBaseUrl || '';
 }
 
-const localSample = Array.isArray(window.HOME_HARBOR_SAMPLE)
-  ? window.HOME_HARBOR_SAMPLE
+// Use HOME_HARBOR_DATA from index.html inline script
+const localSample = Array.isArray(window.HOME_HARBOR_DATA)
+  ? window.HOME_HARBOR_DATA
   : [];
 const localDataById = new Map(
   localSample.map((property) => [String(property.id), property])

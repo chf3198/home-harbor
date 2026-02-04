@@ -20,8 +20,14 @@ export function createCardElements(property) {
   details.textContent = `City: ${property.city} | Type: ${property.metadata?.propertyType || 'N/A'}`;
   details.className = 'text-sm text-slate-500';
 
+  // Build Realtor.com search URL with city and state (CT = Connecticut)
+  // Format: address_city_state (spaces and commas replaced with hyphens/underscores)
+  const addressSlug = (property.address || '').replace(/[,\s]+/g, '-').replace(/-+/g, '-');
+  const citySlug = (property.city || 'CT').replace(/[,\s]+/g, '-');
+  const realtorSearchUrl = `https://www.realtor.com/realestateandhomes-search/${citySlug}_CT/${addressSlug}`;
+  
   const realtorLink = document.createElement('a');
-  realtorLink.href = `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(property.address)}`;
+  realtorLink.href = realtorSearchUrl;
   realtorLink.target = '_blank';
   realtorLink.rel = 'noopener noreferrer';
   realtorLink.textContent = 'View on Realtor.com';
