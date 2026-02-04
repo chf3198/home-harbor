@@ -180,6 +180,18 @@
 - **Cities**: West Hartford, Shelton, South Windsor, Stratford, Torrington, etc.
 - **Validation**: API tested, data integrated into index.html, Realtor.com links verified
 
+### Realtor.com URL Format (February 4, 2026)
+- **Problem**: Direct listing URLs require MLS ID (`/realestateandhomes-detail/M3177893889`)
+- **CT Data Limitation**: Government sales data has no MLS IDs
+- **Alternatives Evaluated**:
+  1. Address path slug (`/City_CT/123-Main-St`) - Returns 404
+  2. City-only search (`/City_CT`) - Works but not address-specific
+  3. Keyword search (`/City_CT?keyword=address`) - Rate limited, unreliable
+  4. Google site search (`site:realtor.com address`) - Always works ✓
+- **Solution**: Use Google Search with `site:realtor.com` filter
+- **Format**: `https://www.google.com/search?q=site:realtor.com+address+city+CT`
+- **UX**: Button text "Find on Realtor.com" - honest about indirection
+
 ---
 
 ## Library Simplification Achievements

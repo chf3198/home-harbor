@@ -829,16 +829,16 @@
           details.textContent = `City: ${property.city} | Type: ${property.metadata?.propertyType || 'N/A'}`;
           details.className = 'text-sm text-slate-500';
 
-          // Build Realtor.com search URL with city and state (CT = Connecticut)
-          const addressSlug = (property.address || '').replace(/[,\s]+/g, '-').replace(/-+/g, '-');
-          const citySlug = (property.city || 'CT').replace(/[,\s]+/g, '-');
-          const realtorSearchUrl = `https://www.realtor.com/realestateandhomes-search/${citySlug}_CT/${addressSlug}`;
+          // Build Google Search URL to find property on Realtor.com
+          // More reliable than direct Realtor.com URLs which require MLS IDs
+          const searchQuery = encodeURIComponent(`site:realtor.com ${property.address} ${property.city} CT`);
+          const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
           
           const realtorLink = document.createElement('a');
-          realtorLink.href = realtorSearchUrl;
+          realtorLink.href = googleSearchUrl;
           realtorLink.target = '_blank';
           realtorLink.rel = 'noopener noreferrer';
-          realtorLink.textContent = 'View on Realtor.com';
+          realtorLink.textContent = 'Find on Realtor.com';
           realtorLink.className =
             'text-xs font-semibold text-emerald-700 hover:underline';
 
