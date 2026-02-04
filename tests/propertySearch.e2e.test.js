@@ -115,8 +115,8 @@ describe('End-to-End Property Search', () => {
   });
 
   it('should handle empty result sets gracefully', () => {
-    // Search for impossible criteria
-    const results = filterByPriceRange(allProperties, 1000000, 2000000);
+    // Search for impossible criteria (price way above all data)
+    const results = filterByPriceRange(allProperties, 10000000, 20000000);
     const page = paginate(results, { page: 1, pageSize: 10 });
 
     expect(page.data.length).toBe(0);

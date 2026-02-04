@@ -4,7 +4,7 @@
  */
 
 const { ctToProperty } = require('./ctDataMapper');
-const { Property } = require('./Property');
+const { Property: _Property } = require('./Property'); // eslint-disable-line no-unused-vars
 
 describe('ctDataMapper', () => {
   describe('ctToProperty', () => {

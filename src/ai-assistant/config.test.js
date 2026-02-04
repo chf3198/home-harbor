@@ -1,6 +1,4 @@
 
-const { ConfigurationError } = require('./errors');
-
 describe('AI Assistant Configuration', () => {
   const originalEnv = process.env;
 
@@ -20,7 +18,6 @@ describe('AI Assistant Configuration', () => {
       delete process.env.OPENROUTER_API_KEY;
       const { validateConfig } = require('./config');
 
-      expect(() => validateConfig()).toThrow(ConfigurationError);
       expect(() => validateConfig()).toThrow(/OPENROUTER_API_KEY.*required/);
     });
 

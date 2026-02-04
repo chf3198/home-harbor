@@ -9,11 +9,12 @@ describe('filterByPriceRange', () => {
   let testProperties;
 
   beforeEach(() => {
+    // Use .value (neverthrow API)
     testProperties = [
-      Property.create({ address: '1', city: 'Columbus', price: 150000, bedrooms: 2, bathrooms: 1 }).getValue(),
-      Property.create({ address: '2', city: 'Columbus', price: 250000, bedrooms: 3, bathrooms: 2 }).getValue(),
-      Property.create({ address: '3', city: 'Columbus', price: 350000, bedrooms: 4, bathrooms: 3 }).getValue(),
-      Property.create({ address: '4', city: 'Columbus', price: 450000, bedrooms: 5, bathrooms: 4 }).getValue()
+      Property.create({ address: '1', city: 'Columbus', price: 150000, bedrooms: 2, bathrooms: 1 }).value,
+      Property.create({ address: '2', city: 'Columbus', price: 250000, bedrooms: 3, bathrooms: 2 }).value,
+      Property.create({ address: '3', city: 'Columbus', price: 350000, bedrooms: 4, bathrooms: 3 }).value,
+      Property.create({ address: '4', city: 'Columbus', price: 450000, bedrooms: 5, bathrooms: 4 }).value
     ];
   });
 

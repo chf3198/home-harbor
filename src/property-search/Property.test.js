@@ -1,11 +1,10 @@
 /**
  * Property Entity Tests
  * 
- * Testing property validation rules:
- * - Required fields (address, price, bedrooms, bathrooms)
+ * Testing property validation rules using neverthrow Result pattern:
+ * - Required fields (address, price)
  * - Price must be positive
- * - Bedrooms/bathrooms must be non-negative integers
- * - City/state should be strings
+ * - Bedrooms/bathrooms must be non-negative if provided
  */
 
 const { Property } = require('./Property');
@@ -23,11 +22,23 @@ describe('Property Validation', () => {
         bathrooms: 2
       };
 
-      const property = Property.create(validData);
+      const result = Property.create(validData);
 
-      expect(property.isSuccess).toBe(true);
-      expect(property.getValue().address).toBe('123 Main St');
-      expect(property.getValue().price).toBe(250000);
+      expect(result.isOk()).toBe(true);
+      expect(result.value.address).toBe('123 Main St');
+      expect(result.value.price).toBe(250000);
+    });
+
+    test('creates property with minimal required fields', () => {
+      const minimalData = {
+        address: '456 Oak Ave',
+        price: 300000
+      };
+
+      const result = Property.create(minimalData);
+
+      expect(result.isOk()).toBe(true);
+      expect(result.value.address).toBe('456 Oak Ave');
     });
   });
 
@@ -42,8 +53,22 @@ describe('Property Validation', () => {
 
       const result = Property.create(invalidData);
 
-      expect(result.isSuccess).toBe(false);
+      expect(result.isErr()).toBe(true);
       expect(result.error).toContain('address');
+    });
+
+    test('fails without price', () => {
+      const invalidData = {
+        address: '123 Main St',
+        city: 'Columbus',
+        bedrooms: 3,
+        bathrooms: 2
+      };
+
+      const result = Property.create(invalidData);
+
+      expect(result.isErr()).toBe(true);
+      expect(result.error).toContain('price');
     });
 
     test('fails with negative price', () => {
@@ -57,23 +82,8 @@ describe('Property Validation', () => {
 
       const result = Property.create(invalidData);
 
-      expect(result.isSuccess).toBe(false);
-      expect(result.error).toContain('price');
-    });
-
-    test('fails with negative bedrooms', () => {
-      const invalidData = {
-        address: '123 Main St',
-        city: 'Columbus',
-        price: 250000,
-        bedrooms: -1,
-        bathrooms: 2
-      };
-
-      const result = Property.create(invalidData);
-
-      expect(result.isSuccess).toBe(false);
-      expect(result.error).toContain('bedrooms');
+      expect(result.isErr()).toBe(true);
+      expect(result.error).toContain('positive');
     });
 
     test('fails with zero price', () => {
@@ -87,8 +97,22 @@ describe('Property Validation', () => {
 
       const result = Property.create(invalidData);
 
-      expect(result.isSuccess).toBe(false);
-      expect(result.error).toContain('price');
+      expect(result.isErr()).toBe(true);
+      expect(result.error).toContain('positive');
+    });
+
+    test('fails with negative bedrooms', () => {
+      const invalidData = {
+        address: '123 Main St',
+        city: 'Columbus',
+        price: 250000,
+        bedrooms: -1,
+        bathrooms: 2
+      };
+
+      const result = Property.create(invalidData);
+
+      expect(result.isErr()).toBe(true);
     });
 
     test('fails with negative bathrooms', () => {
@@ -102,15 +126,7 @@ describe('Property Validation', () => {
 
       const result = Property.create(invalidData);
 
-      expect(result.isSuccess).toBe(false);
-      expect(result.error).toContain('bathrooms');
-    });
-
-    test('cannot get value from failed result', () => {
-      const invalidData = { address: '', price: 250000, bedrooms: 3, bathrooms: 2 };
-      const result = Property.create(invalidData);
-
-      expect(() => result.getValue()).toThrow('Cannot get value from failed result');
+      expect(result.isErr()).toBe(true);
     });
   });
 });

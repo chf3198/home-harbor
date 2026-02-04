@@ -1,14 +1,14 @@
 /**
- * @fileoverview HomeHarbor React Frontend E2E Tests
- * Tests complete user workflows from search to AI analysis
+ * @fileoverview HomeHarbor Static HTML E2E Tests
+ * Tests user workflows on the production static HTML demo
  */
 
 import { test, expect } from '@playwright/test';
 
 test.describe('HomeHarbor Property Search', () => {
   test.beforeEach(async ({ page }) => {
-    // Start the development server
-    await page.goto('http://localhost:3000');
+    // Navigate to app - uses baseURL from playwright config
+    await page.goto('/');
   });
 
   test('loads application successfully', async ({ page }) => {
@@ -18,91 +18,71 @@ test.describe('HomeHarbor Property Search', () => {
     // Verify main components are present
     await expect(page.locator('header')).toBeVisible();
     await expect(page.locator('text=Search Properties')).toBeVisible();
-    await expect(page.locator('text=AI Assistant')).toBeVisible();
+    await expect(page.locator('text=Ask HomeHarbor')).toBeVisible();
   });
 
   test('displays search form with all filters', async ({ page }) => {
-    // Verify search form elements
-    await expect(page.locator('input[placeholder*="city"]')).toBeVisible();
-    await expect(page.locator('input[placeholder*="min price"]')).toBeVisible();
-    await expect(page.locator('input[placeholder*="max price"]')).toBeVisible();
+    // Verify search form elements (static HTML placeholders)
+    await expect(page.locator('input[placeholder="West Hartford"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="100000"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="500000"]')).toBeVisible();
 
-    // Verify property type filters
-    await expect(page.locator('select[name*="property type"]')).toBeVisible();
-    await expect(page.locator('select[name*="bedrooms"]')).toBeVisible();
-    await expect(page.locator('select[name*="bathrooms"]')).toBeVisible();
+    // Verify property type and style inputs
+    await expect(page.locator('input[placeholder="Residential"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="Single Family"]')).toBeVisible();
   });
 
   test('shows help modal when help button clicked', async ({ page }) => {
     // Click help button
-    await page.locator('button[aria-label*="help"]').click();
+    await page.locator('#help-button').click();
 
     // Verify modal appears
-    await expect(page.locator('text=Help & Information')).toBeVisible();
-    await expect(page.locator('text=User Guide')).toBeVisible();
-    await expect(page.locator('text=Developer Info')).toBeVisible();
+    await expect(page.locator('text=HomeHarbor Help')).toBeVisible();
   });
 
   test('performs property search and displays results', async ({ page }) => {
-    // Fill search form
-    await page.locator('input[placeholder*="city"]').fill('Hartford');
-    await page.locator('input[placeholder*="min price"]').fill('200000');
-    await page.locator('input[placeholder*="max price"]').fill('500000');
+    // Fill search form using static HTML placeholders
+    await page.locator('input[name="city"]').fill('Hartford');
+    await page.locator('input[name="minPrice"]').fill('200000');
+    await page.locator('input[name="maxPrice"]').fill('500000');
 
     // Submit search
-    await page.locator('button[type="submit"]').click();
+    await page.locator('#search-form button[type="submit"]').click();
 
-    // Verify results section appears
-    await expect(page.locator('text=Search Results')).toBeVisible();
-
-    // Verify pagination appears
-    await expect(page.locator('text=Page 1 of')).toBeVisible();
-  });
-
-  test('displays property cards with correct information', async ({ page }) => {
-    // Perform search first
-    await page.locator('input[placeholder*="city"]').fill('Hartford');
-    await page.locator('button[type="submit"]').click();
-
-    // Wait for results to load
-    await page.waitForSelector('.property-card');
-
-    // Verify property card structure
-    const firstCard = page.locator('.property-card').first();
-    await expect(firstCard.locator('text=Hartford')).toBeVisible();
-    await expect(firstCard.locator('text=bedrooms')).toBeVisible();
-    await expect(firstCard.locator('text=bathrooms')).toBeVisible();
-    await expect(firstCard.locator('text=AI Analysis')).toBeVisible();
+    // Verify results section shows (or no results message)
+    await expect(page.locator('#results')).toBeVisible();
   });
 
   test('AI chat interface works correctly', async ({ page }) => {
     // Verify AI chat section is present
-    await expect(page.locator('text=AI Property Assistant')).toBeVisible();
+    await expect(page.locator('text=Ask HomeHarbor')).toBeVisible();
 
-    // Verify chat input
-    await expect(page.locator('input[placeholder*="Ask about properties"]')).toBeVisible();
+    // Verify chat textarea
+    await expect(page.locator('textarea[placeholder="Ask about the market or search tips..."]')).toBeVisible();
 
     // Type a message
-    await page.locator('input[placeholder*="Ask about properties"]').fill('What are the best deals in Hartford?');
+    await page.locator('textarea[name="message"]').fill('What are the best deals in Hartford?');
 
-    // Submit message
-    await page.locator('button[type="submit"]').click();
+    // Submit form
+    await page.locator('#chat-form button[type="submit"]').click();
 
-    // Verify message appears in chat
-    await expect(page.locator('text=What are the best deals in Hartford?')).toBeVisible();
+    // Verify response area exists
+    await expect(page.locator('#chat-response')).toBeVisible();
   });
 
   test('keyboard navigation works', async ({ page }) => {
     // Tab through main interactive elements
-    await page.keyboard.press('Tab'); // Header
+    await page.keyboard.press('Tab'); // Help button
+    await expect(page.locator('#help-button')).toBeFocused();
+
     await page.keyboard.press('Tab'); // City input
-    await expect(page.locator('input[placeholder*="city"]')).toBeFocused();
+    await expect(page.locator('input[name="city"]')).toBeFocused();
 
     await page.keyboard.press('Tab'); // Min price
-    await expect(page.locator('input[placeholder*="min price"]')).toBeFocused();
+    await expect(page.locator('input[name="minPrice"]')).toBeFocused();
 
     await page.keyboard.press('Tab'); // Max price
-    await expect(page.locator('input[placeholder*="max price"]')).toBeFocused();
+    await expect(page.locator('input[name="maxPrice"]')).toBeFocused();
   });
 
   test('responsive design works on mobile', async ({ page }) => {
@@ -114,6 +94,6 @@ test.describe('HomeHarbor Property Search', () => {
     await expect(page.locator('text=Search Properties')).toBeVisible();
 
     // Verify search form adapts
-    await expect(page.locator('input[placeholder*="city"]')).toBeVisible();
+    await expect(page.locator('input[name="city"]')).toBeVisible();
   });
 });

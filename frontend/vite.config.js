@@ -4,9 +4,9 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  root: 'frontend',
+  // root defaults to current directory (frontend/)
   build: {
-    outDir: '../dist',
+    outDir: 'dist',
     emptyOutDir: true,
     // Bundle analysis and optimization
     rollupOptions: {
@@ -22,14 +22,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 100,
     // Generate source maps for production debugging
     sourcemap: true,
-    // Minify for production
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-      },
-    },
+    // Minify for production (use esbuild, it's built into Vite)
+    minify: 'esbuild',
   },
   server: {
     port: 3001,
