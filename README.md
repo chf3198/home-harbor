@@ -2,8 +2,9 @@
   <img src=".github/banner.svg" alt="HomeHarbor Banner" width="100%">
   
   <p>
-    <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick%20Start-Guide-10b981?style=for-the-badge" alt="Quick Start"></a>
-    <a href="https://github.com/chf3198/home-harbor/releases"><img src="https://img.shields.io/github/v/release/chf3198/home-harbor?style=for-the-badge&color=10b981" alt="Release"></a>
+    <a href="https://chf3198.github.io/home-harbor/"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-Try%20It!-10b981?style=for-the-badge" alt="Live Demo"></a>
+    <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick%20Start-Guide-6366f1?style=for-the-badge" alt="Quick Start"></a>
+    <a href="https://github.com/chf3198/home-harbor/releases"><img src="https://img.shields.io/github/v/release/chf3198/home-harbor?style=for-the-badge&color=6366f1" alt="Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"></a>
   </p>
   
