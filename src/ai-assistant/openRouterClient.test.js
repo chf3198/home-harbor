@@ -45,10 +45,18 @@ describe('OpenRouterClient', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        headers: new Map([['Retry-After', '60']]),
+        headers: { get: (key) => key === 'Retry-After' ? '60' : null },
       });
 
       await expect(client.getModels()).rejects.toThrow(RateLimitError);
+
+      // Setup mock again for second assertion
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        headers: { get: (key) => key === 'Retry-After' ? '60' : null },
+      });
+      
       await expect(client.getModels()).rejects.toThrow('Rate limit exceeded');
     });
 
@@ -56,7 +64,7 @@ describe('OpenRouterClient', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        headers: new Map(),
+        headers: { get: () => null },
       });
 
       try {

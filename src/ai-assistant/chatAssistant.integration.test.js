@@ -7,7 +7,8 @@
  * Note: This makes real API calls and may be slow or hit rate limits
  */
 
-require('dotenv').config();
+// dotenv is optional - only needed for local development
+try { require('dotenv').config(); } catch (_e) { /* dotenv not installed */ }
 const ChatAssistant = require('./chatAssistant');
 
 describe('ChatAssistant Integration Tests', () => {

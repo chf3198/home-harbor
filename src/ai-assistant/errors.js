@@ -42,9 +42,14 @@ class NetworkError extends Error {
 }
 
 class AllModelsFailedError extends Error {
-  constructor(attempts) {
-    const modelList = attempts.map(a => a.model).join(', ');
-    super(`All models failed: ${modelList}`);
+  constructor(message, attempts = []) {
+    // Handle both signatures: (attempts) and (message, attempts)
+    if (Array.isArray(message)) {
+      attempts = message;
+      const modelList = attempts.map(a => a.model).join(', ');
+      message = `All models failed: ${modelList}`;
+    }
+    super(message);
     this.name = 'AllModelsFailedError';
     this.attempts = attempts;
   }
