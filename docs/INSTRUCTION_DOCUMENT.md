@@ -28,8 +28,9 @@ High-level vision, goals, and architectural overview.
 - AI descriptions (OpenRouter LLM)
 - Photo analysis (Street View + vision)
 - Serverless pipeline (Lambda → DynamoDB → S3)
-- Realtor.com deep links
+- Realtor.com search links (via Google site search)
 - Low-code UI (Tailwind CDN, single-file HTML)
+- React frontend (31 components, Vite)
 
 ## 1.4 Architecture
 
@@ -39,8 +40,10 @@ High-level vision, goals, and architectural overview.
 - Street View + AI endpoints
 - DynamoDB + S3 caching
 
-### Frontend (Simple)
-- Single-file HTML (`public/index.html`)
+### Frontend (Simple + Modern)
+- Single-file HTML (`public/index.html`) - works via file://
+- Modular JS files (`public/*.js`) - 18 modules
+- React frontend (`frontend/`) - 31 components
 - Vanilla JS + Tailwind CSS
 - Professional offline state
 

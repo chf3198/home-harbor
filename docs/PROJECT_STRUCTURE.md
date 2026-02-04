@@ -44,9 +44,10 @@ home-harbor/
 │   └── ENGINEERING_STANDARDS.md
 │
 ├── 📂 public/                             # Single-file UI (no server required)
-│   └── index.html                         # All UI/JS inline
+│   ├── index.html                         # Main UI with embedded data (1477 lines)
+│   └── *.js                               # 18 modular JS files (extracted from inline)
 │
-├── 📂 frontend/                           # React UI Application (NEW)
+├── 📂 frontend/                           # React UI Application
 │   ├── index.html                         # Vite HTML template
 │   ├── vite.config.js                     # Vite build configuration
 │   ├── vitest.config.js                   # Testing configuration
@@ -56,17 +57,22 @@ home-harbor/
 │   │   ├── main.jsx                       # React application entry
 │   │   ├── index.css                      # Global styles & Tailwind
 │   │   │
-│   │   ├── 📂 components/                 # React components
-│   │   │   ├── Header.jsx                 # App header with branding
+│   │   ├── 📂 components/                 # 31 React components
+│   │   │   ├── PropertyCard.jsx           # Property display with AI analysis
 │   │   │   ├── SearchSection.jsx          # Property search form
 │   │   │   ├── ResultsSection.jsx         # Search results display
 │   │   │   ├── AIChatSection.jsx          # AI assistant interface
+│   │   │   ├── Header.jsx                 # App header with branding
 │   │   │   ├── HelpModal.jsx              # Help & documentation modal
-│   │   │   └── *.test.jsx                 # Component test files
+│   │   │   ├── Pagination.jsx             # Accessible pagination
+│   │   │   └── *.test.jsx                 # Component test files (16 test files)
 │   │   │
-│   │   ├── 📂 hooks/                      # Custom React hooks
+│   │   ├── 📂 hooks/                      # 11 Custom React hooks & tests
 │   │   │   ├── usePropertySearch.js       # Property search logic
-│   │   │   └── useAIChat.js               # AI chat functionality
+│   │   │   ├── useAIChat.js               # AI chat functionality
+│   │   │   ├── usePropertyDetails.js      # Property detail fetching
+│   │   │   ├── usePropertyAnalysis.js     # AI property analysis
+│   │   │   └── *Reducer.js, *Types.js     # State management
 │   │   │
 │   │   ├── 📂 utils/                      # Utility functions
 │   │   └── 📂 types/                      # TypeScript definitions (future)
@@ -98,11 +104,13 @@ home-harbor/
 ## 📊 Implementation Statistics
 
 ### Code Written
-- **Lambda Functions:** 5 TypeScript files (~1,500 lines total)
+- **Lambda Functions:** 5 TypeScript files (~1,500 lines)
+- **React Components:** 31 JSX files (~2,000 lines)
+- **Custom Hooks:** 11 JS files (~800 lines)
+- **Public JS Modules:** 18 files (~1,000 lines)
+- **Test Files:** 44 total (Jest + Vitest + Playwright)
 - **Infrastructure:** 1 Bash script (400 lines)
-- **Configuration:** 4 config files (package.json, tsconfig, etc.)
-- **Scripts:** 2 build/deploy scripts (300 lines)
-- **Documentation:** 10+ markdown files (5,000+ lines)
+- **Documentation:** 15+ markdown files (6,000+ lines)
 
 ### AWS Resources Created
 - **Lambda Functions:** 5
