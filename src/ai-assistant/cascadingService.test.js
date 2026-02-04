@@ -1,7 +1,7 @@
 const CascadingService = require('./cascadingService');
 const {
   ModelTimeoutError,
-  RateLimitError,
+  RateLimitError: _RateLimitError,
   AllModelsFailedError,
 } = require('./errors');
 
@@ -91,7 +91,7 @@ describe('CascadingService', () => {
 
       try {
         await service.sendWithCascade(messages);
-        fail('Should have thrown');
+        throw new Error('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(AllModelsFailedError);
         expect(error.attempts).toHaveLength(2);
