@@ -18,9 +18,10 @@ module.exports = {
     '**/__tests__/**/*.js',
     '**/*.test.js'
   ],
-  // Exclude Playwright tests (use .spec.js naming convention)
+  // Exclude Playwright tests (.spec.js) and frontend tests (use vitest)
   testPathIgnorePatterns: [
     '/node_modules/',
-    '.*\\.spec\\.js$'
+    '.*\\.spec\\.js$',
+    '/frontend/'
   ]
 };

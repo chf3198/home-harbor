@@ -11,7 +11,7 @@ describe('Property Search Service', () => {
   let testProperties;
 
   beforeEach(() => {
-    // Create test properties
+    // Create test properties - use .value (neverthrow API)
     testProperties = [
       Property.create({
         address: '123 Main St',
@@ -21,7 +21,7 @@ describe('Property Search Service', () => {
         price: 250000,
         bedrooms: 3,
         bathrooms: 2
-      }).getValue(),
+      }).value,
       Property.create({
         address: '456 Oak Ave',
         city: 'Cleveland',
@@ -30,7 +30,7 @@ describe('Property Search Service', () => {
         price: 180000,
         bedrooms: 2,
         bathrooms: 1
-      }).getValue(),
+      }).value,
       Property.create({
         address: '789 Elm Dr',
         city: 'Columbus',
@@ -39,7 +39,7 @@ describe('Property Search Service', () => {
         price: 320000,
         bedrooms: 4,
         bathrooms: 3
-      }).getValue()
+      }).value
     ];
   });
 

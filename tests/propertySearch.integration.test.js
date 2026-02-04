@@ -10,13 +10,13 @@ describe('Property Search Integration', () => {
   let properties;
 
   beforeEach(() => {
-    // Create realistic test data
+    // Create realistic test data - use .value (neverthrow API)
     properties = [
-      Property.create({ address: '123 Main St', city: 'Columbus', state: 'OH', price: 180000, bedrooms: 2, bathrooms: 1 }).getValue(),
-      Property.create({ address: '456 Oak Ave', city: 'Columbus', state: 'OH', price: 250000, bedrooms: 3, bathrooms: 2 }).getValue(),
-      Property.create({ address: '789 Elm Dr', city: 'Columbus', state: 'OH', price: 320000, bedrooms: 4, bathrooms: 3 }).getValue(),
-      Property.create({ address: '321 Maple Ln', city: 'Cleveland', state: 'OH', price: 200000, bedrooms: 3, bathrooms: 2 }).getValue(),
-      Property.create({ address: '654 Pine Rd', city: 'Cleveland', state: 'OH', price: 280000, bedrooms: 3, bathrooms: 2 }).getValue()
+      Property.create({ address: '123 Main St', city: 'Columbus', state: 'OH', price: 180000, bedrooms: 2, bathrooms: 1 }).value,
+      Property.create({ address: '456 Oak Ave', city: 'Columbus', state: 'OH', price: 250000, bedrooms: 3, bathrooms: 2 }).value,
+      Property.create({ address: '789 Elm Dr', city: 'Columbus', state: 'OH', price: 320000, bedrooms: 4, bathrooms: 3 }).value,
+      Property.create({ address: '321 Maple Ln', city: 'Cleveland', state: 'OH', price: 200000, bedrooms: 3, bathrooms: 2 }).value,
+      Property.create({ address: '654 Pine Rd', city: 'Cleveland', state: 'OH', price: 280000, bedrooms: 3, bathrooms: 2 }).value
     ];
   });
 
