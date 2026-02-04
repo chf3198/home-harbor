@@ -297,16 +297,15 @@ Generates compelling property descriptions with Llama 3.3 70B
 | DynamoDB | 5K items | $0.00 (free tier) |
 | S3 | 500 MB | $0.00 (free tier) |
 | CloudFront | 1 GB transfer | $0.00 (free tier) |
-| Secrets Manager | 3 secrets | $1.20 |
 | Google Street View | 500 requests | $0.00 (free tier) |
 | OpenRouter AI | 1200 requests | $0.00 (free tier) |
-| **Total** | | **$1.20/month** |
+| **Total** | | **$0.00/month** |
 
 ---
 
 ## 🔐 Security & Compliance
 
-✅ API keys encrypted in Secrets Manager  
+✅ API keys stored securely (Lambda environment variables)  
 ✅ Least-privilege IAM policies  
 ✅ CloudWatch logging enabled  
 ✅ Input validation on all endpoints  
