@@ -141,12 +141,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Serve static files from frontend build
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+// Serve static files from public folder (for demo mode without build)
+const publicPath = path.join(__dirname, '..', '..', 'public');
+app.use(express.static(publicPath));
 
-// Catch-all handler for React Router
+// Catch-all handler for SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // Start server
