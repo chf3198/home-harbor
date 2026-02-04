@@ -60,7 +60,7 @@
                   class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
                   type="text"
                   name="city"
-                  placeholder="Hartford"
+                  placeholder="West Hartford"
                   list="city-suggestions"
                   autocomplete="off"
                 />
@@ -153,8 +153,8 @@
           <div id="city-chips" class="flex flex-wrap gap-2"></div>
         </div>
         <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          <strong>Demo coverage:</strong> This prototype only includes Connecticut transactions.
-          Try Hartford, Stamford, or New Haven.
+          <strong>Demo coverage:</strong> Real Connecticut property sales from data.ct.gov.
+          Try West Hartford, Shelton, or South Windsor.
         </div>
         <datalist id="city-suggestions"></datalist>
         <div
@@ -356,159 +356,329 @@
         },
       };
 
+      // Real Connecticut property data from data.ct.gov (Public Domain)
+      // Source: https://data.ct.gov/Housing-and-Development/Real-Estate-Sales-2001-2023-GL/5mzw-sjtu
+      // License: Public Domain - CT Office of Policy and Management
+      // Last updated: September 2024 sales data
       window.HOME_HARBOR_DATA = [
         {
-          id: '1000001',
-          address: '123 Main St',
-          city: 'Hartford',
-          price: 300000,
+          id: '230459',
+          address: '48 GRAY ROAD',
+          city: 'South Windsor',
+          price: 605000,
           metadata: {
-            assessedValue: 180000,
+            assessedValue: 375400,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '01/15/2023',
-            serialNumber: '1000001',
-            location: '41.7637,-72.6851',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '230459',
+            location: '41.82796,-72.52',
+            salesRatio: '0.6204'
+          }
         },
         {
-          id: '1000002',
-          address: '45 Oak Ave',
-          city: 'Hartford',
-          price: 250000,
+          id: '230840',
+          address: '398 CENTER ST',
+          city: 'West Haven',
+          price: 385000,
           metadata: {
-            assessedValue: 140000,
+            assessedValue: 153580,
             propertyType: 'Residential',
-            residentialType: 'Condo',
-            saleDate: '02/10/2023',
-            serialNumber: '1000002',
-            location: '41.7648,-72.6734',
-          },
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230840',
+            location: '41.27143,-72.95495',
+            salesRatio: '0.3989'
+          }
         },
         {
-          id: '1000003',
-          address: '78 Elm St',
+          id: '2300326',
+          address: '58 OLNEY RD',
+          city: 'Wethersfield',
+          price: 200000,
+          metadata: {
+            assessedValue: 169720,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '2300326',
+            location: '41.70059,-72.67774',
+            salesRatio: '0.8486'
+          }
+        },
+        {
+          id: '230570',
+          address: '12 ANDREW DR',
+          city: 'Shelton',
+          price: 570000,
+          metadata: {
+            assessedValue: 307510,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230570',
+            location: '41.27119,-73.11126',
+            salesRatio: '0.5394'
+          }
+        },
+        {
+          id: '230932',
+          address: '55 CRAIGMOOR ROAD',
           city: 'West Hartford',
-          price: 375000,
+          price: 490000,
           metadata: {
-            assessedValue: 210000,
+            assessedValue: 225890,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '03/05/2023',
-            serialNumber: '1000003',
-            location: '41.7620,-72.7420',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '230932',
+            location: '41.7781,-72.74217',
+            salesRatio: '0.4610'
+          }
         },
         {
-          id: '1000004',
-          address: '12 Chapel St',
-          city: 'New Haven',
-          price: 190000,
+          id: '230272',
+          address: '14 WELLWYN DR',
+          city: 'Portland',
+          price: 390000,
           metadata: {
-            assessedValue: 95000,
+            assessedValue: 176890,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230272',
+            location: '41.56063,-72.594',
+            salesRatio: '0.4535'
+          }
+        },
+        {
+          id: '2309038',
+          address: '337-B HERITAGE VILLAGE',
+          city: 'Southbury',
+          price: 439000,
+          metadata: {
+            assessedValue: 195990,
             propertyType: 'Residential',
             residentialType: 'Condo',
-            saleDate: '03/22/2023',
-            serialNumber: '1000004',
-            location: '41.3083,-72.9279',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '2309038',
+            location: '41.48464,-73.22343',
+            salesRatio: '0.4464'
+          }
         },
         {
-          id: '1000005',
-          address: '800 Atlantic St',
-          city: 'Stamford',
-          price: 465000,
+          id: '23259',
+          address: '88 A HANDEL RD',
+          city: 'Stafford',
+          price: 312000,
           metadata: {
-            assessedValue: 265000,
+            assessedValue: 214970,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '04/11/2023',
-            serialNumber: '1000005',
-            location: '41.0534,-73.5387',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '23259',
+            location: '41.95897,-72.3974',
+            salesRatio: '0.6890'
+          }
         },
         {
-          id: '1000006',
-          address: '9 Water St',
-          city: 'Norwalk',
-          price: 395000,
+          id: '230170',
+          address: '17 LIBERTY ST',
+          city: 'Old Lyme',
+          price: 111000,
           metadata: {
-            assessedValue: 220000,
+            assessedValue: 177000,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '05/02/2023',
-            serialNumber: '1000006',
-            location: '41.1177,-73.4082',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '230170',
+            location: '41.2859,-72.28206',
+            salesRatio: '1.5945'
+          }
         },
         {
-          id: '1000007',
-          address: '300 Park Ave',
-          city: 'Bridgeport',
-          price: 210000,
+          id: '230571',
+          address: '365 LONG HILL AVE',
+          city: 'Shelton',
+          price: 422000,
           metadata: {
-            assessedValue: 120000,
+            assessedValue: 254170,
             propertyType: 'Residential',
-            residentialType: 'Two Family',
-            saleDate: '05/19/2023',
-            serialNumber: '1000007',
-            location: '41.1865,-73.1952',
-          },
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230571',
+            location: '41.30164,-73.09957',
+            salesRatio: '0.6022'
+          }
         },
         {
-          id: '1000008',
-          address: '25 Shore Rd',
-          city: 'Milford',
+          id: '2300325',
+          address: '296 NOTT ST',
+          city: 'Wethersfield',
           price: 320000,
           metadata: {
-            assessedValue: 175000,
+            assessedValue: 132930,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '06/01/2023',
-            serialNumber: '1000008',
-            location: '41.2223,-73.0565',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '2300325',
+            location: '41.71527,-72.67324',
+            salesRatio: '0.4154'
+          }
         },
         {
-          id: '1000009',
-          address: '15 Maple Dr',
-          city: 'Danbury',
-          price: 285000,
+          id: '230797',
+          address: '105 CLOVER STREET',
+          city: 'Stratford',
+          price: 550000,
           metadata: {
-            assessedValue: 160000,
+            assessedValue: 175980,
+            propertyType: 'Residential',
+            residentialType: 'Two Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230797',
+            location: '41.19432,-73.15251',
+            salesRatio: '0.3199',
+            remarks: '6 MONTH FLIP OF FORECLOSED PROPERTY'
+          }
+        },
+        {
+          id: '230931',
+          address: '44 HARTWELL ROAD',
+          city: 'West Hartford',
+          price: 470000,
+          metadata: {
+            assessedValue: 257390,
             propertyType: 'Residential',
             residentialType: 'Single Family',
-            saleDate: '06/18/2023',
-            serialNumber: '1000009',
-            location: '41.3948,-73.4540',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '230931',
+            location: '41.79384,-72.75801',
+            salesRatio: '0.5476'
+          }
         },
         {
-          id: '1000010',
-          address: '210 High St',
-          city: 'New Britain',
-          price: 205000,
+          id: '230460',
+          address: '36 EAGLE RUN',
+          city: 'South Windsor',
+          price: 735000,
           metadata: {
-            assessedValue: 110000,
+            assessedValue: 396100,
             propertyType: 'Residential',
             residentialType: 'Condo',
-            saleDate: '07/07/2023',
-            serialNumber: '1000010',
-            location: '41.6612,-72.7795',
-          },
+            saleDate: '2024-09-30',
+            serialNumber: '230460',
+            location: '41.85512,-72.54828',
+            salesRatio: '0.5389'
+          }
         },
+        {
+          id: '230348',
+          address: '18 GRANDVIEW PARK',
+          city: 'Stonington',
+          price: 640000,
+          metadata: {
+            assessedValue: 302300,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230348',
+            location: '41.34457,-71.89513',
+            salesRatio: '0.4723',
+            remarks: 'EXECUTORS DEED / PROPERTY LISTED ON OPEN MARKET'
+          }
+        },
+        {
+          id: '230393',
+          address: '45 STACY DR',
+          city: 'Windsor',
+          price: 390000,
+          metadata: {
+            assessedValue: 219485,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230393',
+            location: '41.89786,-72.6754',
+            salesRatio: '0.5627'
+          }
+        },
+        {
+          id: '2309036',
+          address: '370-B HERITAGE VILLAGE',
+          city: 'Southbury',
+          price: 310000,
+          metadata: {
+            assessedValue: 199650,
+            propertyType: 'Residential',
+            residentialType: 'Condo',
+            saleDate: '2024-09-30',
+            serialNumber: '2309036',
+            location: '41.47297,-73.23104',
+            salesRatio: '0.6440'
+          }
+        },
+        {
+          id: '230273',
+          address: '509 PENFIELD HILL RD',
+          city: 'Portland',
+          price: 681000,
+          metadata: {
+            assessedValue: 278390,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230273',
+            location: '41.5954,-72.58547',
+            salesRatio: '0.4087'
+          }
+        },
+        {
+          id: '230661',
+          address: '72 TIOGA ST',
+          city: 'Torrington',
+          price: 271000,
+          metadata: {
+            assessedValue: 99500,
+            propertyType: 'Residential',
+            residentialType: 'Single Family',
+            saleDate: '2024-09-30',
+            serialNumber: '230661',
+            location: '41.81357,-73.1033',
+            salesRatio: '0.3671'
+          }
+        },
+        {
+          id: '230458',
+          address: '105 SANDSTONE DRIVE',
+          city: 'South Windsor',
+          price: 420000,
+          metadata: {
+            assessedValue: 204300,
+            propertyType: 'Residential',
+            residentialType: 'Condo',
+            saleDate: '2024-09-30',
+            serialNumber: '230458',
+            location: '41.83145,-72.55142',
+            salesRatio: '0.4864'
+          }
+        }
       ];
 
       window.HOME_HARBOR_CITIES = [
-        'Bridgeport',
-        'Danbury',
-        'Hartford',
-        'Milford',
-        'New Britain',
-        'New Haven',
-        'Norwalk',
-        'Stamford',
+        'Old Lyme',
+        'Portland',
+        'Shelton',
+        'South Windsor',
+        'Southbury',
+        'Stafford',
+        'Stonington',
+        'Stratford',
+        'Torrington',
         'West Hartford',
+        'West Haven',
+        'Wethersfield',
+        'Windsor'
       ];
     </script>
     <script>
@@ -638,7 +808,7 @@
 
         if (!data.length) {
           resultsEl.innerHTML =
-            '<div class="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">No properties found. This demo uses Connecticut data—try Hartford, Stamford, or New Haven.</div>';
+            '<div class="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">No properties found. Try cities like West Hartford, Shelton, or South Windsor.</div>';
           return;
         }
 
