@@ -27,8 +27,11 @@ function PropertyCard({
     onToggleExpansion();
   };
 
-  const getRealtorUrl = (address) => {
-    return `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(address)}`;
+  // Build Google Search URL to find property on Realtor.com
+  // More reliable than direct Realtor.com URLs which require MLS IDs
+  const getRealtorSearchUrl = (address, city) => {
+    const searchQuery = encodeURIComponent(`site:realtor.com ${address} ${city} CT`);
+    return `https://www.google.com/search?q=${searchQuery}`;
   };
 
   return (
@@ -46,15 +49,15 @@ function PropertyCard({
         </p>
       </div>
 
-      {/* Realtor Link */}
+      {/* Realtor Link - Uses Google site search for reliability */}
       <div className="mb-3">
         <a
-          href={getRealtorUrl(property.address)}
+          href={getRealtorSearchUrl(property.address, property.city)}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-semibold text-emerald-700 hover:underline"
         >
-          View on Realtor.com →
+          🔍 Find on Google → Realtor.com
         </a>
       </div>
 
