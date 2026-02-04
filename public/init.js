@@ -43,8 +43,6 @@ export async function init() {
 
   fetchConfig();
   fetchCitySuggestions();
-  fetchResults().catch((error) => {
-    setStatus(`Failed to load properties: ${error.message}`, 'error');
-    setLoading(false);
-  });
+  // Note: Don't auto-fetch results on init - let user submit search form
+  // This avoids conflicts with inline script in single-file mode
 }
