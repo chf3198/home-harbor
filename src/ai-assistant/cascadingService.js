@@ -1,198 +1,92 @@
-const {
-  ModelTimeoutError,
-  RateLimitError,
-  AllModelsFailedError,
-} = require('./errors');
-
-const { MAX_RETRIES, RETRY_BACKOFF_MS } = require('./config');
+const { ModelTimeoutError, AllModelsFailedError, RateLimitError } = require('./errors');
+const { sleep, retryWithBackoff, executeWithRetry } = require('./retryUtils');
 
 /**
- * Cascading retry service
- * Attempts requests across multiple models with timeout and retry logic
+ * Cascading retry service - attempts requests across multiple models
  */
 class CascadingService {
   constructor(client, modelSelector) {
     this.client = client;
     this.modelSelector = modelSelector;
-    this.maxRetries = MAX_RETRIES;
-    this.retryBackoffMs = RETRY_BACKOFF_MS;
   }
 
   /**
    * Send chat message with cascading fallback through models
    * @param {Array} messages - Chat messages
-   * @param {Object} options - Additional options (temperature, etc.)
-   * @param {number} timeoutMs - Timeout per model attempt (default: 30000)
+   * @param {Object} options - Additional options
+   * @param {number} timeoutMs - Timeout per model (default: 30000)
    * @returns {Promise<Object>} Chat response with metadata
-   * @throws {AllModelsFailedError} If all models fail
    */
   async sendWithCascade(messages, options = {}, timeoutMs = 30000) {
-    // Get available models
     const allModels = await this.client.getModels();
     const orderedModels = this.modelSelector.getCascadeOrder(allModels);
-
     const attempts = [];
-    
+
     for (const model of orderedModels) {
       try {
-        const response = await this._attemptWithTimeout(
-          model.id,
-          messages,
-          options,
-          timeoutMs
-        );
-
-        // Success - return response with metadata
-        return {
-          success: true,
-          model: model.id,
-          response: response.choices[0].message.content,
-          fullResponse: response,
-          attempts: attempts.length + 1,
-        };
+        const response = await this._attemptWithTimeout(model.id, messages, options, timeoutMs);
+        return this._buildSuccessResponse(model.id, response, attempts.length + 1);
       } catch (error) {
-        // Record failed attempt
-        attempts.push({
-          model: model.id,
-          error: error.constructor.name,
-          message: error.message,
-          timestamp: new Date().toISOString(),
-        });
+        attempts.push(this._recordAttempt(model.id, error));
 
-        // If it's a rate limit, try exponential backoff retry
         if (error instanceof RateLimitError) {
-          const retried = await this._retryWithBackoff(
-            model.id,
-            messages,
-            options,
-            error.retryAfter
+          const retried = await retryWithBackoff(
+            this.client, model.id, messages, options, error.retryAfter
           );
-          
           if (retried) {
-            return {
-              success: true,
-              model: model.id,
-              response: retried.choices[0].message.content,
-              fullResponse: retried,
-              attempts: attempts.length + 1,
-              retried: true,
-            };
+            return this._buildSuccessResponse(model.id, retried, attempts.length + 1, true);
           }
         }
-
-        // Continue to next model
-        continue;
       }
     }
 
-    // All models failed
-    throw new AllModelsFailedError(
-      `All ${orderedModels.length} models failed to respond`,
-      attempts
-    );
+    throw new AllModelsFailedError(`All ${orderedModels.length} models failed`, attempts);
   }
 
-  /**
-   * Attempt chat completion with timeout
-   * @private
-   */
+  /** @private */
   async _attemptWithTimeout(model, messages, options, timeoutMs) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
-        reject(new ModelTimeoutError(
-          `Model ${model} timed out after ${timeoutMs}ms`,
-          model,
-          timeoutMs
-        ));
+        reject(new ModelTimeoutError(`Model ${model} timed out after ${timeoutMs}ms`, model, timeoutMs));
       }, timeoutMs);
 
       this.client.sendChatMessage(model, messages, options)
-        .then(response => {
-          clearTimeout(timer);
-          resolve(response);
-        })
-        .catch(error => {
-          clearTimeout(timer);
-          reject(error);
-        });
+        .then(response => { clearTimeout(timer); resolve(response); })
+        .catch(error => { clearTimeout(timer); reject(error); });
     });
   }
 
-  /**
-   * Retry with exponential backoff for rate limits
-   * @private
-   */
-  async _retryWithBackoff(model, messages, options, initialRetryAfter) {
-    let retryAfter = initialRetryAfter || this.retryBackoffMs;
-
-    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
-      // Wait before retry
-      await this._sleep(retryAfter);
-
-      try {
-        const response = await this.client.sendChatMessage(model, messages, options);
-        return response; // Success
-      } catch (error) {
-        if (error instanceof RateLimitError) {
-          // Exponential backoff
-          retryAfter = error.retryAfter || (retryAfter * 2);
-          continue;
-        }
-        
-        // Different error - give up on this model
-        return null;
-      }
-    }
-
-    // Max retries exceeded
-    return null;
+  /** @private */
+  _buildSuccessResponse(modelId, response, attempts, retried = false) {
+    return {
+      success: true,
+      model: modelId,
+      response: response.choices[0].message.content,
+      fullResponse: response,
+      attempts,
+      ...(retried && { retried: true }),
+    };
   }
 
-  /**
-   * Sleep for specified milliseconds
-   * @private
-   */
-  _sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  /** @private */
+  _recordAttempt(modelId, error) {
+    return {
+      model: modelId,
+      error: error.constructor.name,
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    };
   }
 
   /**
    * Send a single request with retry logic (no cascade)
-   * Useful for specific model requests
-   * @param {string} modelId - Specific model to use
+   * @param {string} modelId - Model to use
    * @param {Array} messages - Chat messages
    * @param {Object} options - Additional options
    * @returns {Promise<Object>} Chat response
    */
   async sendWithRetry(modelId, messages, options = {}) {
-    let lastError;
-
-    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
-      try {
-        const response = await this.client.sendChatMessage(modelId, messages, options);
-        return {
-          success: true,
-          model: modelId,
-          response: response.choices[0].message.content,
-          fullResponse: response,
-          attempts: attempt,
-        };
-      } catch (error) {
-        lastError = error;
-
-        if (error instanceof RateLimitError) {
-          const backoff = error.retryAfter || (this.retryBackoffMs * attempt);
-          await this._sleep(backoff);
-          continue;
-        }
-
-        // Non-retryable error
-        throw error;
-      }
-    }
-
-    // Max retries exceeded
-    throw lastError;
+    return executeWithRetry(this.client, modelId, messages, options);
   }
 }
 
