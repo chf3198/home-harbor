@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **In-app E2E testing documentation** in Developer Guide with Playwright architecture, mock server design, CI/CD integration, and test categories.
 - **Collapsible help sections** using native HTML `<details>/<summary>` elements for progressive disclosure UX.
 - **Scrollable help modal** with `max-h-[60vh] overflow-y-auto` for long content accessibility.
+- **Automated file size enforcement** via ESLint `max-lines` rule (warn) and GitHub Actions workflow.
+- **File size check workflow** (.github/workflows/file-size-check.yml) to audit all JS/TS/HTML files on PRs.
 
 ### Changed
 - Updated .github/copilot-instructions.md for workflow integration.
