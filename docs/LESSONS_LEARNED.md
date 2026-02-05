@@ -24,6 +24,17 @@
 - **Implementation**: DynamoDB TTL caching (30-90 days) for cost optimization
 - **Validation**: Vision analysis and property descriptions working in test environment
 
+### Client-Side RAG Architecture
+- **Decision**: Orama + Transformers.js for 100% browser-based RAG
+- **Why**: No API costs, works on GitHub Pages, real-time property data indexing
+- **Components**:
+  - **Embeddings**: Xenova/all-MiniLM-L6-v2 (22MB, 384-dim vectors)
+  - **Search**: Orama hybrid (vector + full-text + filters)
+  - **LLM**: OpenRouter cascade for final response generation
+- **Trade-offs**: Initial model download (22MB), indexing time per property
+- **Research**: Evaluated Pinecone, Supabase, Jina AI - all require backend/signup
+- **Validation**: 19 unit tests passing, full integration with React hooks
+
 ---
 
 ## Development Workflow Patterns

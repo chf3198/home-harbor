@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Client-side RAG (Retrieval-Augmented Generation)** powered by Orama + Transformers.js.
+  - `embeddingService.js`: Browser-based embeddings using Xenova/all-MiniLM-L6-v2 model.
+  - `ragSearchService.js`: Hybrid vector + full-text search with Orama.
+  - `ragChatService.js`: RAG prompt building and response processing.
+  - `useSemanticSearch.js`: React hook for semantic property search.
+  - `useRAGChat.js`: Hook combining search with OpenRouter LLM responses.
+  - `RAGChatSection.jsx`: UI component with indexing progress and source attribution.
 - Knowledge graph and documentation index for AI optimization.
 - Semantic JSDoc tags to key files for better AI understanding.
 - Comprehensive linking between docs and code.
