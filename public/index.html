@@ -192,7 +192,35 @@
             <h2 class="text-xl font-semibold">Ask HomeHarbor</h2>
             <p class="text-sm text-slate-500">AI assistance using OpenRouter.</p>
           </div>
-          <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">AI</span>
+          <span id="ai-status-badge" class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">AI</span>
+        </div>
+        <!-- API Key Configuration (single-file mode) -->
+        <div id="api-key-config" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div class="flex items-start gap-3">
+            <span class="text-xl">🔑</span>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-amber-800">OpenRouter API Key Required</p>
+              <p class="text-xs text-amber-700 mt-1">
+                Get a free key at <a href="https://openrouter.ai/keys" target="_blank" class="underline">openrouter.ai/keys</a>. 
+                Your key is stored locally in your browser.
+              </p>
+              <div class="mt-3 flex gap-2">
+                <input
+                  id="api-key-input"
+                  type="password"
+                  class="flex-1 rounded-lg border border-amber-300 px-3 py-2 text-sm"
+                  placeholder="sk-or-v1-..."
+                />
+                <button
+                  id="api-key-save"
+                  type="button"
+                  class="rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                >
+                  Save Key
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         <form id="chat-form" class="mt-4 space-y-3">
           <textarea
@@ -304,9 +332,12 @@
             {
               icon: '🤖',
               heading: 'AI Features',
-              summary: 'Leverage AI for property insights (when enabled).',
+              summary: 'Leverage AI for property insights via OpenRouter.',
               details: [
-                '<strong>AI insights</strong> — AI features require an API base URL and keys. In single-file mode they are disabled.',
+                '<strong>Enable AI</strong> — Get a free API key from <a href="https://openrouter.ai/keys" target="_blank" class="underline">openrouter.ai/keys</a> and enter it in the "Ask HomeHarbor" section.',
+                '<strong>Ask questions</strong> — Use the chat to ask about properties, markets, or home buying tips.',
+                '<strong>Analyze properties</strong> — Click "Analyze photo" on any property card for AI-generated market insights.',
+                '<strong>Generate descriptions</strong> — Click "Generate description" for compelling listing copy.',
               ],
             },
           ],
@@ -700,6 +731,10 @@
       const helpContent = document.getElementById('help-content');
       const citySuggestions = document.getElementById('city-suggestions');
       const cityDropdown = document.getElementById('city-dropdown');
+      const apiKeyConfig = document.getElementById('api-key-config');
+      const apiKeyInput = document.getElementById('api-key-input');
+      const apiKeySave = document.getElementById('api-key-save');
+      const aiStatusBadge = document.getElementById('ai-status-badge');
       const cityChips = document.getElementById('city-chips');
       const cityInput = form?.querySelector('input[name="city"]');
       const searchButton = form?.querySelector('button[type="submit"]');
@@ -713,6 +748,73 @@
       const localData = Array.isArray(window.HOME_HARBOR_DATA)
         ? window.HOME_HARBOR_DATA
         : [];
+
+      // OpenRouter API key management
+      const OPENROUTER_API_KEY_STORAGE = 'homeharbor_openrouter_key';
+      const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+      const FREE_CHAT_MODEL = 'google/gemma-3-27b-it:free';
+
+      function getStoredApiKey() {
+        return localStorage.getItem(OPENROUTER_API_KEY_STORAGE) || '';
+      }
+
+      function saveApiKey(key) {
+        localStorage.setItem(OPENROUTER_API_KEY_STORAGE, key);
+        updateAiStatus();
+      }
+
+      function hasApiKey() {
+        return Boolean(getStoredApiKey());
+      }
+
+      function updateAiStatus() {
+        const hasKey = hasApiKey();
+        if (apiKeyConfig) {
+          apiKeyConfig.classList.toggle('hidden', hasKey);
+        }
+        if (aiStatusBadge) {
+          if (hasKey) {
+            aiStatusBadge.textContent = 'AI Ready';
+            aiStatusBadge.className = 'rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700';
+          } else {
+            aiStatusBadge.textContent = 'AI';
+            aiStatusBadge.className = 'rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500';
+          }
+        }
+        aiReady = hasKey;
+      }
+
+      // OpenRouter API client for browser
+      async function callOpenRouter(messages, model = FREE_CHAT_MODEL) {
+        const apiKey = getStoredApiKey();
+        if (!apiKey) throw new Error('OpenRouter API key not configured');
+
+        const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.href,
+            'X-Title': 'HomeHarbor',
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            max_tokens: 1024,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error?.message || `API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+          message: data.choices?.[0]?.message?.content || 'No response',
+          model: data.model || model,
+        };
+      }
 
       function getApiBase() {
         return window.HOME_HARBOR_CONFIG?.apiBaseUrl || '';
@@ -930,65 +1032,116 @@
           });
 
           visionButton.addEventListener('click', async () => {
-            if (!aiReady || !getApiBase()) {
-              aiPanel.hidden = false;
-              aiPanel.textContent =
-                'AI is disabled in single-file mode. Configure an API base URL to enable it.';
-              return;
-            }
             aiPanel.hidden = false;
-            aiPanel.innerHTML = 'Analyzing photo...';
 
-            const response = await fetch(`${getApiBase()}/api/vision`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ propertyId: property.id }),
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-              aiPanel.textContent = data.error || 'Vision analysis failed';
+            // Check for server mode first
+            if (getApiBase()) {
+              aiPanel.innerHTML = 'Analyzing photo...';
+              try {
+                const response = await fetch(`${getApiBase()}/api/vision`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ propertyId: property.id }),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                  aiPanel.textContent = data.error || 'Vision analysis failed';
+                  return;
+                }
+                aiPanel.innerHTML = `
+                  <p><strong>Image URL:</strong> <a href="${data.imageUrl}" target="_blank">View</a></p>
+                  <p><strong>Style:</strong> ${data.insights.architectural_style || 'N/A'}</p>
+                  <p><strong>Condition:</strong> ${data.insights.exterior_condition || 'N/A'}</p>
+                  <p><strong>Curb appeal:</strong> ${data.insights.curb_appeal_score || 'N/A'}</p>
+                  <p><strong>Features:</strong> ${(data.insights.visible_features || []).join(', ')}</p>
+                `;
+              } catch (error) {
+                aiPanel.textContent = `Error: ${error.message}`;
+              }
               return;
             }
 
-            aiPanel.innerHTML = `
-              <p><strong>Image URL:</strong> <a href="${data.imageUrl}" target="_blank">View</a></p>
-              <p><strong>Style:</strong> ${data.insights.architectural_style || 'N/A'}</p>
-              <p><strong>Condition:</strong> ${data.insights.exterior_condition || 'N/A'}</p>
-              <p><strong>Curb appeal:</strong> ${data.insights.curb_appeal_score || 'N/A'}</p>
-              <p><strong>Features:</strong> ${(data.insights.visible_features || []).join(', ')}</p>
-            `;
+            // Single-file mode - check for API key
+            if (!hasApiKey()) {
+              aiPanel.textContent = '🔑 Enter your OpenRouter API key in the chat section to enable AI features.';
+              return;
+            }
+
+            aiPanel.innerHTML = 'Analyzing property...';
+            try {
+              const prompt = `Analyze this Connecticut property and provide insights:
+Address: ${property.address}
+City: ${property.city}
+Price: $${property.price?.toLocaleString() || 'N/A'}
+Property Type: ${property.metadata?.propertyType || 'Unknown'}
+Residential Type: ${property.metadata?.residentialType || 'Unknown'}
+Sale Date: ${property.metadata?.saleDate || 'Unknown'}
+Assessed Value: $${property.metadata?.assessedValue?.toLocaleString() || 'N/A'}
+
+Provide a brief analysis covering: 1) Market positioning, 2) Value assessment, 3) Key considerations for buyers.`;
+
+              const data = await callOpenRouter([
+                { role: 'system', content: 'You are a real estate analyst providing property insights.' },
+                { role: 'user', content: prompt },
+              ]);
+              aiPanel.innerHTML = `<p class="whitespace-pre-wrap">${data.message}</p><p class="text-xs text-slate-400 mt-2">Model: ${data.model}</p>`;
+            } catch (error) {
+              aiPanel.textContent = `❌ ${error.message}`;
+            }
           });
 
           descriptionButton.addEventListener('click', async () => {
-            if (!aiReady || !getApiBase()) {
-              aiPanel.hidden = false;
-              aiPanel.textContent =
-                'AI is disabled in single-file mode. Configure an API base URL to enable it.';
-              return;
-            }
             aiPanel.hidden = false;
-            aiPanel.innerHTML = 'Generating description...';
 
-            const response = await fetch(`${getApiBase()}/api/describe`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ propertyId: property.id }),
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-              aiPanel.textContent = data.error || 'Description failed';
+            // Check for server mode first
+            if (getApiBase()) {
+              aiPanel.innerHTML = 'Generating description...';
+              try {
+                const response = await fetch(`${getApiBase()}/api/describe`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ propertyId: property.id }),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                  aiPanel.textContent = data.error || 'Description failed';
+                  return;
+                }
+                aiPanel.innerHTML = `
+                  <h4>${data.description.headline || 'Listing Summary'}</h4>
+                  <p>${data.description.summary || ''}</p>
+                  <ul>${(data.description.highlights || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+                `;
+              } catch (error) {
+                aiPanel.textContent = `Error: ${error.message}`;
+              }
               return;
             }
 
-            aiPanel.innerHTML = `
-              <h4>${data.description.headline || 'Listing Summary'}</h4>
-              <p>${data.description.summary || ''}</p>
-              <ul>${(data.description.highlights || [])
-                .map((item) => `<li>${item}</li>`)
-                .join('')}</ul>
-            `;
+            // Single-file mode - check for API key
+            if (!hasApiKey()) {
+              aiPanel.textContent = '🔑 Enter your OpenRouter API key in the chat section to enable AI features.';
+              return;
+            }
+
+            aiPanel.innerHTML = 'Generating description...';
+            try {
+              const prompt = `Write a compelling real estate listing description for:
+Address: ${property.address}, ${property.city}, CT
+Price: $${property.price?.toLocaleString() || 'N/A'}
+Type: ${property.metadata?.residentialType || property.metadata?.propertyType || 'Residential'}
+Assessed Value: $${property.metadata?.assessedValue?.toLocaleString() || 'N/A'}
+
+Create: 1) A catchy headline, 2) A brief engaging summary (2-3 sentences), 3) 3 key highlights as bullet points.`;
+
+              const data = await callOpenRouter([
+                { role: 'system', content: 'You are a professional real estate copywriter.' },
+                { role: 'user', content: prompt },
+              ]);
+              aiPanel.innerHTML = `<div class="whitespace-pre-wrap">${data.message}</div><p class="text-xs text-slate-400 mt-2">Model: ${data.model}</p>`;
+            } catch (error) {
+              aiPanel.textContent = `❌ ${error.message}`;
+            }
           });
 
           card.append(
@@ -1440,13 +1593,6 @@
 
       chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        if (!getApiBase()) {
-          chatResponseEl.textContent =
-            'Chat is disabled in single-file mode. Configure an API base URL to enable it.';
-          return;
-        }
-
-        chatResponseEl.textContent = 'Thinking...';
 
         const message = chatForm.message.value.trim();
         if (!message) {
@@ -1454,19 +1600,50 @@
           return;
         }
 
-        const response = await fetch(`${getApiBase()}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message }),
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          chatResponseEl.textContent = data.error || 'Chat failed.';
+        // Check if we have an API base URL (server mode) or API key (single-file mode)
+        if (getApiBase()) {
+          // Server mode - use backend API
+          chatResponseEl.textContent = 'Thinking...';
+          try {
+            const response = await fetch(`${getApiBase()}/api/chat`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              chatResponseEl.textContent = data.error || 'Chat failed.';
+              return;
+            }
+            chatResponseEl.textContent = `${data.message} (model: ${data.model})`;
+          } catch (error) {
+            chatResponseEl.textContent = `Error: ${error.message}`;
+          }
           return;
         }
 
-        chatResponseEl.textContent = `${data.message} (model: ${data.model})`;
+        // Single-file mode - use direct OpenRouter API
+        if (!hasApiKey()) {
+          chatResponseEl.textContent = '🔑 Please enter your OpenRouter API key above to enable AI chat.';
+          return;
+        }
+
+        chatResponseEl.textContent = 'Thinking...';
+
+        try {
+          const systemPrompt = `You are HomeHarbor AI, a helpful real estate assistant for Connecticut properties. 
+You help users understand real estate markets, property search tips, and general home buying advice.
+Be concise and helpful. If asked about specific properties, note that you can see the demo data shown on this page.`;
+
+          const data = await callOpenRouter([
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message },
+          ]);
+
+          chatResponseEl.textContent = `${data.message} (model: ${data.model})`;
+        } catch (error) {
+          chatResponseEl.textContent = `❌ ${error.message}`;
+        }
       });
 
       if (helpButton) {
@@ -1484,6 +1661,23 @@
       if (helpTabDev) {
         helpTabDev.addEventListener('click', () => openHelp('developer'));
       }
+
+      // API Key save button handler
+      if (apiKeySave) {
+        apiKeySave.addEventListener('click', () => {
+          const key = apiKeyInput?.value?.trim();
+          if (key && key.startsWith('sk-or-')) {
+            saveApiKey(key);
+            apiKeyInput.value = '';
+            chatResponseEl.textContent = '✅ API key saved! AI features are now enabled.';
+          } else {
+            chatResponseEl.textContent = '❌ Invalid key format. OpenRouter keys start with "sk-or-".';
+          }
+        });
+      }
+
+      // Initialize AI status on load
+      updateAiStatus();
 
     </script>
     <script type="module" src="app.js"></script>
