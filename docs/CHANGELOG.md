@@ -8,11 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Single-file AI support** - AI features now work directly in file:// mode without a backend.
-  - Browser-based OpenRouter client with localStorage API key storage.
-  - API key configuration UI in the "Ask HomeHarbor" section.
-  - Direct AI chat, property analysis, and description generation via OpenRouter free models.
-  - Updated help documentation explaining how to enable AI features.
 - **Client-side RAG (Retrieval-Augmented Generation)** powered by Orama + Transformers.js.
   - `embeddingService.js`: Browser-based embeddings using Xenova/all-MiniLM-L6-v2 model.
   - `ragSearchService.js`: Hybrid vector + full-text search with Orama.
