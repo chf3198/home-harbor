@@ -44,7 +44,10 @@
 - **Pattern**: ≤100 lines per file, systematic refactoring
 - **Why**: Maintainability, reviewability, focused responsibilities
 - **Implementation**: ES modules, barrel exports, feature folders
-- **Validation**: All core files under limit, complex logic split appropriately
+- **Automation**: ESLint `max-lines` rule (warn) + GitHub Actions file-size-check workflow
+- **Enforcement**: Two-pronged approach - IDE feedback via ESLint, CI visibility via Actions
+- **Research**: ESLint max-lines docs, GitHub Actions workflow syntax
+- **Current Violations**: ~15 files exceed limit (tracked for future refactoring)
 
 ### Progressive Disclosure UX
 - **Pattern**: Native HTML `<details>/<summary>` for collapsible content

@@ -12,8 +12,9 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    // max-lines disabled - aspirational guideline in docs, not enforced
-    'max-lines': 'off',
+    // Enforce ≤100 lines per file (project best practice)
+    // Warns on violations; skip blank lines and comments for practical counting
+    'max-lines': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
     // Allow unused vars in destructuring and rest siblings
     'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
   },

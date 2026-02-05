@@ -1,0 +1,76 @@
+name: File Size Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  check-file-sizes:
+    name: Check File Line Limits
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check file sizes (≤100 lines)
+        run: |
+          echo "🔍 Checking file sizes against 100-line limit..."
+          echo ""
+          
+          # Define max lines (project standard)
+          MAX_LINES=100
+          
+          # Track violations
+          VIOLATIONS=0
+          VIOLATION_LIST=""
+          
+          # Check JS/TS files (excluding node_modules, dist, coverage)
+          echo "📁 Scanning JS/TS files..."
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              lines=$(wc -l < "$file")
+              if [ "$lines" -gt "$MAX_LINES" ]; then
+                VIOLATIONS=$((VIOLATIONS + 1))
+                excess=$((lines - MAX_LINES))
+                VIOLATION_LIST="${VIOLATION_LIST}⚠️  ${file}: ${lines} lines (+${excess} over limit)\n"
+              fi
+            fi
+          done < <(find src public lambda/src frontend/src -type f \( -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) 2>/dev/null | grep -v node_modules | grep -v dist | grep -v coverage)
+          
+          # Check HTML files
+          echo "📁 Scanning HTML files..."
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              lines=$(wc -l < "$file")
+              if [ "$lines" -gt "$MAX_LINES" ]; then
+                VIOLATIONS=$((VIOLATIONS + 1))
+                excess=$((lines - MAX_LINES))
+                VIOLATION_LIST="${VIOLATION_LIST}⚠️  ${file}: ${lines} lines (+${excess} over limit)\n"
+              fi
+            fi
+          done < <(find public frontend/src -type f -name "*.html" 2>/dev/null | grep -v node_modules)
+          
+          # Report results
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          if [ "$VIOLATIONS" -gt 0 ]; then
+            echo "📊 FILE SIZE REPORT: ${VIOLATIONS} file(s) exceed ${MAX_LINES}-line limit"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+            echo -e "$VIOLATION_LIST"
+            echo ""
+            echo "💡 Tip: Refactor large files into smaller, focused modules."
+            echo "   See docs/CODE_STRUCTURE_PATTERNS.md for guidance."
+            echo ""
+            # Warning only - does not fail the build (set exit 1 to enforce)
+            echo "⚠️  This is a warning. Consider refactoring these files."
+            exit 0
+          else
+            echo "✅ FILE SIZE CHECK PASSED"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "All files are within the ${MAX_LINES}-line limit."
+            exit 0
+          fi
