@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modular frontend components (AIChatForm, PropertyCard, etc.).
 - Git workflow documentation (Conventional Commits, Trunk-Based Development).
 - React frontend with 31 components and comprehensive test coverage.
+- **In-app E2E testing documentation** in Developer Guide with Playwright architecture, mock server design, CI/CD integration, and test categories.
+- **Collapsible help sections** using native HTML `<details>/<summary>` elements for progressive disclosure UX.
+- **Scrollable help modal** with `max-h-[60vh] overflow-y-auto` for long content accessibility.
 
 ### Changed
 - Updated .github/copilot-instructions.md for workflow integration.

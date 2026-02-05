@@ -126,6 +126,8 @@
 - [ ] API documentation (Swagger/OpenAPI?)
 - [ ] Architecture decision records (ADRs)
 - [ ] Performance benchmarks
+- [x] In-app Developer Guide: E2E testing documentation
+- [x] Progressive disclosure UX for help guides (collapsible sections)
 
 ---
 
@@ -157,6 +159,6 @@
 
 ---
 
-**Next Action**: Commit architecture docs, then initialize project structure
+**Next Action**: Continue with Phase 3 deployment or Phase 4 advanced features
 
-**Last Updated**: January 31, 2026
+**Last Updated**: February 5, 2026

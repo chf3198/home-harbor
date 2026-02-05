@@ -46,6 +46,13 @@
 - **Implementation**: ES modules, barrel exports, feature folders
 - **Validation**: All core files under limit, complex logic split appropriately
 
+### Progressive Disclosure UX
+- **Pattern**: Native HTML `<details>/<summary>` for collapsible content
+- **Why**: W3C accessible, no JS required, collapsed by default
+- **Research**: MDN disclosure widgets, NN/g progressive disclosure, W3C ARIA accordion
+- **Implementation**: icon/heading/summary/details data structure + CSS transitions
+- **Validation**: UAT confirmed sections collapse on render, expand individually, scroll properly
+
 ---
 
 ## Code Quality Standards
