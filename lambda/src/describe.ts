@@ -2,6 +2,11 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
+// OpenRouter API response type
+interface OpenRouterResponse {
+  choices: Array<{ message: { content: string } }>;
+}
+
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const secretsClient = new SecretsManagerClient({});
 
@@ -64,7 +69,7 @@ export const handler = async (event: any) => {
       throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as OpenRouterResponse;
     const description = data.choices[0].message.content;
 
     // Cache result

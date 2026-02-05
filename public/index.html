@@ -304,9 +304,10 @@
             {
               icon: '🤖',
               heading: 'AI Features',
-              summary: 'Leverage AI for property insights (when enabled).',
+              summary: 'AI-powered property insights using free LLM models.',
               details: [
-                '<strong>AI insights</strong> — AI features require an API base URL and keys. In single-file mode they are disabled.',
+                '<strong>AI assistant</strong> — Ask questions about Connecticut real estate using the chat feature below.',
+                '<strong>Free tier</strong> — Uses Google Gemma via OpenRouter (100% free, no API key needed from users).',
               ],
             },
           ],
@@ -1440,11 +1441,9 @@
 
       chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        if (!getApiBase()) {
-          chatResponseEl.textContent =
-            'Chat is disabled in single-file mode. Configure an API base URL to enable it.';
-          return;
-        }
+        
+        // Use AWS API Gateway for chat (always available)
+        const CHAT_API_URL = 'https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod/chat';
 
         chatResponseEl.textContent = 'Thinking...';
 
@@ -1454,19 +1453,23 @@
           return;
         }
 
-        const response = await fetch(`${getApiBase()}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message }),
-        });
+        try {
+          const response = await fetch(CHAT_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+          });
 
-        const data = await response.json();
-        if (!response.ok) {
-          chatResponseEl.textContent = data.error || 'Chat failed.';
-          return;
+          const data = await response.json();
+          if (!response.ok) {
+            chatResponseEl.textContent = data.error || 'Chat failed.';
+            return;
+          }
+
+          chatResponseEl.textContent = data.message;
+        } catch (error) {
+          chatResponseEl.textContent = 'Network error. Please try again.';
         }
-
-        chatResponseEl.textContent = `${data.message} (model: ${data.model})`;
       });
 
       if (helpButton) {

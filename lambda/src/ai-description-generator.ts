@@ -38,6 +38,11 @@ interface PropertyDescriptionRequest {
   force_refresh?: boolean;
 }
 
+// OpenRouter API response type
+interface OpenRouterResponse {
+  choices: Array<{ message: { content: string } }>;
+}
+
 interface PropertyDescription {
   headline: string;
   summary: string;
@@ -203,7 +208,7 @@ Guidelines:
     throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
   }
   
-  const data = await response.json();
+  const data = (await response.json()) as OpenRouterResponse;
   const content = data.choices[0].message.content;
   console.log('Raw AI response:', content);
   
