@@ -22,6 +22,11 @@ interface VisionAnalysisRequest {
   force_refresh?: boolean;
 }
 
+// OpenRouter API response type
+interface OpenRouterResponse {
+  choices: Array<{ message: { content: string } }>;
+}
+
 interface VisionInsights {
   architectural_style: string;
   exterior_condition: number; // 1-10
@@ -159,7 +164,7 @@ Be specific and detailed. Base your analysis only on what is visible in the imag
     throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
   }
   
-  const data = await response.json();
+  const data = (await response.json()) as OpenRouterResponse;
   const content = data.choices[0].message.content;
   console.log('Raw AI response:', content);
   

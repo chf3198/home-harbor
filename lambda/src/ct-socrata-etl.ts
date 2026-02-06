@@ -95,7 +95,7 @@ async function fetchTransactions(
     throw new Error(`Socrata API error: ${response.status} ${response.statusText}`);
   }
   
-  const data: CTTransaction[] = await response.json();
+  const data = (await response.json()) as CTTransaction[];
   
   console.log(`Fetched ${data.length} transactions`);
   return data;
