@@ -108,23 +108,39 @@
 ## Phase 3.5: AI Search Integration ⏳ IN PROGRESS
 
 ### Feature: Natural Language → Search Filters
-- [ ] Design: Two-LLM architecture (filter extraction + conversation)
-- [ ] Lambda: Update chat.ts with structured JSON output (LLM #1)
-- [ ] Lambda: Conversational response with search results context (LLM #2)
-- [ ] React: useAISearch hook for coordinating LLMs + search
-- [ ] React: Update AIChatSection with progress indicator
-- [ ] React: Sync AI-generated filters → SearchSection form
-- [ ] State: localStorage persistence (chat history, filters, results)
+- [x] Design: Two-LLM architecture (filter extraction + conversation)
+- [x] Lambda: Update chat.ts with structured JSON output (LLM #1)
+- [x] Lambda: Conversational response with search results context (LLM #2)
+- [x] React: useAISearch hook for coordinating LLMs + search
+- [x] React: Update AIChatSection with progress indicator
+- [x] React: Sync AI-generated filters → SearchSection form
+- [x] State: localStorage persistence (chat history, filters, results)
 - [ ] Test: Integration tests for AI search flow
 - [ ] UAT: Manual verification of full flow
 
 ### Design Decisions (February 6, 2026)
-- **Single endpoint** `/chat` returns `{ filters, response }`
+- **Single endpoint** `/chat` returns `{ filters, response, model }`
 - **Structured outputs** via OpenRouter `response_format: json_schema`
 - **Model**: arcee-ai/trinity-large-preview:free (supports both JSON + conversation)
 - **Chat precedence**: LLM filter values override form values (null = keep form value)
 - **Progress indicator**: "thinking..." placeholder during LLM calls
 - **Persistence**: All state (chat, filters, results) in localStorage
+
+### Implementation Status (February 6, 2026)
+**Lambda Modules (≤100 lines each):**
+- `chat.ts` (88 lines): Main handler orchestrating two-LLM flow
+- `chat-types.ts` (43 lines): TypeScript interfaces
+- `chat-filters.ts` (89 lines): JSON extraction and filter normalization
+- `chat-llm.ts` (58 lines): OpenRouter client with cascading fallback
+- `chat-prompts.ts` (50 lines): System prompts for both LLMs
+
+**React Modules (≤100 lines each):**
+- `useAISearch.js` (85 lines): Main hook integrating AI chat with search
+- `aiSearchTypes.js` (32 lines): Action types and initial state
+- `aiSearchReducer.js` (45 lines): State reducer for chat messages
+- `aiSearchStorage.js` (62 lines): localStorage persistence utilities
+- `AIChatSection.jsx` (49 lines): Updated to wire filters to PropertySearch
+- `AIChatMessages.jsx` (72 lines): Chat history display with thinking indicator
 
 ---
 
@@ -183,6 +199,6 @@
 
 ---
 
-**Next Action**: Continue with Phase 3 deployment or Phase 4 advanced features
+**Next Action**: Complete UAT for Phase 3.5 AI Search Integration, then continue with Phase 3 deployment
 
-**Last Updated**: February 5, 2026
+**Last Updated**: February 6, 2026
