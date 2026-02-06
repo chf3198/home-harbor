@@ -1,6 +1,6 @@
 # HomeHarbor Project Structure
 
-**Single-file UI requirement:** The app’s UI must run directly from public/index.html via file:// with no local server.
+**Frontend:** React SPA served via local dev server (UAT) or GitHub Pages (production). The `public/` folder is **deprecated** - API access requires HTTP server.
 
 ## 📁 Complete File Tree
 
@@ -43,9 +43,9 @@ home-harbor/
 │   ├── MINIMAL_FREE_ARCHITECTURE.md
 │   └── ENGINEERING_STANDARDS.md
 │
-├── 📂 public/                             # Single-file UI (no server required)
-│   ├── index.html                         # Main UI with embedded data (1477 lines)
-│   └── *.js                               # 18 modular JS files (extracted from inline)
+├── 📂 public/                             # ⚠️ DEPRECATED - Legacy UI (API access blocked via file://)
+│   ├── index.html                         # Legacy UI - use frontend/ instead
+│   └── *.js                               # Legacy JS modules
 │
 ├── 📂 frontend/                           # React UI Application
 │   ├── index.html                         # Vite HTML template

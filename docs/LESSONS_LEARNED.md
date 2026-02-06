@@ -24,6 +24,24 @@
 - **Implementation**: DynamoDB TTL caching (30-90 days) for cost optimization
 - **Validation**: Vision analysis and property descriptions working in test environment
 
+### AI Search Integration Pattern (February 6, 2026)
+- **Decision**: Two-LLM architecture for natural language → search conversion
+- **Components**:
+  - **LLM #1 (Filter Extraction)**: Uses OpenRouter structured outputs (`response_format: json_schema`) to extract exact search parameters from user chat messages
+  - **LLM #2 (Conversational Response)**: Generates human-friendly response with full search results context
+- **Model**: `arcee-ai/trinity-large-preview:free` - supports both structured JSON output and creative conversation
+- **Merge Logic**: Chat-extracted values (non-null) override form values; null preserves form state
+- **State Persistence**: All state (chat history, filters, results) persisted to localStorage
+- **UX**: Progress indicator ("thinking...") during LLM processing; results display in existing ResultsSection
+- **Research**: Evaluated structured outputs support across free models; Trinity supports both use cases
+- **Validation**: Pending UAT
+
+### Frontend Architecture Decision (February 6, 2026)
+- **Decision**: Deprecate `public/` folder; React (`frontend/`) is primary UI
+- **Why**: `file://` protocol blocks API access; GitHub Pages provides free hosting
+- **Trade-off**: Requires server (local dev or GitHub Pages) vs direct file open
+- **Validation**: GitHub Pages deployment working for production demo
+
 ### Client-Side RAG Architecture
 - **Decision**: Orama + Transformers.js for 100% browser-based RAG
 - **Why**: No API costs, works on GitHub Pages, real-time property data indexing

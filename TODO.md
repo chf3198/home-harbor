@@ -105,6 +105,29 @@
 
 ---
 
+## Phase 3.5: AI Search Integration ⏳ IN PROGRESS
+
+### Feature: Natural Language → Search Filters
+- [ ] Design: Two-LLM architecture (filter extraction + conversation)
+- [ ] Lambda: Update chat.ts with structured JSON output (LLM #1)
+- [ ] Lambda: Conversational response with search results context (LLM #2)
+- [ ] React: useAISearch hook for coordinating LLMs + search
+- [ ] React: Update AIChatSection with progress indicator
+- [ ] React: Sync AI-generated filters → SearchSection form
+- [ ] State: localStorage persistence (chat history, filters, results)
+- [ ] Test: Integration tests for AI search flow
+- [ ] UAT: Manual verification of full flow
+
+### Design Decisions (February 6, 2026)
+- **Single endpoint** `/chat` returns `{ filters, response }`
+- **Structured outputs** via OpenRouter `response_format: json_schema`
+- **Model**: arcee-ai/trinity-large-preview:free (supports both JSON + conversation)
+- **Chat precedence**: LLM filter values override form values (null = keep form value)
+- **Progress indicator**: "thinking..." placeholder during LLM calls
+- **Persistence**: All state (chat, filters, results) in localStorage
+
+---
+
 ## Phase 4: Advanced Features (Time Permitting)
 
 - [ ] User authentication (AWS Cognito?)
@@ -113,6 +136,7 @@
 - [ ] Map integration (Google Maps API?)
 - [ ] Price alerts
 - [ ] Image optimization (CloudFront?)
+- [ ] Clear chat/state feature
 
 ---
 

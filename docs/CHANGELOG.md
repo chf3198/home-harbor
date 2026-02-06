@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **AI Search Integration** (Phase 3.5): Natural language chat triggers property search.
+  - Two-LLM architecture: Filter extraction (structured JSON) + conversational response.
+  - `useAISearch.js`: React hook coordinating LLMs with search form state.
+  - localStorage persistence for chat history, filters, and search results.
+  - Progress indicator ("thinking...") during LLM processing.
+  - Chat-to-form sync: AI-extracted filters update SearchSection form.
 - **Client-side RAG (Retrieval-Augmented Generation)** powered by Orama + Transformers.js.
   - `embeddingService.js`: Browser-based embeddings using Xenova/all-MiniLM-L6-v2 model.
   - `ragSearchService.js`: Hybrid vector + full-text search with Orama.
@@ -31,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated .github/copilot-instructions.md for workflow integration.
 - **BREAKING**: Replaced axios with native fetch in all Lambda functions.
+- **BREAKING**: Deprecated `public/` folder - React frontend (`frontend/`) is now primary UI.
 - Modularized public/index.html inline scripts into separate JS files.
 - app.js now only initializes when served via HTTP (not file://).
 - Realtor.com links now use Google site search for reliable property lookup.
