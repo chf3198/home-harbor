@@ -54,9 +54,9 @@ function ResultsSection() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800">Search Results</h2>
-            {results.length > 0 && (
+            {results.length > 0 && pagination && (
               <p className="text-sm text-slate-500">
-                {pagination.total} properties found
+                {pagination.total || results.length} properties found
               </p>
             )}
           </div>

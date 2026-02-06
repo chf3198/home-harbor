@@ -12,8 +12,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Two-LLM architecture: Filter extraction (structured JSON) + conversational response.
   - `useAISearch.js`: React hook coordinating LLMs with search form state.
   - localStorage persistence for chat history, filters, and search results.
-  - Progress indicator ("thinking...") during LLM processing.
+  - Progress indicator (typing animation) during LLM processing.
   - Chat-to-form sync: AI-extracted filters update SearchSection form.
+  - Default filter values (price range) when user doesn't specify.
+- **Messenger-style Chat UI**: Beautiful chat interface inspired by social messaging apps.
+  - Gradient header with "Online" status indicator.
+  - Chat bubbles with avatars and timestamps.
+  - Animated typing indicator during AI processing.
+  - Auto-scroll to latest messages.
+  - Compact input bar with send/clear buttons.
+- **Five-star AI Customer Service**: Conversational AI system prompt ensures friendly, direct responses.
+  - AI responds directly to user (no third-person narration).
+  - No exposed reasoning/thinking process.
+  - Proactive guidance on filters and search features.
+- **Comprehensive E2E Test Suite**: 20 Playwright tests covering full interaction workflow.
+  - Page load and navigation tests.
+  - Property search with filters.
+  - AI chat messaging and filter extraction.
+  - Responsive design (mobile/tablet).
+  - Error handling scenarios.
 - **Client-side RAG (Retrieval-Augmented Generation)** powered by Orama + Transformers.js.
   - `embeddingService.js`: Browser-based embeddings using Xenova/all-MiniLM-L6-v2 model.
   - `ragSearchService.js`: Hybrid vector + full-text search with Orama.

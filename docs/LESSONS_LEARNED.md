@@ -27,14 +27,23 @@
 ### AI Search Integration Pattern (February 6, 2026)
 - **Decision**: Two-LLM architecture for natural language → search conversion
 - **Components**:
-  - **LLM #1 (Filter Extraction)**: Uses OpenRouter structured outputs (`response_format: json_schema`) to extract exact search parameters from user chat messages
-  - **LLM #2 (Conversational Response)**: Generates human-friendly response with full search results context
-- **Model**: `arcee-ai/trinity-large-preview:free` - supports both structured JSON output and creative conversation
-- **Merge Logic**: Chat-extracted values (non-null) override form values; null preserves form state
+  - **LLM #1 (Filter Extraction)**: Server-side regex pattern matching extracts bedrooms, bathrooms, price, city from user messages
+  - **LLM #2 (Conversational Response)**: OpenRouter cascading models generate human-friendly responses
+- **Model Cascade**: Free models via OpenRouter with intelligent fallback
+- **Default Values**: minPrice ($100K), maxPrice ($500K) applied when not specified; AI informs user
 - **State Persistence**: All state (chat history, filters, results) persisted to localStorage
-- **UX**: Progress indicator ("thinking...") during LLM processing; results display in existing ResultsSection
-- **Research**: Evaluated structured outputs support across free models; Trinity supports both use cases
-- **Validation**: Pending UAT
+- **UX**: Typing indicator animation during LLM processing; messenger-style chat bubbles
+- **Validation**: ✅ UAT passed February 6, 2026
+
+### AI System Prompt Engineering (February 6, 2026)
+- **Problem**: Free LLMs sometimes expose chain-of-thought reasoning ("Okay, the user wants...")
+- **Solution**: Explicit system prompt with critical instructions at top:
+  - "You are talking DIRECTLY to the user"
+  - "NEVER write 'the user' or 'their request'"
+  - "NEVER show your thinking process"
+  - Good/bad response examples included
+- **Result**: 3/3 conversational test prompts pass validation
+- **Learning**: Free models need very explicit, structured instructions with examples
 
 ### Frontend Architecture Decision (February 6, 2026)
 - **Decision**: Deprecate `public/` folder; React (`frontend/`) is primary UI
