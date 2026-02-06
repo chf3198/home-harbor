@@ -13,9 +13,9 @@ function App() {
     <ErrorBoundary>
       <PropertyProvider>
         <AIProvider>
-          <div className="min-h-screen bg-slate-50 text-slate-900" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white text-slate-900" style={{ fontFamily: "'Inter', sans-serif" }}>
             <Header />
-            <main className="mx-auto w-[min(1120px,92vw)] space-y-8 py-10">
+            <main className="mx-auto w-[min(1120px,92vw)] space-y-6 py-8 pb-16">
               <ErrorBoundary fallback={({ retry }) => (
                 <div className="text-center p-8">
                   <h3 className="text-lg font-semibold text-red-600 mb-4">Search Error</h3>
