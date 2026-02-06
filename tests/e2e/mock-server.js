@@ -67,7 +67,7 @@ app.use(express.json());
 
 // Properties search endpoint
 app.get('/api/properties', (req, res) => {
-  const { city, minPrice, maxPrice, page = 1, limit = 12 } = req.query;
+  const { city, minPrice, maxPrice, bedrooms, bathrooms, page = 1, limit = 12 } = req.query;
 
   let filtered = [...mockProperties];
 
@@ -84,21 +84,34 @@ app.get('/api/properties', (req, res) => {
     filtered = filtered.filter(p => p.price <= parseInt(maxPrice));
   }
 
+  if (bedrooms && bedrooms !== 'Any') {
+    filtered = filtered.filter(p => p.bedrooms >= parseInt(bedrooms));
+  }
+
+  if (bathrooms && bathrooms !== 'Any') {
+    filtered = filtered.filter(p => p.bathrooms >= parseInt(bathrooms));
+  }
+
   // Pagination
-  const startIndex = (parseInt(page) - 1) * parseInt(limit);
-  const endIndex = startIndex + parseInt(limit);
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const startIndex = (pageNum - 1) * limitNum;
+  const endIndex = startIndex + limitNum;
   const paginated = filtered.slice(startIndex, endIndex);
 
+  // Return format expected by React frontend
   res.json({
-    properties: paginated,
-    total: filtered.length,
-    page: parseInt(page),
-    limit: parseInt(limit),
-    totalPages: Math.ceil(filtered.length / parseInt(limit))
+    data: paginated,
+    pagination: {
+      page: pageNum,
+      pageSize: limitNum,
+      total: filtered.length,
+      totalPages: Math.ceil(filtered.length / limitNum)
+    }
   });
 });
 
-// AI chat endpoint
+// AI chat endpoint (legacy path)
 app.post('/api/ai/chat', (req, res) => {
   const { message } = req.body;
 
@@ -110,6 +123,81 @@ app.post('/api/ai/chat', (req, res) => {
       timestamp: new Date().toISOString()
     });
   }, 1000); // 1 second delay to simulate AI processing
+});
+
+// AI chat endpoint (new path for React frontend)
+app.post('/api/chat', (req, res) => {
+  const { message } = req.body;
+
+  if (!message || message.trim() === '') {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  // Extract filters from message (simple mock implementation)
+  const filters = {};
+  const extractedFields = [];
+  const defaultFields = [];
+  const lowerMsg = message.toLowerCase();
+  
+  // Extract city
+  const cities = ['hartford', 'west hartford', 'stamford', 'new haven'];
+  for (const city of cities) {
+    if (lowerMsg.includes(city)) {
+      filters.city = city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      extractedFields.push('city');
+      break;
+    }
+  }
+  
+  // Extract bedrooms
+  const bedroomMatch = lowerMsg.match(/(\d+)\s*(?:bed|bedroom|br)/);
+  if (bedroomMatch) {
+    filters.bedrooms = parseInt(bedroomMatch[1]);
+    extractedFields.push('bedrooms');
+  }
+  
+  // Extract bathrooms
+  const bathroomMatch = lowerMsg.match(/(\d+)\s*(?:bath|bathroom|ba)/);
+  if (bathroomMatch) {
+    filters.bathrooms = parseInt(bathroomMatch[1]);
+    extractedFields.push('bathrooms');
+  }
+  
+  // Extract price
+  const priceMatch = lowerMsg.match(/under\s*\$?(\d+)k?/i);
+  if (priceMatch) {
+    const price = parseInt(priceMatch[1]);
+    filters.maxPrice = price > 1000 ? price : price * 1000;
+    extractedFields.push('maxPrice');
+  }
+
+  // Apply defaults for missing critical fields
+  if (!filters.minPrice) {
+    filters.minPrice = 100000;
+    defaultFields.push('minPrice ($100,000)');
+  }
+  if (!filters.maxPrice) {
+    filters.maxPrice = 500000;
+    defaultFields.push('maxPrice ($500,000)');
+  }
+
+  // Simulate processing delay
+  setTimeout(() => {
+    let response = mockAIResponses[message] || mockAIResponses.default;
+    
+    // Add defaults note if applicable
+    if (defaultFields.length > 0 && extractedFields.length > 0) {
+      response += `\n\n📋 *I've applied some default search values: ${defaultFields.join(', ')}. Feel free to tell me if you'd like different values!*`;
+    }
+    
+    res.json({
+      filters: extractedFields.length > 0 ? filters : null,
+      response,
+      model: 'mock-llm-v1',
+      extractedFields,
+      defaultFields,
+    });
+  }, 500);
 });
 
 // AI property analysis endpoint
@@ -141,14 +229,30 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Serve static files from public folder (for demo mode without build)
-const publicPath = path.join(__dirname, '..', '..', 'public');
-app.use(express.static(publicPath));
-
-// Catch-all handler for SPA
-app.get('*', (req, res) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
+// Cities endpoint
+app.get('/api/cities', (req, res) => {
+  const cities = [...new Set(mockProperties.map(p => p.city))].sort();
+  res.json({ cities });
 });
+
+// Serve React frontend build if exists, otherwise serve public folder
+const frontendDistPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+const publicPath = path.join(__dirname, '..', '..', 'public');
+const fs = require('fs');
+
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  // Catch-all handler for SPA (React Router)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+} else {
+  // Fallback to public folder for legacy static HTML
+  app.use(express.static(publicPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // Start server
 if (require.main === module) {

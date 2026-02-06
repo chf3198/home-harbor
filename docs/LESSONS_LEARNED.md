@@ -24,6 +24,33 @@
 - **Implementation**: DynamoDB TTL caching (30-90 days) for cost optimization
 - **Validation**: Vision analysis and property descriptions working in test environment
 
+### AI Search Integration Pattern (February 6, 2026)
+- **Decision**: Two-LLM architecture for natural language → search conversion
+- **Components**:
+  - **LLM #1 (Filter Extraction)**: Server-side regex pattern matching extracts bedrooms, bathrooms, price, city from user messages
+  - **LLM #2 (Conversational Response)**: OpenRouter cascading models generate human-friendly responses
+- **Model Cascade**: Free models via OpenRouter with intelligent fallback
+- **Default Values**: minPrice ($100K), maxPrice ($500K) applied when not specified; AI informs user
+- **State Persistence**: All state (chat history, filters, results) persisted to localStorage
+- **UX**: Typing indicator animation during LLM processing; messenger-style chat bubbles
+- **Validation**: ✅ UAT passed February 6, 2026
+
+### AI System Prompt Engineering (February 6, 2026)
+- **Problem**: Free LLMs sometimes expose chain-of-thought reasoning ("Okay, the user wants...")
+- **Solution**: Explicit system prompt with critical instructions at top:
+  - "You are talking DIRECTLY to the user"
+  - "NEVER write 'the user' or 'their request'"
+  - "NEVER show your thinking process"
+  - Good/bad response examples included
+- **Result**: 3/3 conversational test prompts pass validation
+- **Learning**: Free models need very explicit, structured instructions with examples
+
+### Frontend Architecture Decision (February 6, 2026)
+- **Decision**: Deprecate `public/` folder; React (`frontend/`) is primary UI
+- **Why**: `file://` protocol blocks API access; GitHub Pages provides free hosting
+- **Trade-off**: Requires server (local dev or GitHub Pages) vs direct file open
+- **Validation**: GitHub Pages deployment working for production demo
+
 ### Client-Side RAG Architecture
 - **Decision**: Orama + Transformers.js for 100% browser-based RAG
 - **Why**: No API costs, works on GitHub Pages, real-time property data indexing

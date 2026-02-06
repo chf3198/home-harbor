@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-HomeHarbor integrates **AI vision analysis and AI-generated descriptions** using 100% free tier APIs. A chat assistant remains planned for a later phase.
+HomeHarbor integrates **AI chat assistant, vision analysis, and AI-generated descriptions** using 100% free tier APIs. The chat assistant provides natural language property search with filter extraction.
 
 ### Data Sources & AI Stack
 
@@ -11,6 +11,7 @@ HomeHarbor integrates **AI vision analysis and AI-generated descriptions** using
 | **Market Data** | Redfin Data Center | Monthly CSV exports | Free (non-commercial) | City-level market metrics |
 | **Transaction Data** | Connecticut Open Data | Socrata API (2001-2023) | Free (public domain) | Property records with pricing, location, type |
 | **Property Photos** | Google Maps | Street View Static API | $200/mo free ($0.007 after) | Exterior photos for any address |
+| **Chat AI** | OpenRouter | Cascading free models | Free | Natural language search, customer service |
 | **Vision AI** | OpenRouter | AllenAI Molmo 72B | Free | Image analysis, condition assessment, amenity detection |
 | **Description AI** | OpenRouter | Llama 3.3 70B | Free | Listing descriptions and market positioning |
 
@@ -18,34 +19,69 @@ HomeHarbor integrates **AI vision analysis and AI-generated descriptions** using
 
 
 
-## AI System #1: Chat Assistant (Planned)
+## AI System #1: Chat Assistant (Complete ✅)
 
 ### Purpose
-Answer user questions about the app, property search features, and provide intelligent recommendations based on user preferences.
+Provide five-star customer service for property search. Users can describe what they're looking for in natural language, and the AI extracts search filters and provides helpful guidance.
 
 ### Architecture
 ```
-User Question
+User Message (e.g., "Show me 3 bedroom houses in Hartford under $400k")
     ↓
-chatAssistant.ask(question)
+POST /api/chat
     ↓
-Model Selection (cascade order):
-  1. arcee-ai/trinity-large-preview:free (131K context, frontier model)
-  2. arcee-ai/trinity-mini:free (131K context, function calling)
-  3. google/gemma-3-27b-it:free (multimodal, structured outputs)
-  4. liquid/lfm-2.5-1.2b-thinking:free (reasoning focused)
-  5. openai/gpt-oss-120b:free (coding specialist)
+Filter Extraction (server-side regex):
+  - Bedrooms: /(\d+)\s*(?:bed|bedroom|br)/
+  - Bathrooms: /(\d+)\s*(?:bath|bathroom|ba)/
+  - Max Price: /(?:under|below|less than)\s*\$?(\d+)k?/
+  - City: Match against CT cities list
     ↓
-[Retry with fallback on failure/timeout]
+Default Values Applied:
+  - minPrice: $100,000 (if not specified)
+  - maxPrice: $500,000 (if not specified)
     ↓
-Return AI response with model used
+OpenRouter LLM (cascading free models):
+  → Generate conversational response
+  → Five-star customer service tone
+  → Direct, friendly, no exposed reasoning
+    ↓
+Response: { response, filters, model, extractedFields, defaultFields }
 ```
 
-### Capabilities
+### System Prompt (Five-Star Customer Service)
+```
+You are HomeHarbor's friendly AI assistant. You provide five-star customer 
+service for our real estate search platform.
 
-### Free Models Available (Jan 2026)
+CRITICAL INSTRUCTIONS:
+1. You are talking DIRECTLY to the user. Use "you" and "your".
+2. NEVER write "the user", "their request", or narrate in third person.
+3. NEVER show your thinking process. Only output your final response.
+4. Start with a direct, friendly greeting or acknowledgment.
 
-### Performance Targets
+Example Good Response:
+"Great choice! A 2-bedroom home is perfect for many buyers. Do you have a 
+specific Connecticut city in mind?"
+
+Example BAD Response (NEVER do this):
+"The user wants a 2-bedroom house. I should ask about their budget..."
+```
+
+### Messenger-Style UI Features
+- Gradient header with "Online" status indicator
+- Chat bubbles with avatars (user = blue, AI = green)
+- Animated typing indicator during AI processing
+- Timestamps on messages
+- Auto-scroll to latest message
+- Compact input bar with send/clear buttons
+- Enter to send, Shift+Enter for new line
+- localStorage persistence for chat history
+
+### Test Coverage
+- **Unit Tests**: chatAssistant.test.js (Jest)
+- **Integration Tests**: chatAssistant.integration.test.js
+- **E2E Tests**: 7 AI Chat tests in react-app.spec.js (Playwright)
+- **Conversational Tests**: 3/3 prompts pass validation
 
 
 ## AI System #2: Vision Analysis

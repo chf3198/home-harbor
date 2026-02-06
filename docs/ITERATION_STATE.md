@@ -1,10 +1,10 @@
-# Iteration State Snapshot - February 3, 2026
+# Iteration State Snapshot - February 6, 2026
 
 ## Current Development Context
 
-### Active Branch: `feature/frontend-react-rewrite`
-**Status**: RED → GREEN - React foundation complete, ready for component implementation
-**Goal**: Complete Phase 2 Frontend - Property Viewer with React rewrite
+### Active Branch: `feature/ai-search-integration`
+**Status**: ✅ COMPLETE - Ready for merge to main
+**Goal**: Phase 3.5 AI Search Integration - Natural language chat triggers property search
 
 ### System Architecture Overview
 
@@ -12,92 +12,62 @@
 - **AWS Lambda Functions**: 5 serverless functions for data ingestion and AI processing
 - **API Gateway**: RESTful endpoints for property search and AI features
 - **Data Pipeline**: Redfin market data, CT property transactions, Google Street View
-- **AI Integration**: OpenRouter with Molmo2 vision and Llama 3.3 LLM models
+- **AI Integration**: OpenRouter with cascading free models for chat
+- **Chat API**: `/api/chat` returns `{ response, filters, model, extractedFields, defaultFields }`
 - **Cost**: $0.00/month (100% free tier — no paid services)
 
-#### Frontend (In Progress ⏳)
+#### Frontend (Complete ✅)
 - **Technology**: React 18 + Vite + Tailwind CSS
 - **Architecture**: Context providers + custom hooks + functional components
-- **Testing**: Vitest + React Testing Library + accessibility assertions
-- **State Management**: Context API with useReducer for complex state
-- **Accessibility**: WCAG compliant with ARIA labels and keyboard navigation
+- **Testing**: Vitest + React Testing Library + Playwright E2E (20 tests)
+- **State Management**: Context API with useReducer, localStorage persistence
+- **AI Chat**: Messenger-style UI with typing indicator, chat bubbles, filter extraction
 
 ### Current Implementation Status
 
-#### ✅ Completed Components
-- **App.jsx**: Root component with provider setup
-- **Header.jsx**: Accessible header with help modal integration
-- **SearchSection.jsx**: Complete search form with city autocomplete
-- **HelpModal.jsx**: Tabbed help interface with user/developer content
-- **ResultsSection.jsx**: Property results display with pagination
-- **AIChatSection.jsx**: AI assistant chat interface
-- **PropertyCard.jsx**: Individual property display with AI analysis
-- **Pagination.jsx**: Accessible pagination controls
-- **LoadingSpinner.jsx**: Reusable loading component
+#### ✅ Phase 3.5 AI Search Integration (COMPLETE)
+- **AIChatSection.jsx**: Messenger-style chat with gradient header, online status
+- **AIChatMessages.jsx**: Chat bubbles with avatars, timestamps, typing indicator
+- **AIChatForm.jsx**: Compact input bar with send/clear buttons, Enter to send
+- **useAISearch.js**: Hook coordinating AI chat with property search
+- **aiRoutes.js**: Backend filter extraction from natural language
+- **chatAssistant.js**: Five-star customer service system prompt
 
-#### ✅ Infrastructure Complete
-- **Vite Configuration**: Optimized build with API proxy
-- **Testing Setup**: Vitest configuration with jest-dom
-- **Component Registry**: Complete documentation of all components/hooks
-- **State Management**: PropertyProvider and AIProvider implemented
-- **Component Tests**: Comprehensive test suite for all components
+#### ✅ Test Coverage
+- **Unit Tests**: 164 passing (Jest)
+- **E2E Tests**: 20 passing (Playwright)
+- **Conversational AI Tests**: 3/3 passing
+- **UAT**: ✅ Passed February 6, 2026
 
 ### API Integration Points
 
 #### Property Search API
 ```
 GET /api/properties?city=Hartford&minPrice=100000&maxPrice=500000&page=1&limit=12
-Response: {
-  data: [Property],
-  pagination: { page, pageSize, total, totalPages }
-}
-```
-
-#### Property Details API
-```
-GET /api/properties/{id}
-Response: { id, address, metadata: { saleDate, residentialType, serialNumber } }
+Response: { data: [Property], page, pageSize, totalItems, totalPages }
 ```
 
 #### AI Chat API
 ```
-POST /api/ai/chat
-Body: { message: string, propertyId?: string }
-Response: { response: string }
+POST /api/chat
+Body: { message: string, chatHistory?: array, searchResults?: array }
+Response: { response: string, filters?: object, model: string, extractedFields: array, defaultFields: array }
 ```
 
-#### AI Analysis APIs
-```
-POST /api/ai/analyze/{propertyId}  # Vision analysis
-POST /api/ai/chat                  # Description generation
-```
+### Key Files Modified This Iteration
+- `src/ai-assistant/chatAssistant.js` - Five-star customer service system prompt
+- `src/server/routes/aiRoutes.js` - Filter extraction with defaults
+- `frontend/src/components/AIChatSection.jsx` - Messenger-style container
+- `frontend/src/components/AIChatMessages.jsx` - Chat bubbles and typing indicator
+- `frontend/src/components/AIChatForm.jsx` - Compact input bar
+- `frontend/src/hooks/propertySearchReducer.js` - Pagination format handling
+- `tests/e2e/react-app.spec.js` - 20 comprehensive E2E tests
+- `tests/e2e/mock-server.js` - Mock API with filter extraction
 
-### Design Decisions (For Continuity)
-
-#### Component Architecture
-- **Atomic Design**: Small, focused components (PropertyCard, Pagination, LoadingSpinner)
-- **Compound Components**: Related functionality grouped (ResultsSection contains PropertyCard + Pagination)
-- **Custom Hooks**: Business logic separated from UI (usePropertySearch, useAIChat)
-- **Provider Pattern**: Global state managed through React Context
-
-#### State Management Choice
-- **Context API with useReducer**: Complex state logic for search filters and pagination
-- **Local Component State**: useState for UI-specific state (expanded cards, form inputs)
-- **Server State**: API responses managed through custom hooks
-- **Error Boundaries**: Recommended for production error handling
-
-#### Testing Strategy
-- **Component Testing**: Unit tests for rendering, interactions, accessibility
-- **Hook Testing**: Integration tests for state management and API calls
-- **Mocking**: fetch API mocked for reliable testing
-- **Accessibility**: Built-in a11y assertions in all component tests
-
-### Current Status: RED → GREEN
-**Iteration Complete**: All core React components implemented with comprehensive testing
-**Ready for**: Integration testing and accessibility audit
-**Next Phase**: E2E testing with Playwright, performance optimization
-
-### API Integration Points
+### Current Status: ✅ COMPLETE
+**UAT Passed**: February 6, 2026
+**Ready for**: Merge to main branch
+**Next Phase**: Phase 3 CI/CD deployment
 
 #### Property Search API
 ```
