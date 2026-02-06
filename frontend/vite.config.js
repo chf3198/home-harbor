@@ -1,12 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// AWS API Gateway URL for production (deployed via SAM)
+const AWS_API_URL = 'https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   // Base path for GitHub Pages deployment (repository name)
   // Use '/' for local dev, '/home-harbor/' for GitHub Pages
   base: process.env.NODE_ENV === 'production' ? '/home-harbor/' : '/',
+  // Define global constants available at build time
+  define: {
+    __AWS_API_URL__: JSON.stringify(AWS_API_URL),
+  },
   // root defaults to current directory (frontend/)
   build: {
     outDir: 'dist',

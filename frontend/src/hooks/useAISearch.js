@@ -9,7 +9,28 @@ import { AISearchActionTypes, initialAISearchState } from './aiSearchTypes.js';
 import { aiSearchReducer } from './aiSearchReducer.js';
 import { saveChatHistory, loadChatHistory } from './aiSearchStorage.js';
 
-const CHAT_API_URL = '/api/chat';
+/**
+ * Chat API URL configuration
+ * - Production: AWS Lambda via API Gateway (secure, API key in Secrets Manager)
+ * - Development: Vite proxy to local Express backend
+ * 
+ * __AWS_API_URL__ is defined in vite.config.js at build time
+ */
+/* global __AWS_API_URL__ */
+const AWS_CHAT_API = `${typeof __AWS_API_URL__ !== 'undefined' ? __AWS_API_URL__ : ''}/chat`;
+const LOCAL_CHAT_API = '/api/chat';
+
+/**
+ * Get the appropriate chat API URL based on environment
+ * - Production (GitHub Pages): Uses AWS Lambda via API Gateway
+ * - Local development: Uses Vite proxy to Express backend
+ * @returns {string} Chat API URL
+ */
+function getChatApiUrl() {
+  // Vite sets import.meta.env.PROD = true for production builds
+  const isProduction = import.meta.env.PROD;
+  return isProduction ? AWS_CHAT_API : LOCAL_CHAT_API;
+}
 
 /**
  * Custom hook for AI-powered property search
@@ -41,7 +62,8 @@ export function useAISearch(onFiltersExtracted, searchResults = []) {
     dispatch({ type: AISearchActionTypes.SET_LOADING, payload: true });
 
     try {
-      const response = await fetch(CHAT_API_URL, {
+      const chatApiUrl = getChatApiUrl();
+      const response = await fetch(chatApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
