@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **GitHub Pages React Deployment**: Updated CI/CD to build and deploy React frontend.
+  - `deploy-pages.yml` now builds frontend with Vite and deploys `dist/` folder.
+  - Vite `base` path configured for `/home-harbor/` subdirectory.
+  - Automatic deployment triggered on `frontend/**` changes.
 - **AI Search Integration** (Phase 3.5): Natural language chat triggers property search.
   - Two-LLM architecture: Filter extraction (structured JSON) + conversational response.
   - `useAISearch.js`: React hook coordinating LLMs with search form state.
