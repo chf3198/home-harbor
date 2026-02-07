@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import Markdown from 'react-markdown';
 
 function AIChatMessages({ messages = [], loading = false, error = null }) {
   const messagesEndRef = useRef(null);
@@ -72,7 +73,16 @@ function ChatBubble({ message }) {
             ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md'
             : 'bg-white border border-slate-200 text-slate-700 rounded-bl-md'
         }`}>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          {isUser ? (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          ) : (
+            <div className="text-sm leading-relaxed prose prose-sm prose-slate max-w-none
+              prose-headings:text-slate-800 prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-2
+              prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5
+              prose-strong:text-slate-800 prose-strong:font-semibold">
+              <Markdown>{message.content}</Markdown>
+            </div>
+          )}
           {message.filters && <FilterBadge filters={message.filters} isUser={isUser} />}
         </div>
         {/* Timestamp */}

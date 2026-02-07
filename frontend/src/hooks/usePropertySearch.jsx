@@ -6,6 +6,22 @@ import { createContext, useContext, useReducer, useCallback } from 'react';
 import { PropertyActionTypes, initialState } from './propertySearchTypes.js';
 import { propertyReducer } from './propertySearchReducer.js';
 
+/**
+ * Properties API URL configuration
+ * - Production: AWS Lambda via API Gateway (Socrata-backed)
+ * - Development: Vite proxy to local Express backend (Socrata-backed)
+ * 
+ * Both use CT Open Data Portal (211K+ properties) via Socrata API
+ */
+/* global __AWS_API_URL__ */
+const AWS_PROPERTIES_API = `${typeof __AWS_API_URL__ !== 'undefined' ? __AWS_API_URL__ : ''}/properties`;
+const LOCAL_PROPERTIES_API = '/api/socrata/properties';
+
+function getPropertiesApiUrl() {
+  const isProduction = import.meta.env.PROD;
+  return isProduction ? AWS_PROPERTIES_API : LOCAL_PROPERTIES_API;
+}
+
 // Context
 const PropertyContext = createContext();
 
@@ -17,13 +33,19 @@ export function PropertyProvider({ children }) {
     dispatch({ type: PropertyActionTypes.SET_LOADING, payload: true });
 
     try {
+      // Clean filters - remove null/undefined values
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([, v]) => v != null && v !== '')
+      );
+
       const queryParams = new URLSearchParams({
-        ...filters,
+        ...cleanFilters,
         page: page.toString(),
         limit: '12',
       });
 
-      const response = await fetch(`/api/properties?${queryParams}`);
+      const apiUrl = getPropertiesApiUrl();
+      const response = await fetch(`${apiUrl}?${queryParams}`);
 
       if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`);
