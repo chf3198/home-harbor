@@ -79,18 +79,24 @@ export function useAISearch(onFiltersExtracted, searchResults = []) {
 
       const data = await response.json();
 
-      // If AI extracted filters, notify parent to update search form
+      // ALWAYS trigger search if filters are returned (alwaysSearch flag)
+      // This ensures any property-related query initiates a search
       if (data.filters && onFiltersExtracted) {
+        console.log('[useAISearch] Triggering search with filters:', data.filters);
+        console.log('[useAISearch] Search intent:', data.searchIntent);
+        console.log('[useAISearch] Suggested towns:', data.suggestedTowns);
         onFiltersExtracted(data.filters);
       }
 
-      // Add AI response
+      // Add AI response with additional metadata
       const aiMessage = {
         role: 'assistant',
         content: data.response,
         timestamp: Date.now(),
         filters: data.filters,
         model: data.model,
+        searchIntent: data.searchIntent,
+        suggestedTowns: data.suggestedTowns,
       };
       dispatch({ type: AISearchActionTypes.ADD_MESSAGE, payload: aiMessage });
     } catch (error) {

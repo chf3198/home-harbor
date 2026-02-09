@@ -3,6 +3,12 @@ const { getPropertyById } = require('../dataService');
 const { askChat } = require('../chatService');
 const { analyzeProperty } = require('../visionService');
 const { generateDescription } = require('../descriptionService');
+const {
+  extractFiltersWithLLM,
+  fallbackExtraction,
+  generateResultsExplanation,
+  CT_TOP_SCHOOL_TOWNS,
+} = require('../filterExtractionService');
 
 const router = express.Router();
 
@@ -26,99 +32,68 @@ router.post('/chat', async (req, res) => {
   }
 
   try {
-    const result = await askChat(message);
+    // Step 1: Extract filters using LLM (with fallback to keyword matching)
+    console.log('[AI Chat] Extracting filters from:', message);
+    const filterResult = await extractFiltersWithLLM(message);
+    console.log('[AI Chat] Filter extraction result:', filterResult);
 
-    if (!result.success) {
-      res.status(502).json({
-        error: result.error,
-        errorType: result.errorType,
+    // Step 2: Get conversational response from chat assistant
+    const chatResult = await askChat(message);
+
+    if (!chatResult.success) {
+      // Even if chat fails, still return filters for search
+      res.json({
+        response: `I'm having trouble connecting to my AI assistant, but I've started a search based on your request. ${generateResultsExplanation(filterResult.searchIntent, filterResult.suggestedTowns, filterResult.filters, 0)}`,
+        model: null,
+        filters: filterResult.filters,
+        searchIntent: filterResult.searchIntent,
+        suggestedTowns: filterResult.suggestedTowns,
+        extractedBy: filterResult.extractedBy,
+        alwaysSearch: true,
       });
       return;
     }
 
-    // Extract filters from the message using simple pattern matching
-    const { filters, extractedFields, defaultFields } = extractFiltersFromMessage(message);
-    
-    // Build response with defaults info if applicable
-    let responseText = result.message;
-    if (defaultFields.length > 0 && extractedFields.length > 0) {
-      responseText += `\n\n📋 *I've applied some default search values: ${defaultFields.join(', ')}. Feel free to tell me if you'd like different values!*`;
+    // Step 3: Build enhanced response that acknowledges the search
+    let responseText = chatResult.message;
+
+    // Add search context to the response if not already mentioned
+    if (filterResult.filters && filterResult.searchIntent) {
+      const townInfo = filterResult.suggestedTowns.length > 0
+        ? ` I'm showing you properties in ${filterResult.suggestedTowns.slice(0, 3).join(', ')}`
+        : '';
+      
+      // Only add if the AI didn't already mention searching
+      if (!responseText.toLowerCase().includes('search') && 
+          !responseText.toLowerCase().includes('showing') &&
+          !responseText.toLowerCase().includes('found')) {
+        responseText += `\n\n🔍 *I've started a search for ${filterResult.searchIntent}.${townInfo} — check out the results below!*`;
+      }
     }
 
     res.json({
       response: responseText,
-      model: result.model,
-      filters: extractedFields.length > 0 ? filters : null,
-      extractedFields,
-      defaultFields,
+      model: chatResult.model,
+      filters: filterResult.filters, // ALWAYS return filters
+      searchIntent: filterResult.searchIntent,
+      suggestedTowns: filterResult.suggestedTowns,
+      extractedBy: filterResult.extractedBy,
+      alwaysSearch: true, // Signal to frontend to always trigger search
     });
   } catch (error) {
+    console.error('[AI Chat] Error:', error);
+    
+    // Fallback: still extract filters and return them
+    const fallback = fallbackExtraction(message);
     res.status(503).json({
       error: 'Chat assistant unavailable',
       details: error.message,
+      filters: fallback.filters, // Still provide filters for search
+      searchIntent: fallback.searchIntent,
+      alwaysSearch: true,
     });
   }
 });
-
-/**
- * Extract property search filters from natural language message
- * Returns filters with defaults applied for search
- */
-function extractFiltersFromMessage(message) {
-  const filters = {};
-  const extractedFields = [];
-  const defaultFields = [];
-  const lowerMsg = message.toLowerCase();
-
-  // Extract bedrooms
-  const bedroomMatch = lowerMsg.match(/(\d+)\s*(?:bed(?:room)?s?|br|bd)/);
-  if (bedroomMatch) {
-    filters.bedrooms = parseInt(bedroomMatch[1], 10);
-    extractedFields.push('bedrooms');
-  }
-
-  // Extract bathrooms
-  const bathroomMatch = lowerMsg.match(/(\d+)\s*(?:bath(?:room)?s?|ba)/);
-  if (bathroomMatch) {
-    filters.bathrooms = parseInt(bathroomMatch[1], 10);
-    extractedFields.push('bathrooms');
-  }
-
-  // Extract max price
-  const priceMatch = lowerMsg.match(/(?:under|below|less than|max|maximum|up to)\s*\$?([\d,]+)k?/i);
-  if (priceMatch) {
-    let price = parseInt(priceMatch[1].replace(/,/g, ''), 10);
-    if (lowerMsg.includes('k') || price < 1000) {
-      price *= 1000;
-    }
-    filters.maxPrice = price;
-    extractedFields.push('maxPrice');
-  }
-
-  // Extract city - check for common CT cities
-  const ctCities = ['hartford', 'stamford', 'new haven', 'bridgeport', 'waterbury', 
-                    'norwalk', 'danbury', 'new britain', 'bristol', 'meriden',
-                    'west hartford', 'greenwich', 'fairfield', 'hamden', 'manchester'];
-  for (const city of ctCities) {
-    if (lowerMsg.includes(city)) {
-      filters.city = city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      extractedFields.push('city');
-      break;
-    }
-  }
-
-  // Apply defaults for missing critical fields
-  if (!filters.minPrice) {
-    filters.minPrice = 100000;
-    defaultFields.push('minPrice ($100,000)');
-  }
-  if (!filters.maxPrice) {
-    filters.maxPrice = 500000;
-    defaultFields.push('maxPrice ($500,000)');
-  }
-
-  return { filters, extractedFields, defaultFields };
-}
 
 router.post('/vision', async (req, res) => {
   const { propertyId, address } = req.body || {};
