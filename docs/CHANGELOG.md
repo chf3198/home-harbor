@@ -5,10 +5,10 @@ All notable changes to HomeHarbor will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-02-09
 
 ### Fixed
-- **Lambda Socrata Integration** (2026-02-09): Fixed Lambda handler to use Socrata API.
+- **Lambda Socrata Integration**: Fixed Lambda handler to use Socrata API.
   - Changed Lambda handler from `properties.handler` to `properties-socrata.handler`.
   - Lambda now queries CT Open Data Portal (211K+ real estate records).
   - Updated `usePropertySearch.jsx` to handle new `{data, meta}` response format.
@@ -18,8 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `useAIChat.jsx`: Uses AWS Lambda URL in production.
   - `CityInput.jsx`: Fixed cities.json path using `import.meta.env.BASE_URL`.
   - `vite.config.js`: Fixed environment detection using Vite's `mode` parameter.
+- **Favicon and Tailwind warnings**: Added custom favicon.svg, removed CDN script (bundled by Vite).
 
 ### Added
+- **Production UAT Test Suite**: Automated E2E tests against live GitHub Pages deployment.
+  - `production-uat.spec.js`: 10 Playwright tests matching manual UAT workflow.
+  - `playwright.production.config.ts`: Separate config for production testing.
+  - npm scripts: `test:uat`, `test:uat:headed`, `test:uat:ui`.
+  - Tests verify: page load, AI chat, filter extraction, Socrata API, AWS Lambda integration.
+- **Custom Favicon**: HomeHarbor house+harbor icon in `frontend/public/favicon.svg`.
 - **GitHub Pages React Deployment**: Updated CI/CD to build and deploy React frontend.
   - `deploy-pages.yml` now builds frontend with Vite and deploys `dist/` folder.
   - Vite `base` path configured for `/home-harbor/` subdirectory.

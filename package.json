@@ -1,8 +1,8 @@
 {
   "name": "home-harbor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Real estate listing aggregator demo - AWS Lambda + React portfolio project",
+  "description": "AI-powered real estate search platform - AWS Lambda + React + Socrata API",
   "author": "Curtis Franks",
   "license": "MIT",
   "keywords": [

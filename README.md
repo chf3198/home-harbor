@@ -19,7 +19,7 @@
     <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright">
   </p>
   
-  <p><strong>Cost: $0.00/month</strong> • <strong>44 Tests</strong> • <strong>31 Components</strong> • <strong>5 Lambda Functions</strong></p>
+  <p><strong>Cost: $0.00/month</strong> • <strong>54 Tests</strong> • <strong>31 Components</strong> • <strong>5 Lambda Functions</strong> • <strong>211K+ Properties</strong></p>
 </div>
 
 ---
@@ -46,19 +46,19 @@ HomeHarbor is a production-ready real estate application designed to showcase AW
 
 ### Data Pipeline (Complete ✅)
 - **5 Lambda Functions** for data ingestion, processing, and AI enhancement
-- **3 DynamoDB Tables** for properties, market metrics, and AI insights
+- **CT Open Data Socrata API** — real-time queries to 211K+ property records
 - **S3 + CloudFront** pipeline for image storage and delivery
 - **EventBridge Schedules** for automated data updates
-- **Realtor.com search links** via Google site search for reliable property lookup
-- **City autocomplete helper** from the CT dataset
+- **AI-powered search** — natural language queries extract filters automatically
+- **Production UAT testing** — automated Playwright tests against GitHub Pages
 
 ### Data Sources (100% Legal & Free)
 | Source | Purpose | Records |
 |--------|---------|---------|
+| CT Open Data (Socrata) | Property transactions | 211K+ properties |
 | Redfin Data Center | Market analytics | 50K+ metrics |
-| CT Open Data | Property transactions | 5K+ properties |
 | Google Street View | Property photos | 500+ images |
-| OpenRouter AI | Vision + descriptions | Unlimited |
+| OpenRouter AI | Vision + chat | Unlimited |
 
 ### Cost: $0.00/month (100% Free Tier)
 - AWS Services: $0.00 (Lambda, DynamoDB, S3, CloudFront — all free tier)
@@ -324,10 +324,43 @@ Generates compelling property descriptions with Llama 3.3 70B
 - [x] Single-file HTML UI (works via file://)
 - [x] React frontend with 31 components
 - [x] Property search functionality
-- [x] 44 test files (Jest + Vitest + Playwright)
+- [x] 54 test files (Jest + Vitest + Playwright)
+- [x] Socrata API integration (211K+ CT properties)
+- [x] AI chat filter extraction
+- [x] Production UAT test suite
+- [x] GitHub Pages deployment
 - [ ] API Gateway REST endpoints
 - [ ] Map visualization (Mapbox)
-- [ ] CI/CD pipeline (GitHub Actions)
+
+---
+
+## 🧪 Testing
+
+### Unit & Integration Tests
+```bash
+npm test              # Run Jest tests with coverage
+npm run test:watch    # Watch mode for development
+```
+
+### E2E Tests (Local)
+```bash
+npm run test:e2e      # Run against local mock server
+npm run test:e2e:ui   # Playwright UI mode
+```
+
+### Production UAT Tests
+```bash
+npm run test:uat      # Run against GitHub Pages
+npm run test:uat:headed  # With visible browser
+npm run test:uat:ui   # Playwright UI for debugging
+```
+
+The UAT suite verifies the same workflow you'd test manually:
+- Page loads without errors
+- AI chat responds to natural language
+- Filters are extracted and applied
+- Search returns real CT property data
+- Network requests go to AWS Lambda
 
 ---
 

@@ -6,6 +6,25 @@
 
 ## Core Architectural Decisions
 
+### Production UAT Testing Pattern (February 9, 2026)
+- **Decision**: Separate Playwright config for production (GitHub Pages) testing
+- **Why**: Manual UAT is time-consuming and error-prone; automated tests provide consistent verification
+- **Implementation**:
+  - `playwright.production.config.ts`: Longer timeouts (90s), retry on failure, network-realistic settings
+  - `production-uat.spec.js`: 10 tests covering full user workflow
+  - npm scripts: `test:uat`, `test:uat:headed`, `test:uat:ui`
+- **Test Coverage**: Page load → AI chat → filter extraction → API calls → results display
+- **Learning**: Production tests need longer timeouts than local tests (AI responses can take 30-60s)
+- **Validation**: ✅ 10/10 tests passing against live GitHub Pages (February 9, 2026)
+
+### Socrata API Direct Query Pattern (February 9, 2026)
+- **Decision**: Query CT Open Data Portal directly instead of pre-cached DynamoDB
+- **Why**: 211K+ real-time records vs 5K cached; no data freshness concerns
+- **Implementation**: Lambda `properties-socrata.handler` with SoQL queries
+- **Response Format**: `{data: [...], meta: {total, page, limit}, source: 'CT Open Data Portal'}`
+- **Learning**: Always verify Lambda handler configuration matches expected module exports
+- **Trade-off**: Slightly slower (network latency) but vastly more data
+
 ### Serverless-First Approach
 - **Decision**: AWS Lambda + DynamoDB + S3 architecture
 - **Why**: $0.00/month cost (100% free tier), auto-scaling, zero maintenance
