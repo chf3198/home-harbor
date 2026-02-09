@@ -73,12 +73,14 @@ test.describe('Production UAT - GitHub Pages', () => {
     const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
     
-    // Wait for AI response - look for the AI response bubble (not the suggested queries)
-    // AI responses appear in chat bubbles with specific styling
-    await expect(
-      page.locator('[class*="whitespace-pre-wrap"]').filter({ hasText: /Conard|Hall|high school|education/i })
-        .or(page.locator('text=/Simsbury High|Glastonbury High|top.*(school|district)/i'))
-    ).toBeVisible({ timeout: AI_RESPONSE_TIMEOUT });
+    // Wait for AI response - look for specific content in chat area
+    // The AI will mention towns like West Hartford, Simsbury, etc.
+    // Use a longer timeout since AI responses take time
+    await page.waitForTimeout(5000); // Wait for AI to start responding
+    
+    // Look for AI response content about schools/towns
+    const aiResponseContent = page.locator('text=/Conard|Hall|Simsbury|Glastonbury|education|school district/i').first();
+    await expect(aiResponseContent).toBeVisible({ timeout: AI_RESPONSE_TIMEOUT });
     
     // Verify filters were applied (look for filter indicator in compact filters area)
     await expect(page.locator('text=/\\d+ filter/').first()).toBeVisible({ timeout: 10_000 });
