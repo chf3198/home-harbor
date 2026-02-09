@@ -22,14 +22,15 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const params = event.queryStringParameters || {};
 
     // Parse query parameters
+    const pageSize = params.limit ? Math.min(parseInt(params.limit), 100) : 50;
     const filters = {
       city: params.city || null,
       minPrice: params.minPrice ? parseInt(params.minPrice) : null,
       maxPrice: params.maxPrice ? parseInt(params.maxPrice) : null,
       propertyType: params.propertyType || null,
       residentialType: params.residentialType || null,
-      limit: params.limit ? Math.min(parseInt(params.limit), 100) : 50,
-      offset: params.page ? (parseInt(params.page) - 1) * (parseInt(params.limit) || 50) : 0,
+      limit: pageSize,
+      offset: params.page ? (parseInt(params.page) - 1) * pageSize : 0,
     };
 
     console.log('[Properties] Filters:', JSON.stringify(filters));

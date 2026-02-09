@@ -154,7 +154,7 @@ export async function queryPropertiesFromSocrata(
     throw new Error(`Socrata API error: ${response.status} ${response.statusText}`);
   }
 
-  const rawProperties: SocrataProperty[] = await response.json();
+  const rawProperties = (await response.json()) as SocrataProperty[];
   const properties = rawProperties.map(transformProperty);
 
   // Get total count via a separate count query
@@ -167,7 +167,7 @@ export async function queryPropertiesFromSocrata(
 
   const countUrl = `${SOCRATA_BASE_URL}?${countParams.toString()}`;
   const countResponse = await fetch(countUrl);
-  const countData = await countResponse.json();
+  const countData = (await countResponse.json()) as Array<{ count?: string }>;
   const totalCount = countData[0]?.count ? parseInt(countData[0].count) : properties.length;
 
   return { properties, count: totalCount };
@@ -241,8 +241,8 @@ async function fetchDistinctValues(column: string, limit: number): Promise<strin
   const response = await fetch(`${SOCRATA_BASE_URL}?${params.toString()}`);
   if (!response.ok) return [];
 
-  const data = await response.json();
-  return data.map((row: Record<string, string>) => row[column]).filter(Boolean);
+  const data = (await response.json()) as Array<Record<string, string>>;
+  return data.map((row) => row[column]).filter(Boolean);
 }
 
 /** Fetch min/max price range */
@@ -255,7 +255,7 @@ async function fetchPriceRange(): Promise<{ min: number; max: number }> {
   const response = await fetch(`${SOCRATA_BASE_URL}?${params.toString()}`);
   if (!response.ok) return { min: 50000, max: 5000000 };
 
-  const data = await response.json();
+  const data = (await response.json()) as Array<{ min_price?: string; max_price?: string }>;
   return {
     min: Number(data[0]?.min_price) || 50000,
     max: Number(data[0]?.max_price) || 5000000,
@@ -272,7 +272,7 @@ async function fetchRecordCount(): Promise<{ count: number; lastDate: string }> 
   const response = await fetch(`${SOCRATA_BASE_URL}?${params.toString()}`);
   if (!response.ok) return { count: 0, lastDate: '' };
 
-  const data = await response.json();
+  const data = (await response.json()) as Array<{ total?: string; last_date?: string }>;
   return {
     count: Number(data[0]?.total) || 0,
     lastDate: data[0]?.last_date || '',
