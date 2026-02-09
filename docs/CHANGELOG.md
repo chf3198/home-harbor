@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Lambda Socrata Integration** (2026-02-09): Fixed Lambda handler to use Socrata API.
+  - Changed Lambda handler from `properties.handler` to `properties-socrata.handler`.
+  - Lambda now queries CT Open Data Portal (211K+ real estate records).
+  - Updated `usePropertySearch.jsx` to handle new `{data, meta}` response format.
+  - Added debug logging throughout search flow for troubleshooting.
+  - Verified API returns real property data via curl testing.
+- **Frontend API URL Configuration**: Fixed production API URLs for GitHub Pages deployment.
+  - `useAIChat.jsx`: Uses AWS Lambda URL in production.
+  - `CityInput.jsx`: Fixed cities.json path using `import.meta.env.BASE_URL`.
+  - `vite.config.js`: Fixed environment detection using Vite's `mode` parameter.
+
 ### Added
 - **GitHub Pages React Deployment**: Updated CI/CD to build and deploy React frontend.
   - `deploy-pages.yml` now builds frontend with Vite and deploys `dist/` folder.
