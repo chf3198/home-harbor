@@ -1,4 +1,5 @@
 import React from 'react';
+// HomeHarbor React App - v2.1.0 - Socrata API Integration
 import Header from './components/Header';
 import SearchSection from './components/SearchSection';
 import ResultsSection from './components/ResultsSection';
