@@ -95,16 +95,12 @@ test.describe('Production UAT - GitHub Pages', () => {
     await submitButton.click();
     
     // Wait for search results to appear
-    // Look for property cards or result indicators
-    const resultsContainer = page.locator('[data-testid="search-results"]').or(
-      page.locator('[class*="property"]').or(
-        page.locator('[class*="result"]').or(
-          page.locator('[class*="card"]')
-        )
-      )
+    // Look for "Search Results" heading or "properties found" text
+    const resultsIndicator = page.locator('text=Search Results').or(
+      page.locator('text=properties found')
     );
     
-    await expect(resultsContainer.first()).toBeVisible({ timeout: SEARCH_TIMEOUT });
+    await expect(resultsIndicator.first()).toBeVisible({ timeout: SEARCH_TIMEOUT });
   });
 
   test('5. Search results display property information', async ({ page }) => {
@@ -113,18 +109,18 @@ test.describe('Production UAT - GitHub Pages', () => {
     await textarea.fill('Find properties in West Hartford');
     await page.locator('button[type="submit"]').first().click();
     
-    // Wait for results
-    await page.waitForTimeout(5000);
+    // Wait for "properties found" text indicating results loaded
+    await expect(page.locator('text=properties found')).toBeVisible({ timeout: SEARCH_TIMEOUT });
     
-    // Verify property data is displayed (price, address, or property details)
+    // Verify property data is displayed (price format or CT addresses)
     const propertyInfo = page.locator('text=/\\$[0-9,]+/').or(
       page.locator('text=/[0-9]+ bed/i').or(
-        page.locator('text=/CT [0-9]{5}/') // CT zip codes
+        page.locator('text=/, CT/')
       )
     );
     
     // Should have at least one property displayed
-    await expect(propertyInfo.first()).toBeVisible({ timeout: SEARCH_TIMEOUT });
+    await expect(propertyInfo.first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('6. Console logs show correct API flow', async ({ page }) => {
