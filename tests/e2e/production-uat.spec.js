@@ -73,17 +73,15 @@ test.describe('Production UAT - GitHub Pages', () => {
     const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
     
-    // Wait for AI response (indicated by new content appearing)
-    await expect(page.locator('text=West Hartford').or(
-      page.locator('text=Simsbury').or(
-        page.locator('text=Glastonbury').or(
-          page.locator('text=school')
-        )
-      )
-    )).toBeVisible({ timeout: AI_RESPONSE_TIMEOUT });
+    // Wait for AI response - look for the AI response bubble (not the suggested queries)
+    // AI responses appear in chat bubbles with specific styling
+    await expect(
+      page.locator('[class*="whitespace-pre-wrap"]').filter({ hasText: /Conard|Hall|high school|education/i })
+        .or(page.locator('text=/Simsbury High|Glastonbury High|top.*(school|district)/i'))
+    ).toBeVisible({ timeout: AI_RESPONSE_TIMEOUT });
     
-    // Verify filters were applied (look for filter indicator)
-    await expect(page.locator('text=filter').first()).toBeVisible({ timeout: 10_000 });
+    // Verify filters were applied (look for filter indicator in compact filters area)
+    await expect(page.locator('text=/\\d+ filter/').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('4. Property search returns results from Socrata API', async ({ page }) => {
@@ -205,9 +203,14 @@ test.describe('Production UAT - Error Handling', () => {
   });
 
   test('Handles empty search gracefully', async ({ page }) => {
-    // Try to submit empty form
+    // Submit button should be disabled when textarea is empty (good UX)
     const submitButton = page.locator('button[type="submit"]').first();
-    await submitButton.click();
+    await expect(submitButton).toBeDisabled();
+    
+    // Verify the textarea is visible and ready for input
+    const textarea = page.locator('textarea').first();
+    await expect(textarea).toBeVisible();
+    await expect(textarea).toBeEnabled();
     
     // Page should not crash
     await expect(page.locator('#root')).toBeVisible();
