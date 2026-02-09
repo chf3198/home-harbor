@@ -27,7 +27,7 @@ jobs:
       run: cd frontend && npm ci && cd ..
 
     - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps chromium
 
     - name: Run linting
       run: npm run lint
@@ -35,8 +35,8 @@ jobs:
     - name: Build frontend
       run: cd frontend && npm run build && cd ..
 
-    - name: Run E2E tests
-      run: npm run test:e2e
+    - name: Run Production UAT tests
+      run: npm run test:uat
       env:
         CI: true
 
@@ -45,7 +45,7 @@ jobs:
       if: always()
       with:
         name: playwright-report
-        path: playwright-report/
+        path: playwright-report-production/
         retention-days: 30
 
     - name: Upload test traces
