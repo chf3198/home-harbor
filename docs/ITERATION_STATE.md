@@ -1,8 +1,87 @@
-# Iteration State Snapshot - February 6, 2026
+# Iteration State Snapshot - February 8, 2026
 
 ## Current Development Context
 
-### Active Branch: `feature/ai-search-integration`
+### Active Branch: `fix/github-pages-ai-chat`
+**Status**: ✅ UAT IN PROGRESS - Socrata API Integration Complete
+**Goal**: Replace static CSV with live CT Open Data Portal queries (211K+ properties)
+
+### Quick Start Commands (Feb 8, 2026)
+```bash
+# Backend (should already be running on port 3000)
+cd "/mnt/chromeos/removable/SSD Drive/usb_backup_2026-02-02/repos/home-harbor"
+npm start
+
+# Frontend (port 3001)
+cd frontend
+node ./node_modules/vite/bin/vite.js --port 3001
+
+# Launch Chromium for UAT
+/usr/bin/chromium --user-data-dir="/mnt/chromeos/removable/SSD Drive/chromium-data" http://localhost:3001
+```
+
+### Disk Space Cleanup (Feb 7, 2026)
+- Deleted old repo copies: freed ~923 MB
+- Cleared caches (playwright, pip, node-gyp): freed ~805 MB
+- **Total freed: ~1.7 GB** - Now 2.0 GB available on local drive
+
+### exFAT Workaround for npm (SOLVED)
+The USB drive uses exFAT which doesn't support symlinks OR executable binaries.
+
+**To run frontend on exFAT drive:**
+```bash
+# 1. Install dependencies (skip scripts that need symlinks)
+cd frontend
+npm install --no-bin-links --ignore-scripts
+
+# 2. Download fresh esbuild binary to /tmp (NOT on USB - binaries corrupt on exFAT)
+cd /tmp
+npm pack @esbuild/linux-x64@0.21.5
+tar xzf esbuild-linux-x64-0.21.5.tgz
+cp package/bin/esbuild /tmp/esbuild
+chmod +x /tmp/esbuild
+
+# 3. Create wrapper script in node_modules (text files work fine on exFAT)
+cat > "frontend/node_modules/@esbuild/linux-x64/bin/esbuild" << 'EOF'
+#!/bin/bash
+exec /tmp/esbuild "$@"
+EOF
+
+# 4. Run vite
+cd frontend
+node ./node_modules/vite/bin/vite.js --port 3001
+```
+
+**Key Insight**: exFAT corrupts binary executables but text/shell scripts work fine.
+The wrapper script delegates to the binary in /tmp (ext4 filesystem).
+
+### Latest Work Session (Feb 7, 2026 - Evening)
+
+#### Socrata API Integration - COMPLETE ✅
+- [x] Created `lambda/src/socrata-service.ts` - Full SoQL query builder
+- [x] Created `lambda/src/properties-socrata.ts` - Lambda handlers for /properties, /cities, /metadata
+- [x] Created `src/server/socrataService.js` - Express server Socrata client
+- [x] Created `src/server/routes/socrataRoutes.js` - Local API routes
+- [x] Updated `src/server/routes.js` - Wired Socrata routes at /api/socrata/*
+- [x] Updated `frontend/src/hooks/usePropertySearch.jsx` - Use /api/socrata/properties
+- [x] Updated `lambda/src/chat-prompts.ts` - Real metadata (211K properties, 169 cities)
+- [x] Tested /api/socrata/metadata - Returns all 169 CT cities, price ranges
+- [x] Tested /api/socrata/properties - Returns real properties with filters
+
+#### Verified API Endpoints (Local)
+- `GET /api/socrata/metadata` ✅ Returns 169 cities, property types, 211K records
+- `GET /api/socrata/properties?city=Hartford&limit=3` ✅ Returns 3,283 Hartford properties
+
+#### Key Files Modified This Session
+- `src/server/socrataService.js` - SoQL queries to CT Open Data Portal
+- `src/server/routes/socrataRoutes.js` - /properties, /metadata routes
+- `src/server/routes.js` - Added `/socrata` prefix
+- `frontend/src/hooks/usePropertySearch.jsx` - Changed to /api/socrata/properties
+- `lambda/src/chat-prompts.ts` - Updated with real data availability
+
+---
+
+### Previous Branch: `feature/ai-search-integration`
 **Status**: ✅ COMPLETE - Ready for merge to main
 **Goal**: Phase 3.5 AI Search Integration - Natural language chat triggers property search
 

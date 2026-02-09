@@ -38,10 +38,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/
-      Handler: properties.handler
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref PropertiesTable
+      Handler: properties-socrata.handler
+      # No DynamoDB needed - queries CT Open Data Portal directly
+      Timeout: 15  # Allow time for Socrata API calls
       Events:
         Api:
           Type: HttpApi
@@ -50,21 +49,37 @@ Resources:
             Path: /properties
             Method: GET
 
-  SearchFunction:
+  CitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/
-      Handler: search.handler
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref PropertiesTable
+      Handler: properties-socrata.citiesHandler
+      Timeout: 10
       Events:
         Api:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApi
-            Path: /search
+            Path: /cities
             Method: GET
+
+  MetadataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: properties-socrata.metadataHandler
+      Timeout: 15
+      Description: Returns dataset metadata (cities, price ranges, property types)
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /metadata
+            Method: GET
+
+  # SearchFunction - deprecated, now using PropertiesFunction with filters
+  # Keeping for backwards compatibility but redirecting to properties-socrata
 
   AnalyzeFunction:
     Type: AWS::Serverless::Function

@@ -9,7 +9,28 @@ import { AISearchActionTypes, initialAISearchState } from './aiSearchTypes.js';
 import { aiSearchReducer } from './aiSearchReducer.js';
 import { saveChatHistory, loadChatHistory } from './aiSearchStorage.js';
 
-const CHAT_API_URL = '/api/chat';
+/**
+ * Chat API URL configuration
+ * - Production: AWS Lambda via API Gateway (secure, API key in Secrets Manager)
+ * - Development: Vite proxy to local Express backend
+ * 
+ * __AWS_API_URL__ is defined in vite.config.js at build time
+ */
+/* global __AWS_API_URL__ */
+const AWS_CHAT_API = `${typeof __AWS_API_URL__ !== 'undefined' ? __AWS_API_URL__ : ''}/chat`;
+const LOCAL_CHAT_API = '/api/chat';
+
+/**
+ * Get the appropriate chat API URL based on environment
+ * - Production (GitHub Pages): Uses AWS Lambda via API Gateway
+ * - Local development: Uses Vite proxy to Express backend
+ * @returns {string} Chat API URL
+ */
+function getChatApiUrl() {
+  // Vite sets import.meta.env.PROD = true for production builds
+  const isProduction = import.meta.env.PROD;
+  return isProduction ? AWS_CHAT_API : LOCAL_CHAT_API;
+}
 
 /**
  * Custom hook for AI-powered property search
@@ -41,7 +62,8 @@ export function useAISearch(onFiltersExtracted, searchResults = []) {
     dispatch({ type: AISearchActionTypes.SET_LOADING, payload: true });
 
     try {
-      const response = await fetch(CHAT_API_URL, {
+      const chatApiUrl = getChatApiUrl();
+      const response = await fetch(chatApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,18 +79,24 @@ export function useAISearch(onFiltersExtracted, searchResults = []) {
 
       const data = await response.json();
 
-      // If AI extracted filters, notify parent to update search form
+      // ALWAYS trigger search if filters are returned (alwaysSearch flag)
+      // This ensures any property-related query initiates a search
       if (data.filters && onFiltersExtracted) {
+        console.log('[useAISearch] Triggering search with filters:', data.filters);
+        console.log('[useAISearch] Search intent:', data.searchIntent);
+        console.log('[useAISearch] Suggested towns:', data.suggestedTowns);
         onFiltersExtracted(data.filters);
       }
 
-      // Add AI response
+      // Add AI response with additional metadata
       const aiMessage = {
         role: 'assistant',
         content: data.response,
         timestamp: Date.now(),
         filters: data.filters,
         model: data.model,
+        searchIntent: data.searchIntent,
+        suggestedTowns: data.suggestedTowns,
       };
       dispatch({ type: AISearchActionTypes.ADD_MESSAGE, payload: aiMessage });
     } catch (error) {
