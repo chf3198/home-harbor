@@ -1,5 +1,7 @@
 /**
  * @fileoverview AI Chat Hook and Provider
+ * @semantic hook, ai, property-analysis
+ * @intent Provides AI features for property analysis (vision, descriptions)
  */
 
 import { createContext, useContext, useReducer, useCallback } from 'react';
@@ -9,6 +11,26 @@ import { aiReducer } from './aiChatReducer.js';
 // Context
 const AIContext = createContext();
 
+/**
+ * API URL configuration for AI features
+ * Production: AWS Lambda via API Gateway
+ * Development: Vite proxy to local Express backend
+ * 
+ * Note: Property analysis endpoints are NOT yet deployed to AWS Lambda.
+ * These features will fail in production until Lambda handlers are added.
+ */
+/* global __AWS_API_URL__ */
+const AWS_API_BASE = typeof __AWS_API_URL__ !== 'undefined' ? __AWS_API_URL__ : '';
+const LOCAL_API_BASE = '/api';
+
+/**
+ * Get the appropriate API base URL based on environment
+ * @returns {string} API base URL
+ */
+function getApiBase() {
+  return import.meta.env.PROD ? AWS_API_BASE : LOCAL_API_BASE;
+}
+
 // Provider component
 export function AIProvider({ children }) {
   const [state, dispatch] = useReducer(aiReducer, initialState);
@@ -17,7 +39,8 @@ export function AIProvider({ children }) {
     dispatch({ type: AIActionTypes.SET_LOADING, payload: true });
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +66,8 @@ export function AIProvider({ children }) {
     dispatch({ type: AIActionTypes.SET_LOADING, payload: true });
 
     try {
-      const response = await fetch(`/api/ai/analyze/${propertyId}`, {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/ai/analyze/${propertyId}`, {
         method: 'POST',
       });
 
