@@ -30,6 +30,7 @@ export function PropertyProvider({ children }) {
   const [state, dispatch] = useReducer(propertyReducer, initialState);
 
   const searchProperties = useCallback(async (filters = {}, page = 1) => {
+    console.log('[usePropertySearch] searchProperties called with:', filters);
     dispatch({ type: PropertyActionTypes.SET_LOADING, payload: true });
 
     try {
@@ -37,6 +38,7 @@ export function PropertyProvider({ children }) {
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([, v]) => v != null && v !== '')
       );
+      console.log('[usePropertySearch] Clean filters:', cleanFilters);
 
       const queryParams = new URLSearchParams({
         ...cleanFilters,
@@ -45,6 +47,7 @@ export function PropertyProvider({ children }) {
       });
 
       const apiUrl = getPropertiesApiUrl();
+      console.log('[usePropertySearch] Fetching from:', `${apiUrl}?${queryParams}`);
       const response = await fetch(`${apiUrl}?${queryParams}`);
 
       if (!response.ok) {
@@ -52,8 +55,10 @@ export function PropertyProvider({ children }) {
       }
 
       const data = await response.json();
+      console.log('[usePropertySearch] Response data:', data);
       dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: data });
     } catch (error) {
+      console.error('[usePropertySearch] Error:', error);
       dispatch({ type: PropertyActionTypes.SET_ERROR, payload: error.message });
     }
   }, []);

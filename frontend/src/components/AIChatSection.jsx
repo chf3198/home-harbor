@@ -12,7 +12,9 @@ function AIChatSection() {
   const { setFilters, searchProperties, results } = usePropertySearch();
 
   const handleFiltersExtracted = useCallback((filters) => {
+    console.log('[AIChatSection] handleFiltersExtracted called with:', filters);
     setFilters(filters);
+    console.log('[AIChatSection] Calling searchProperties...');
     searchProperties(filters);
   }, [setFilters, searchProperties]);
 
