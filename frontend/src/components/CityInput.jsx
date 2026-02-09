@@ -4,9 +4,9 @@ function CityInput({ value, onChange, onSelect }) {
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Load city data
+  // Load city data - use Vite's BASE_URL for GitHub Pages compatibility
   useEffect(() => {
-    fetch('/cities.json')
+    fetch(`${import.meta.env.BASE_URL}cities.json`)
       .then(response => response.json())
       .then(data => setCitySuggestions(data.cities || []))
       .catch(error => console.error('Failed to load cities:', error));

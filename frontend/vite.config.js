@@ -5,11 +5,12 @@ import react from '@vitejs/plugin-react'
 const AWS_API_URL = 'https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   // Base path for GitHub Pages deployment (repository name)
   // Use '/' for local dev, '/home-harbor/' for GitHub Pages
-  base: process.env.NODE_ENV === 'production' ? '/home-harbor/' : '/',
+  // Note: 'mode' is 'production' when running `vite build`
+  base: mode === 'production' ? '/home-harbor/' : '/',
   // Define global constants available at build time
   define: {
     __AWS_API_URL__: JSON.stringify(AWS_API_URL),
@@ -48,4 +49,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom'],
   },
-})
+}))
