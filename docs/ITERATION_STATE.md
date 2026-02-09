@@ -1,10 +1,24 @@
-# Iteration State Snapshot - February 7, 2026
+# Iteration State Snapshot - February 8, 2026
 
 ## Current Development Context
 
 ### Active Branch: `fix/github-pages-ai-chat`
-**Status**: ✅ READY FOR E2E TESTING - Socrata API Working
+**Status**: ✅ UAT IN PROGRESS - Socrata API Integration Complete
 **Goal**: Replace static CSV with live CT Open Data Portal queries (211K+ properties)
+
+### Quick Start Commands (Feb 8, 2026)
+```bash
+# Backend (should already be running on port 3000)
+cd "/mnt/chromeos/removable/SSD Drive/usb_backup_2026-02-02/repos/home-harbor"
+npm start
+
+# Frontend (port 3001)
+cd frontend
+node ./node_modules/vite/bin/vite.js --port 3001
+
+# Launch Chromium for UAT
+/usr/bin/chromium --user-data-dir="/mnt/chromeos/removable/SSD Drive/chromium-data" http://localhost:3001
+```
 
 ### Disk Space Cleanup (Feb 7, 2026)
 - Deleted old repo copies: freed ~923 MB

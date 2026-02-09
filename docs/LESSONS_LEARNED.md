@@ -64,6 +64,72 @@
 
 ---
 
+## VS Code Copilot Chat History on Removable Drives (February 8, 2026)
+
+### Root Cause: Workspace ID Uses Inode/ctime
+- **Problem**: VS Code Copilot chat history lost after each reboot when workspace is on SSD Drive
+- **Discovery**: 16+ separate workspace storage folders created for identical folder path
+- **Root Cause**: VS Code generates workspace ID hash using:
+  ```typescript
+  // src/vs/platform/workspaces/node/workspaces.ts
+  createHash('md5')
+    .update(folderUri.fsPath)
+    .update(ctime ? String(ctime) : '')  // <-- inode changes on mount!
+    .digest('hex');
+  ```
+- **Why it fails on removable drives**: 
+  - ChromeOS uses 9p filesystem to share files with Linux VM
+  - 9p assigns different inodes on each mount/reboot
+  - Different inode → different workspace ID → different chat storage folder
+
+### Key Discovery: Two-Layer Storage Architecture
+- **Layer 1 - Session Files**: `workspaceStorage/{id}/chatSessions/*.json`
+  - Contains actual conversation data
+  - Can be symlinked to share across workspace IDs ✅
+- **Layer 2 - Session Index**: `workspaceStorage/{id}/state.vscdb` → `chat.ChatSessionStore.index`
+  - SQLite database with session metadata (title, timestamps, sessionId)
+  - Must ALSO be synchronized across workspace IDs ✅
+  - VS Code only shows sessions that are BOTH in index AND have matching files
+
+### Solution: Symlink + Index Merge Script
+- **Approach**: Symlink chatSessions AND merge indexes across all workspace state databases
+- **Script**: `scripts/fix-vscode-chat-history.sh`
+- **How it works**:
+  1. Finds all workspace folders for SSD Drive path
+  2. Identifies "canonical" workspace (largest chat sessions)
+  3. Merges all chat sessions into canonical workspace
+  4. **Merges chat indexes from all workspace state.vscdb files**
+  5. **Syncs merged index back to ALL workspace state databases**
+  6. Replaces other chatSessions directories with symlinks
+- **Usage**: Run after each reboot to include new workspace ID
+
+### VS Code Storage Locations Reference
+```
+~/.config/Code/User/
+├── globalStorage/
+│   ├── state.vscdb                    # Global chat index (for empty windows)
+│   ├── emptyWindowChatSessions/       # Sessions from "Welcome" tab
+│   └── github.copilot-chat/           # Extension embeddings & config
+└── workspaceStorage/
+    └── {workspace-id}/
+        ├── state.vscdb                # WORKSPACE chat index (key!)
+        ├── chatSessions/              # Session JSON files
+        └── workspace.json             # Maps ID → folder path
+```
+
+### Prevention Tips
+- After reboot, run: `bash scripts/fix-vscode-chat-history.sh`
+- Auto-run is configured in `~/.bashrc`
+- After running script, **Reload VS Code Window** to pick up merged index
+- Alternative: Store workspace on local drive (not removable)
+
+### Technical References
+- VS Code workspace ID generation: `src/vs/platform/workspaces/node/workspaces.ts`
+- Chat storage location: `~/.config/Code/User/workspaceStorage/{id}/chatSessions/`
+- 9p filesystem: ChromeOS's Plan 9 protocol for file sharing to Linux VM
+
+---
+
 ## Development Workflow Patterns
 
 ### Iterative Research-Implementation Cycle
