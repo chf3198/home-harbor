@@ -118,15 +118,51 @@
 ```
 
 ### Prevention Tips
-- After reboot, run: `bash scripts/fix-vscode-chat-history.sh`
-- Auto-run is configured in `~/.bashrc`
-- After running script, **Reload VS Code Window** to pick up merged index
-- Alternative: Store workspace on local drive (not removable)
+- ~~After reboot, run: `bash scripts/fix-vscode-chat-history.sh`~~ (no longer needed)
+- ~~Auto-run is configured in `~/.bashrc`~~ (superseded by permanent fix)
+- **Use the `.code-workspace` file** - see permanent fix below
+
+### PERMANENT FIX: Use .code-workspace File (February 9, 2026)
+
+**Root Cause Analysis:**
+| Workspace Type | ID Generation Formula | Stable on Removable? |
+|----------------|----------------------|---------------------|
+| Folder (`code .`) | `hash(path + inode/ctime)` | ❌ No - inode changes on mount |
+| `.code-workspace` file | `hash(path only)` | ✅ Yes - path is constant |
+
+**VS Code Source** (`src/vs/platform/workspaces/node/workspaces.ts`):
+```typescript
+// .code-workspace files - STABLE ID!
+getWorkspaceIdentifier(): createHash('md5').update(configPathStr).digest('hex');
+
+// Folder workspaces - UNSTABLE on removable drives!
+getSingleFolderWorkspaceIdentifier(): createHash('md5').update(path).update(ctime).digest('hex');
+```
+
+**Implementation:**
+1. **Created**: `home-harbor.code-workspace` file in project root
+2. **Stable workspace ID**: `79db99727787ea8d7aec0ef492ca686a` (never changes!)
+3. **Chat storage**: `~/.config/Code/User/workspaceStorage/79db99727787ea8d7aec0ef492ca686a/`
+4. **Symlinked**: Chat sessions from canonical workspace to stable workspace
+
+**Seamless Usage Options (no scripts needed!):**
+- **Terminal alias**: `hh` or `home-harbor` (added to ~/.bashrc)
+- **Desktop launcher**: "HomeHarbor (VS Code)" in ChromeOS app launcher
+- **VS Code recents**: Added to File → Open Recent list
+- **Direct command**: `code home-harbor.code-workspace`
+
+**How VS Code Auto-Restore Works:**
+- `window.restoreWindows: "all"` (default) reopens last session
+- When you close VS Code with workspace open, it remembers
+- On next launch, workspace opens automatically with same ID
+- Chat panel and history persist seamlessly
 
 ### Technical References
 - VS Code workspace ID generation: `src/vs/platform/workspaces/node/workspaces.ts`
 - Chat storage location: `~/.config/Code/User/workspaceStorage/{id}/chatSessions/`
 - 9p filesystem: ChromeOS's Plan 9 protocol for file sharing to Linux VM
+- Stable workspace storage: `~/.config/Code/User/workspaceStorage/79db99727787ea8d7aec0ef492ca686a/`
+- Desktop entry: `~/.local/share/applications/home-harbor-workspace.desktop`
 
 ---
 
