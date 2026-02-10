@@ -1,10 +1,15 @@
 /**
  * @fileoverview Property Search Hook and Provider
+ * 
+ * Persistence: Filters and results are saved to localStorage for:
+ * - Page refresh recovery
+ * - Session continuity
  */
 
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import { PropertyActionTypes, initialState } from './propertySearchTypes.js';
 import { propertyReducer } from './propertySearchReducer.js';
+import { saveFilters, loadFilters, saveResults, loadResults } from './aiSearchStorage.js';
 
 /**
  * Properties API URL configuration
@@ -28,6 +33,28 @@ const PropertyContext = createContext();
 // Provider component
 export function PropertyProvider({ children }) {
   const [state, dispatch] = useReducer(propertyReducer, initialState);
+  const hasRestoredRef = useRef(false);
+
+  // Restore filters and results from localStorage on mount
+  useEffect(() => {
+    if (hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
+
+    const savedFilters = loadFilters();
+    const savedResults = loadResults();
+
+    console.log('[usePropertySearch] Restoring from storage:', { savedFilters, savedResults: savedResults?.length });
+
+    // If we have saved filters, restore them
+    if (savedFilters && Object.keys(savedFilters).length > 0) {
+      dispatch({ type: PropertyActionTypes.SET_FILTERS, payload: savedFilters });
+    }
+
+    // If we have saved results, restore them immediately
+    if (savedResults && savedResults.length > 0) {
+      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: { properties: savedResults } });
+    }
+  }, []);
 
   const searchProperties = useCallback(async (filters = {}, page = 1) => {
     console.log('[usePropertySearch] searchProperties called with:', filters);
@@ -57,6 +84,11 @@ export function PropertyProvider({ children }) {
       const data = await response.json();
       console.log('[usePropertySearch] Response data:', data);
       dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: data });
+      
+      // Save results to localStorage for page refresh recovery
+      if (data.properties) {
+        saveResults(data.properties);
+      }
     } catch (error) {
       console.error('[usePropertySearch] Error:', error);
       dispatch({ type: PropertyActionTypes.SET_ERROR, payload: error.message });
@@ -65,6 +97,8 @@ export function PropertyProvider({ children }) {
 
   const setFilters = useCallback((filters) => {
     dispatch({ type: PropertyActionTypes.SET_FILTERS, payload: filters });
+    // Save filters to localStorage for page refresh recovery
+    saveFilters(filters);
   }, []);
 
   const setPage = useCallback((page) => {
@@ -73,6 +107,9 @@ export function PropertyProvider({ children }) {
 
   const clearResults = useCallback(() => {
     dispatch({ type: PropertyActionTypes.CLEAR_RESULTS });
+    // Clear saved results from localStorage
+    saveResults([]);
+    saveFilters({});
   }, []);
 
   const value = {
