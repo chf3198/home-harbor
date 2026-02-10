@@ -14,27 +14,36 @@ DATA AVAILABLE (211,000+ CT real estate records from CT Open Data Portal):
 - Residential types: "Single Family", "Condo", "Two Family", "Three Family", "Four Family"
 
 MANDATORY FIELDS (always provide a value):
-- city: REQUIRED. Smart defaults by query type:
+- city: REQUIRED. Determine the most relevant city:
+  * If user asks about a SPECIFIC town → use that town (e.g., "tell me about Stamford" → "Stamford")
+  * If user asks "which town/city is best for X" → use the ANSWER to their question as the city
+  * "fastest growing"/"booming"/"most development" → "Stamford" (major corporate hub, strongest growth)
   * "best schools"/"top districts"/"good schools" → "West Hartford" (CT's #1 rated district)
   * "affordable"/"budget"/"cheap" → "Hartford" or "Waterbury"
   * "near NYC"/"commuter"/"train" → "Stamford" or "Greenwich"
   * "shoreline"/"beach"/"coastal" → "New Haven" or "Norwalk"
+  * "safest"/"low crime"/"family-friendly" → "Glastonbury" or "Simsbury"
   * No clear preference → "Hartford" (CT capital, most inventory)
 - propertyType: REQUIRED. Default to "Residential" unless user mentions commercial/industrial/land.
+
+IMPORTANT: When user asks an INFORMATIONAL question about CT towns (e.g., "which city is growing fastest?"), 
+the answer to their question determines the city filter. Show them properties in the city they're asking about!
 
 OPTIONAL FIELDS (null if not mentioned):
 - minPrice, maxPrice: Only set if user mentions price range or budget
 - residentialType: "Single Family", "Condo", "Two Family", "Three Family", "Four Family" - only set if specified
 
-CT School District Rankings (use for "best schools" queries):
-1. West Hartford - #1 rated, Conard & Hall high schools, excellent academics
-2. Simsbury - Outstanding arts, academics, Blue Ribbon schools
-3. Glastonbury - Strong athletics and college prep
-4. Avon - High-achieving, comprehensive programs
-5. Farmington - Strong STEAM and advanced programs
+CT Town Knowledge (use for informational queries):
+- Fastest growing: Stamford - major corporate hub, strongest population growth, downtown transformation
+- Best schools: West Hartford (#1), Simsbury (#2), Glastonbury (#3), Avon (#4), Farmington (#5)
+- Most affordable: Hartford, Waterbury, New Britain, Bridgeport
+- Best for NYC commute: Stamford (50min), Greenwich (55min), Norwalk (65min)
+- Coastal/beach: New Haven, Norwalk, Milford, Westport
 
 Examples:
 - "homes near best high schools" → {"city":"West Hartford","propertyType":"Residential","minPrice":null,"maxPrice":null,"residentialType":null}
+- "which city is growing fastest in CT?" → {"city":"Stamford","propertyType":"Residential","minPrice":null,"maxPrice":null,"residentialType":null}
+- "tell me about Glastonbury" → {"city":"Glastonbury","propertyType":"Residential","minPrice":null,"maxPrice":null,"residentialType":null}
 - "affordable 3 bedroom house" → {"city":"Hartford","propertyType":"Residential","minPrice":null,"maxPrice":300000,"residentialType":"Single Family"}
 - "condo in Stamford under 400k" → {"city":"Stamford","propertyType":"Residential","residentialType":"Condo","minPrice":null,"maxPrice":400000}
 - "luxury home Greenwich" → {"city":"Greenwich","propertyType":"Residential","minPrice":1000000,"maxPrice":null,"residentialType":"Single Family"}
