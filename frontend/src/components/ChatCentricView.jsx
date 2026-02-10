@@ -96,10 +96,10 @@ function ChatCentricView() {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* View Toggle - Only show when we have results */}
       {hasResults && (
-        <div className="flex-shrink-0 px-4 py-2 bg-white border-b border-slate-100">
+        <div className="flex-shrink-0 px-4 py-2 bg-white border-b border-slate-100 z-10">
           <div className="flex items-center justify-center gap-1 bg-slate-100 rounded-xl p-1 max-w-xs mx-auto">
             <button
               onClick={() => setViewMode(VIEW_MODES.CHAT)}
@@ -125,8 +125,8 @@ function ChatCentricView() {
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 min-h-0 relative">
+      {/* Main Content Area - Must be overflow hidden to contain absolute children */}
+      <div className="flex-1 min-h-0 relative overflow-hidden">
         {/* Chat View */}
         <div 
           className={`absolute inset-0 flex flex-col transition-transform duration-300 ${
