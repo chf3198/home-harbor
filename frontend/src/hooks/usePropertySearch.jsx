@@ -51,8 +51,9 @@ export function PropertyProvider({ children }) {
     }
 
     // If we have saved results, restore them immediately
+    // Use 'data' key to match the format expected by the reducer
     if (savedResults && savedResults.length > 0) {
-      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: { properties: savedResults } });
+      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: { data: savedResults } });
     }
   }, []);
 
@@ -86,8 +87,10 @@ export function PropertyProvider({ children }) {
       dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: data });
       
       // Save results to localStorage for page refresh recovery
-      if (data.properties) {
-        saveResults(data.properties);
+      // Handle both API formats: { data: [...] } (Socrata) and { properties: [...] } (Lambda)
+      const resultsToSave = data.data || data.properties;
+      if (resultsToSave && resultsToSave.length > 0) {
+        saveResults(resultsToSave);
       }
     } catch (error) {
       console.error('[usePropertySearch] Error:', error);

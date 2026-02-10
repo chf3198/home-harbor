@@ -10,9 +10,9 @@ export function propertyReducer(state, action) {
     case PropertyActionTypes.SET_LOADING:
       return { ...state, loading: action.payload };
     case PropertyActionTypes.SET_RESULTS: {
-      // Handle { data, meta } format from Socrata API
+      // Handle multiple formats: { data }, { properties }, or raw array from localStorage
       const payload = action.payload;
-      const results = payload.data || [];
+      const results = payload.data || payload.properties || (Array.isArray(payload) ? payload : []);
       const meta = payload.meta || {};
       const pagination = payload.pagination || {
         page: meta.page || payload.page || 1,
