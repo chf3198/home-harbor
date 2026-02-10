@@ -51,23 +51,27 @@ test.describe('Production UAT - GitHub Pages', () => {
   test('2. AI Chat section is visible and interactive', async ({ page }) => {
     // Wait for AI chat section to load
     const chatSection = page.locator('[data-testid="ai-chat-section"]').or(
-      page.locator('text=AI Assistant').or(page.locator('textarea'))
+      page.locator('text=AI Assistant').or(
+        page.locator('text=HomeHarbor').or(
+          page.locator('input[type="text"]')
+        )
+      )
     );
     await expect(chatSection.first()).toBeVisible({ timeout: 10_000 });
     
-    // Verify textarea is present and enabled
-    const textarea = page.locator('textarea').first();
-    await expect(textarea).toBeVisible();
-    await expect(textarea).toBeEnabled();
+    // Verify input is present and enabled (new chat-centric UI uses input, not textarea)
+    const chatInput = page.locator('input[type="text"]').first();
+    await expect(chatInput).toBeVisible();
+    await expect(chatInput).toBeEnabled();
   });
 
   test('3. AI Chat processes family/school query and extracts filters', async ({ page }) => {
     // The exact query from manual UAT
     const testQuery = 'My family and I are moving from out of state. We have two highschool age boys and wish to locate so that they can attend the best highschool in the state';
     
-    // Find and fill the chat textarea
-    const textarea = page.locator('textarea').first();
-    await textarea.fill(testQuery);
+    // Find and fill the chat input (new chat-centric UI uses input, not textarea)
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill(testQuery);
     
     // Submit the message (find submit button near textarea)
     const submitButton = page.locator('button[type="submit"]').first();
@@ -205,22 +209,22 @@ test.describe('Production UAT - Error Handling', () => {
   });
 
   test('Handles empty search gracefully', async ({ page }) => {
-    // Submit button should be disabled when textarea is empty (good UX)
+    // Submit button should be disabled when input is empty (good UX)
     const submitButton = page.locator('button[type="submit"]').first();
     await expect(submitButton).toBeDisabled();
     
-    // Verify the textarea is visible and ready for input
-    const textarea = page.locator('textarea').first();
-    await expect(textarea).toBeVisible();
-    await expect(textarea).toBeEnabled();
+    // Verify the chat input is visible and ready for input (new UI uses input, not textarea)
+    const chatInput = page.locator('input[type="text"]').first();
+    await expect(chatInput).toBeVisible();
+    await expect(chatInput).toBeEnabled();
     
     // Page should not crash
     await expect(page.locator('#root')).toBeVisible();
   });
 
   test('Shows appropriate feedback during loading', async ({ page }) => {
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Find properties');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Find properties');
     await page.locator('button[type="submit"]').first().click();
     
     // Should show some loading indicator
