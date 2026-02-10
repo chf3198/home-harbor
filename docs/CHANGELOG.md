@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Page Refresh Persistence**: Search results and filters now persist across page refresh.
-  - Added localStorage persistence in `usePropertySearch.jsx`.
-  - Restores filters and results on component mount.
-  - View toggle (Chat/Results) properly appears when results exist after refresh.
+  - **Synchronous initialization**: Uses `useReducer` lazy initializer to load state BEFORE first render.
+  - Handles both API response formats: `{ data }` (Socrata) and `{ properties }` (Lambda).
+  - View toggle (Chat/Results) visible immediately on page load when results exist.
+  - Chat history also persists across sessions via localStorage.
+  - **UAT Validated**: February 9, 2026 - toggle appears correctly after browser refresh.
 - **Lambda Socrata Integration**: Fixed Lambda handler to use Socrata API.
   - Changed Lambda handler from `properties.handler` to `properties-socrata.handler`.
   - Lambda now queries CT Open Data Portal (211K+ real estate records).

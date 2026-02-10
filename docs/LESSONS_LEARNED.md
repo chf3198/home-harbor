@@ -63,44 +63,44 @@ min-height: -webkit-fill-available; /* iOS Safari fallback */
 
 **Problem**: After page refresh, search results were lost and user was stuck in chat view with no toggle to return to results.
 
-**Root Cause**: `usePropertySearch` hook managed state in memory only (React useState/useReducer). On refresh, state resets to initial values.
+**Root Cause**: `useEffect`-based restoration runs AFTER first render. The toggle visibility depends on `results.length > 0`, but on first render `results = []` (initial state), so toggle doesn't appear. By the time useEffect runs, user already sees broken UI.
 
-**Solution**: Persist search filters and results to localStorage, restore on component mount.
+**Solution**: Use `useReducer` lazy initializer to load state synchronously BEFORE first render.
 
 **Implementation Pattern** (usePropertySearch.jsx):
 ```jsx
-// On mount - restore state (run once with ref guard)
-const hasRestoredRef = useRef(false);
-useEffect(() => {
-  if (hasRestoredRef.current) return;
-  hasRestoredRef.current = true;
-  
+// Synchronous initialization function - runs BEFORE first render
+function getInitialState() {
   const savedFilters = loadFilters();
   const savedResults = loadResults();
-  if (savedFilters && Object.keys(savedFilters).length > 0) {
-    dispatch({ type: 'SET_FILTERS', payload: savedFilters });
-  }
-  if (savedResults && savedResults.length > 0) {
-    dispatch({ type: 'SET_RESULTS', payload: { properties: savedResults } });
-  }
-}, []);
+  
+  return {
+    ...initialState,
+    filters: savedFilters && Object.keys(savedFilters).length > 0 
+      ? { ...initialState.filters, ...savedFilters }
+      : initialState.filters,
+    results: savedResults || [],
+    pagination: savedResults?.length > 0 
+      ? { ...initialState.pagination, total: savedResults.length }
+      : initialState.pagination,
+  };
+}
 
-// On search - save results after fetch
-const searchProperties = async (searchFilters) => {
-  // ... fetch logic
-  saveResults(data);  // Persist to localStorage
-};
+// useReducer with lazy initializer (3rd argument)
+const [state, dispatch] = useReducer(propertyReducer, null, getInitialState);
 
-// On filter change - save filters
-const setFilters = (newFilters) => {
-  dispatch({ type: 'SET_FILTERS', payload: newFilters });
-  saveFilters(newFilters);  // Persist to localStorage
-};
+// On search - save results (handle both API formats)
+const resultsToSave = data.data || data.properties;
+if (resultsToSave?.length > 0) {
+  saveResults(resultsToSave);
+}
 ```
 
-**Key Learning**: When UI state affects view visibility (like showing/hiding a toggle), that state MUST persist across page refreshes for consistent UX.
+**Key Learning**: When UI visibility depends on state (toggle, conditional rendering), use synchronous initialization. `useEffect` is too late - it runs after paint, causing flash of incorrect UI.
 
-**Validation**: ✅ All 4 CI/CD workflows passing
+**Key Learning**: When UI visibility depends on state (toggle, conditional rendering), use synchronous initialization. `useEffect` is too late - it runs after paint, causing flash of incorrect UI.
+
+**Validation**: ✅ UAT passed February 9, 2026
 
 ---
 
