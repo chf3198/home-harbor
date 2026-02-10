@@ -6,6 +6,49 @@
 
 ## Core Architectural Decisions
 
+### Infinite Scroll for Swipeable Cards (February 9, 2026)
+
+**Problem**: "Load more properties" button did nothing. Users couldn't browse beyond the first 12 results.
+
+**Root Cause**: `onPageChange` was passed to `SwipeablePropertyCards` but only called `setPage()` which updated state without fetching new data.
+
+**Solution**: Implement auto-loading infinite scroll with append semantics.
+
+**Implementation Pattern**:
+```jsx
+// 1. Add APPEND_RESULTS action (propertySearchReducer.js)
+case PropertyActionTypes.APPEND_RESULTS: {
+  const newResults = payload.data || payload.properties || [];
+  return {
+    ...state,
+    results: [...state.results, ...newResults],  // Append, don't replace
+    pagination: { page: nextPage, ... },
+  };
+}
+
+// 2. Auto-detect end approach (SwipeablePropertyCards.jsx)
+useEffect(() => {
+  const shouldLoadMore = 
+    currentIndex >= properties.length - 3 &&  // Within 3 cards of end
+    pagination.page < pagination.totalPages && 
+    !loading;
+  if (shouldLoadMore) onLoadMore?.();
+}, [currentIndex, properties.length, pagination, loading]);
+
+// 3. Don't reset index when appending (preserve scroll position)
+useEffect(() => {
+  if (properties.length < prevLength || properties.length === 0) {
+    setCurrentIndex(0);  // Only reset on NEW search
+  }
+}, [properties.length]);
+```
+
+**Key Learning**: For infinite scroll, distinguish between "new search" (replace results, reset index) and "load more" (append results, preserve index).
+
+**Validation**: Pending UAT
+
+---
+
 ### Chat-Centric Fullscreen with Swipeable Cards (February 9, 2026)
 
 **UX Research Applied**:

@@ -5,6 +5,17 @@ All notable changes to HomeHarbor will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-02-09
+
+### Fixed
+- **Infinite Scroll for Swipeable Cards**: "Load more properties" now works automatically.
+  - Auto-fetches next page when user is 3 cards from the end.
+  - Added `APPEND_RESULTS` action to append (not replace) results for smooth scrolling.
+  - Added `loadMoreProperties` function to `usePropertySearch` hook.
+  - Loading indicator shown during fetch.
+  - Results preserved when appending (index doesn't reset).
+  - All results persisted to localStorage for refresh recovery.
+
 ## [0.2.0] - 2026-02-09
 
 ### Fixed

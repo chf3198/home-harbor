@@ -40,6 +40,7 @@ function ChatCentricView() {
     pagination, 
     setFilters, 
     searchProperties,
+    loadMoreProperties,
     setPage 
   } = usePropertySearch();
 
@@ -214,6 +215,8 @@ function ChatCentricView() {
               properties={results}
               pagination={pagination}
               onPageChange={setPage}
+              onLoadMore={loadMoreProperties}
+              loading={searchLoading}
             />
           </div>
         )}

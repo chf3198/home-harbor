@@ -228,20 +228,39 @@ function PropertyDetailModal({ property, onClose }) {
  * Performance optimizations:
  * - Virtual rendering: Only 3 cards in DOM at a time
  * - CSS scroll-snap: Native swipe feel without JS overhead
- * - Intersection Observer: Lazy load upcoming cards
+ * - Auto-loading: Fetches more results when user approaches end
  */
-function SwipeablePropertyCards({ properties = [], pagination, onPageChange }) {
+function SwipeablePropertyCards({ properties = [], pagination, onPageChange, onLoadMore, loading }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedProperty, setExpandedProperty] = useState(null);
   const scrollContainerRef = useRef(null);
 
-  // Reset index when properties change
+  // Reset index when properties change (but not when appending)
+  const prevPropertiesLengthRef = useRef(properties.length);
   useEffect(() => {
-    setCurrentIndex(0);
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'instant' });
+    // Only reset if this is a new search (length decreased or went to 0)
+    if (properties.length < prevPropertiesLengthRef.current || properties.length === 0) {
+      setCurrentIndex(0);
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({ left: 0, behavior: 'instant' });
+      }
     }
-  }, [properties]);
+    prevPropertiesLengthRef.current = properties.length;
+  }, [properties.length]);
+
+  // Auto-load more when approaching end (3 cards from end)
+  useEffect(() => {
+    const shouldLoadMore = 
+      currentIndex >= properties.length - 3 && 
+      pagination && 
+      pagination.page < pagination.totalPages && 
+      !loading;
+    
+    if (shouldLoadMore) {
+      console.log('[SwipeablePropertyCards] Auto-loading more properties...');
+      onLoadMore?.();
+    }
+  }, [currentIndex, properties.length, pagination, loading, onLoadMore]);
 
   // Calculate which cards to render (memory optimization)
   // Only render current card ± 2 for smooth swiping
@@ -425,15 +444,22 @@ function SwipeablePropertyCards({ properties = [], pagination, onPageChange }) {
         )}
       </div>
 
-      {/* Load More Button (for pagination) */}
+      {/* Load More Button (for pagination) - Manual trigger if auto-load fails */}
       {pagination && pagination.page < pagination.totalPages && (
         <div className="flex-shrink-0 px-4 pb-3">
-          <button
-            onClick={() => onPageChange?.(pagination.page + 1)}
-            className="w-full py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-colors"
-          >
-            Load more properties →
-          </button>
+          {loading ? (
+            <div className="w-full py-2 text-sm font-medium text-slate-500 text-center flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              Loading more properties...
+            </div>
+          ) : (
+            <button
+              onClick={() => onLoadMore?.()}
+              className="w-full py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-colors"
+            >
+              Load more properties →
+            </button>
+          )}
         </div>
       )}
 
