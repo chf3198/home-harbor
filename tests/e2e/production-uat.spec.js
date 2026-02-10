@@ -92,8 +92,8 @@ test.describe('Production UAT - GitHub Pages', () => {
 
   test('4. Property search returns results from Socrata API', async ({ page }) => {
     // Trigger a search via AI chat
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Show me homes in Hartford');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Show me homes in Hartford');
     
     const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
@@ -109,8 +109,8 @@ test.describe('Production UAT - GitHub Pages', () => {
 
   test('5. Search results display property information', async ({ page }) => {
     // Direct search with city filter
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Find properties in West Hartford');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Find properties in West Hartford');
     await page.locator('button[type="submit"]').first().click();
     
     // Wait for "properties found" text indicating results loaded
@@ -135,8 +135,8 @@ test.describe('Production UAT - GitHub Pages', () => {
     });
     
     // Trigger a search
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Show me houses in Hartford');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Show me houses in Hartford');
     await page.locator('button[type="submit"]').first().click();
     
     // Wait for API calls
@@ -162,8 +162,8 @@ test.describe('Production UAT - GitHub Pages', () => {
     });
     
     // Trigger a search
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Houses in Stamford');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Houses in Stamford');
     await page.locator('button[type="submit"]').first().click();
     
     // Wait for API calls
@@ -188,8 +188,8 @@ test.describe('Production UAT - GitHub Pages', () => {
     });
     
     // Trigger a search
-    const textarea = page.locator('textarea').first();
-    await textarea.fill('Properties in New Haven');
+    const chatInput = page.locator('input[type="text"]').first();
+    await chatInput.fill('Properties in New Haven');
     await page.locator('button[type="submit"]').first().click();
     
     // Wait for response
