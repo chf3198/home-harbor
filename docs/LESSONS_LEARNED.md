@@ -59,6 +59,49 @@ min-height: -webkit-fill-available; /* iOS Safari fallback */
 
 **Validation**: Build successful, dev server running, UI renders correctly
 
+### State Persistence Across Page Refresh (February 9, 2026)
+
+**Problem**: After page refresh, search results were lost and user was stuck in chat view with no toggle to return to results.
+
+**Root Cause**: `usePropertySearch` hook managed state in memory only (React useState/useReducer). On refresh, state resets to initial values.
+
+**Solution**: Persist search filters and results to localStorage, restore on component mount.
+
+**Implementation Pattern** (usePropertySearch.jsx):
+```jsx
+// On mount - restore state (run once with ref guard)
+const hasRestoredRef = useRef(false);
+useEffect(() => {
+  if (hasRestoredRef.current) return;
+  hasRestoredRef.current = true;
+  
+  const savedFilters = loadFilters();
+  const savedResults = loadResults();
+  if (savedFilters && Object.keys(savedFilters).length > 0) {
+    dispatch({ type: 'SET_FILTERS', payload: savedFilters });
+  }
+  if (savedResults && savedResults.length > 0) {
+    dispatch({ type: 'SET_RESULTS', payload: { properties: savedResults } });
+  }
+}, []);
+
+// On search - save results after fetch
+const searchProperties = async (searchFilters) => {
+  // ... fetch logic
+  saveResults(data);  // Persist to localStorage
+};
+
+// On filter change - save filters
+const setFilters = (newFilters) => {
+  dispatch({ type: 'SET_FILTERS', payload: newFilters });
+  saveFilters(newFilters);  // Persist to localStorage
+};
+```
+
+**Key Learning**: When UI state affects view visibility (like showing/hiding a toggle), that state MUST persist across page refreshes for consistent UX.
+
+**Validation**: ✅ All 4 CI/CD workflows passing
+
 ---
 
 ### Production UAT Testing Pattern (February 9, 2026)

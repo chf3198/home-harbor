@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2026-02-09
 
 ### Fixed
+- **Page Refresh Persistence**: Search results and filters now persist across page refresh.
+  - Added localStorage persistence in `usePropertySearch.jsx`.
+  - Restores filters and results on component mount.
+  - View toggle (Chat/Results) properly appears when results exist after refresh.
 - **Lambda Socrata Integration**: Fixed Lambda handler to use Socrata API.
   - Changed Lambda handler from `properties.handler` to `properties-socrata.handler`.
   - Lambda now queries CT Open Data Portal (211K+ real estate records).
