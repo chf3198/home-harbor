@@ -28,6 +28,25 @@ export function propertyReducer(state, action) {
         error: null,
       };
     }
+    case PropertyActionTypes.APPEND_RESULTS: {
+      // Append new results for infinite scroll
+      const payload = action.payload;
+      const newResults = payload.data || payload.properties || (Array.isArray(payload) ? payload : []);
+      const meta = payload.meta || {};
+      const pagination = {
+        page: meta.page || payload.page || state.pagination.page + 1,
+        pageSize: meta.pageSize || payload.pageSize || 12,
+        total: meta.totalItems || payload.totalItems || state.pagination.total,
+        totalPages: meta.totalPages || payload.totalPages || state.pagination.totalPages,
+      };
+      return {
+        ...state,
+        results: [...state.results, ...newResults],
+        pagination,
+        loading: false,
+        error: null,
+      };
+    }
     case PropertyActionTypes.SET_ERROR:
       return { ...state, error: action.payload, loading: false };
     case PropertyActionTypes.SET_FILTERS:

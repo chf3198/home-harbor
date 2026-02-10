@@ -108,6 +108,55 @@ export function PropertyProvider({ children }) {
     saveFilters(filters);
   }, []);
 
+  /**
+   * Load more properties for infinite scroll
+   * Appends results to existing results instead of replacing
+   */
+  const loadMoreProperties = useCallback(async () => {
+    const { filters, pagination, loading } = state;
+    
+    // Don't fetch if already loading or no more pages
+    if (loading || pagination.page >= pagination.totalPages) {
+      console.log('[usePropertySearch] loadMoreProperties: skipped (loading or no more pages)');
+      return;
+    }
+
+    const nextPage = pagination.page + 1;
+    console.log('[usePropertySearch] loadMoreProperties: fetching page', nextPage);
+    dispatch({ type: PropertyActionTypes.SET_LOADING, payload: true });
+
+    try {
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([, v]) => v != null && v !== '')
+      );
+
+      const queryParams = new URLSearchParams({
+        ...cleanFilters,
+        page: nextPage.toString(),
+        limit: '12',
+      });
+
+      const apiUrl = getPropertiesApiUrl();
+      const response = await fetch(`${apiUrl}?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error(`Load more failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('[usePropertySearch] loadMoreProperties response:', data);
+      dispatch({ type: PropertyActionTypes.APPEND_RESULTS, payload: data });
+      
+      // Update localStorage with all results (existing + new)
+      const newResults = data.data || data.properties || [];
+      const allResults = [...state.results, ...newResults];
+      saveResults(allResults);
+    } catch (error) {
+      console.error('[usePropertySearch] loadMoreProperties error:', error);
+      dispatch({ type: PropertyActionTypes.SET_ERROR, payload: error.message });
+    }
+  }, [state]);
+
   const setPage = useCallback((page) => {
     dispatch({ type: PropertyActionTypes.SET_PAGE, payload: page });
   }, []);
@@ -122,6 +171,7 @@ export function PropertyProvider({ children }) {
   const value = {
     ...state,
     searchProperties,
+    loadMoreProperties,
     setFilters,
     setPage,
     clearResults,
