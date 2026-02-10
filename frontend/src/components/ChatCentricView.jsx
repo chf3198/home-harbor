@@ -22,6 +22,7 @@ import { usePropertySearch } from '../hooks/usePropertySearch';
 import { useAISearch } from '../hooks/useAISearch';
 import AIChatMessages from './AIChatMessages';
 import SwipeablePropertyCards from './SwipeablePropertyCards';
+import CompactFilters from './CompactFilters';
 
 const VIEW_MODES = {
   CHAT: 'chat',
@@ -31,6 +32,7 @@ const VIEW_MODES = {
 function ChatCentricView() {
   const [viewMode, setViewMode] = useState(VIEW_MODES.CHAT);
   const [inputValue, setInputValue] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -236,6 +238,22 @@ function ChatCentricView() {
       <div className="border-t border-slate-200 bg-white p-3 safe-area-inset-bottom">
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
           <div className="flex items-end gap-2">
+            {/* Filter Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
+                showFilters 
+                  ? 'bg-emerald-500 text-white' 
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
+              }`}
+              title={showFilters ? 'Hide filters' : 'Show filters'}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+            </button>
+
             {/* Clear Button */}
             {hasMessages && (
               <button
@@ -284,6 +302,13 @@ function ChatCentricView() {
           <p className="text-center text-xs text-slate-400 mt-2 hidden sm:block">
             Press Enter to send • Swipe cards to browse results
           </p>
+          
+          {/* Expandable Filters Panel */}
+          {showFilters && (
+            <div className="mt-3 pt-3 border-t border-slate-100">
+              <CompactFilters />
+            </div>
+          )}
         </form>
       </div>
     </div>

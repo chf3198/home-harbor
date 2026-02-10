@@ -7,7 +7,7 @@
 import { useReducer, useCallback, useEffect } from 'react';
 import { AISearchActionTypes, initialAISearchState } from './aiSearchTypes.js';
 import { aiSearchReducer } from './aiSearchReducer.js';
-import { saveChatHistory, loadChatHistory } from './aiSearchStorage.js';
+import { saveChatHistory, loadChatHistory, saveResults } from './aiSearchStorage.js';
 
 /**
  * Chat API URL configuration
@@ -107,6 +107,9 @@ export function useAISearch(onFiltersExtracted, searchResults = []) {
   const clearChat = useCallback(() => {
     dispatch({ type: AISearchActionTypes.CLEAR_CHAT });
     saveChatHistory([]);
+    // Also clear results to keep state synchronized - prevents orphaned results on reload
+    saveResults([]);
+    console.log('[useAISearch] Chat and results cleared');
   }, []);
 
   return {
