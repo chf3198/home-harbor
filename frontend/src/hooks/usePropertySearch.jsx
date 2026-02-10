@@ -6,10 +6,35 @@
  * - Session continuity
  */
 
-import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import { createContext, useContext, useReducer, useCallback } from 'react';
 import { PropertyActionTypes, initialState } from './propertySearchTypes.js';
 import { propertyReducer } from './propertySearchReducer.js';
 import { saveFilters, loadFilters, saveResults, loadResults } from './aiSearchStorage.js';
+
+/**
+ * Get initial state with persisted data from localStorage
+ * This runs synchronously before first render to ensure UI consistency
+ */
+function getInitialState() {
+  const savedFilters = loadFilters();
+  const savedResults = loadResults();
+  
+  console.log('[usePropertySearch] Initializing from storage:', { 
+    savedFilters, 
+    savedResultsCount: savedResults?.length 
+  });
+
+  return {
+    ...initialState,
+    filters: savedFilters && Object.keys(savedFilters).length > 0 
+      ? { ...initialState.filters, ...savedFilters }
+      : initialState.filters,
+    results: savedResults || [],
+    pagination: savedResults?.length > 0 
+      ? { ...initialState.pagination, total: savedResults.length, totalPages: Math.ceil(savedResults.length / 12) }
+      : initialState.pagination,
+  };
+}
 
 /**
  * Properties API URL configuration
@@ -32,30 +57,9 @@ const PropertyContext = createContext();
 
 // Provider component
 export function PropertyProvider({ children }) {
-  const [state, dispatch] = useReducer(propertyReducer, initialState);
-  const hasRestoredRef = useRef(false);
-
-  // Restore filters and results from localStorage on mount
-  useEffect(() => {
-    if (hasRestoredRef.current) return;
-    hasRestoredRef.current = true;
-
-    const savedFilters = loadFilters();
-    const savedResults = loadResults();
-
-    console.log('[usePropertySearch] Restoring from storage:', { savedFilters, savedResults: savedResults?.length });
-
-    // If we have saved filters, restore them
-    if (savedFilters && Object.keys(savedFilters).length > 0) {
-      dispatch({ type: PropertyActionTypes.SET_FILTERS, payload: savedFilters });
-    }
-
-    // If we have saved results, restore them immediately
-    // Use 'data' key to match the format expected by the reducer
-    if (savedResults && savedResults.length > 0) {
-      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: { data: savedResults } });
-    }
-  }, []);
+  // Initialize state synchronously from localStorage
+  // This ensures persisted results are available on first render (toggle visible immediately)
+  const [state, dispatch] = useReducer(propertyReducer, null, getInitialState);
 
   const searchProperties = useCallback(async (filters = {}, page = 1) => {
     console.log('[usePropertySearch] searchProperties called with:', filters);
