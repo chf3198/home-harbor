@@ -14,26 +14,41 @@ import { saveFilters, loadFilters, saveResults, loadResults } from './aiSearchSt
 /**
  * Get initial state with persisted data from localStorage
  * This runs synchronously before first render to ensure UI consistency
+ * Note: Called by useReducer's lazy initializer - arg is ignored
  */
-function getInitialState() {
-  const savedFilters = loadFilters();
-  const savedResults = loadResults();
-  
-  console.log('[usePropertySearch] Initializing from storage:', { 
-    savedFilters, 
-    savedResultsCount: savedResults?.length 
-  });
+function getInitialState(_ignored) {
+  try {
+    const savedFilters = loadFilters();
+    const savedResults = loadResults();
+    
+    console.log('[usePropertySearch] getInitialState called:', { 
+      savedFilters, 
+      savedResultsCount: savedResults?.length,
+      savedResultsPreview: savedResults?.slice(0, 2)
+    });
 
-  return {
-    ...initialState,
-    filters: savedFilters && Object.keys(savedFilters).length > 0 
-      ? { ...initialState.filters, ...savedFilters }
-      : initialState.filters,
-    results: savedResults || [],
-    pagination: savedResults?.length > 0 
-      ? { ...initialState.pagination, total: savedResults.length, totalPages: Math.ceil(savedResults.length / 12) }
-      : initialState.pagination,
-  };
+    if (savedResults && savedResults.length > 0) {
+      console.log('[usePropertySearch] Restoring', savedResults.length, 'results from localStorage');
+      return {
+        ...initialState,
+        filters: savedFilters && Object.keys(savedFilters).length > 0 
+          ? { ...initialState.filters, ...savedFilters }
+          : initialState.filters,
+        results: savedResults,
+        pagination: {
+          ...initialState.pagination, 
+          total: savedResults.length, 
+          totalPages: Math.ceil(savedResults.length / 12)
+        },
+      };
+    }
+
+    console.log('[usePropertySearch] No saved results, using initial state');
+    return initialState;
+  } catch (error) {
+    console.error('[usePropertySearch] Error loading from storage:', error);
+    return initialState;
+  }
 }
 
 /**
@@ -94,8 +109,13 @@ export function PropertyProvider({ children }) {
       // Handle both API formats: { data: [...] } (Socrata) and { properties: [...] } (Lambda)
       // Always save (even empty array) to keep localStorage in sync with current state
       const resultsToSave = data.data || data.properties || [];
+      console.log('[usePropertySearch] Saving to localStorage:', resultsToSave.length, 'results');
       saveResults(resultsToSave);
-      saveFilters(cleanFilters);  // Also save the filters that produced these results
+      saveFilters(cleanFilters);
+      
+      // Verify save worked
+      const verified = loadResults();
+      console.log('[usePropertySearch] Verified localStorage has:', verified?.length, 'results');
     } catch (error) {
       console.error('[usePropertySearch] Error:', error);
       dispatch({ type: PropertyActionTypes.SET_ERROR, payload: error.message });
