@@ -6,6 +6,61 @@
 
 ## Core Architectural Decisions
 
+### Chat-Centric Fullscreen with Swipeable Cards (February 9, 2026)
+
+**UX Research Applied**:
+- **Nielsen Norman Group**: 57% of viewing time is above the fold → fit everything in viewport
+- **Fitts's Law**: Large touch targets, swipe gestures in thumb zone (bottom navigation)
+- **Miller's Law**: 7±2 items in working memory → show one card at a time
+- **Hick's Law**: Fewer visible options = faster decisions
+- **Laws of UX / Law of Prägnanz**: Simplest design requires least cognitive effort
+
+**Design Decisions**:
+1. **Fixed Viewport Layout**: `100dvh` height container, no body scroll
+   - Header: 48px fixed
+   - Main content: flex-1 fills remaining space
+   - Chat input: 56px fixed at bottom (thumb zone)
+   
+2. **Search → Browse Workflow**: Inspired by ChatGPT + Tinder/Bumble
+   - User chats to search → AI extracts filters → Results appear as swipeable cards
+   - View toggle (Chat/Results) only appears after results exist
+   
+3. **Swipeable Property Cards**: Virtual rendering for memory efficiency
+   - Only 3 cards in DOM at a time (current ± 2)
+   - CSS `scroll-snap` for native swipe feel (no heavy JS libraries)
+   - Keyboard navigation (← →) for desktop accessibility
+
+**Implementation**:
+- `App.jsx`: Chat-centric fullscreen layout v3.0
+- `ChatCentricView.jsx`: Combines chat messages + swipeable results
+- `SwipeablePropertyCards.jsx`: Tinder-style card stack with virtual rendering
+
+**Memory Optimization**:
+```jsx
+// Only render visible cards (current ± 2)
+const visibleCards = useMemo(() => {
+  const start = Math.max(0, currentIndex - 2);
+  const end = Math.min(properties.length, currentIndex + 3);
+  return properties.slice(start, end);
+}, [properties, currentIndex]);
+```
+
+**CSS Scroll-Snap** (no library dependencies):
+```css
+scroll-snap-type: x mandatory;
+-webkit-overflow-scrolling: touch;
+```
+
+**Viewport Height Fix** (iOS Safari):
+```css
+height: 100dvh; /* Dynamic viewport height */
+min-height: -webkit-fill-available; /* iOS Safari fallback */
+```
+
+**Validation**: Build successful, dev server running, UI renders correctly
+
+---
+
 ### Production UAT Testing Pattern (February 9, 2026)
 - **Decision**: Separate Playwright config for production (GitHub Pages) testing
 - **Why**: Manual UAT is time-consuming and error-prone; automated tests provide consistent verification

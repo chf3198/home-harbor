@@ -1,11 +1,53 @@
 import React from 'react';
 
-function Header() {
+/**
+ * Header Component
+ * @param {Object} props
+ * @param {boolean} props.compact - If true, renders minimal header for fullscreen layout
+ */
+function Header({ compact = false }) {
   const openHelp = () => {
     // This will be handled by the HelpModal context
     window.dispatchEvent(new CustomEvent('openHelp', { detail: 'user' }));
   };
 
+  // Compact header for chat-centric fullscreen layout
+  if (compact) {
+    return (
+      <header className="flex-shrink-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
+        <div className="flex items-center justify-between px-4 py-2 h-12">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🏠</span>
+            <span className="text-sm font-semibold tracking-wide text-white">HomeHarbor</span>
+            <span className="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              AI
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:flex items-center gap-1 text-xs text-slate-400">
+              211K+ CT Properties
+            </span>
+            <button
+              onClick={openHelp}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors"
+              type="button"
+              aria-label="Help and guides"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  // Full header (original design)
   return (
     <header className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
       {/* Decorative background elements */}
