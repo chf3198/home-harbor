@@ -26,43 +26,113 @@
 
 # HomeHarbor
 
-🏡 **AI-Powered Real Estate Search Platform** built with AWS serverless architecture and legal, free data sources.
+🏡 **AI-Powered Real Estate Search Platform** — A full-stack serverless application demonstrating modern cloud architecture, AI/LLM integration, and cost-optimized design.
 
 ## 🎯 Project Overview
 
-HomeHarbor is a production-ready real estate application designed to showcase AWS cloud architecture skills for a **Realtor.com Staff Software Engineer** position. The platform demonstrates:
+HomeHarbor showcases production-grade software engineering through a working real estate search application. Users can search using **natural language** (e.g., "3 bedroom homes under $400k near Hartford") and the AI automatically extracts structured filters.
 
-- ✅ **Serverless AWS architecture** (Lambda, DynamoDB, S3, CloudFront)
-- ✅ **Legal data sourcing** (Redfin, CT Open Data, Google Street View)
-- ✅ **AI integration** (OpenRouter with Molmo 72B vision + Llama 3.3 LLM)
-- ✅ **Cost optimization** ($0.00/month — 100% free tier)
-- ✅ **Production patterns** (caching, monitoring, auto-scaling)
+### Technical Highlights
 
-**Status:** ✅ Data pipeline complete | ✅ Single-file UI complete | ✅ React frontend complete
+| Category | What I Built |
+|----------|-------------|
+| **Cloud Architecture** | 5 Lambda functions, DynamoDB, S3, CloudFront, EventBridge |
+| **AI/NLP Integration** | Natural language → structured query via LLM (OpenRouter) |
+| **Cost Engineering** | $0.00/month — 100% AWS free tier |
+| **Resilience** | Cascading model fallbacks, graceful degradation |
+| **Frontend** | React 18 SPA + vanilla HTML option |
+| **Testing** | 54 tests (Jest, Vitest, Playwright E2E) |
+| **Data** | 211K+ CT property records via Socrata API |
+
+**Status:** ✅ Fully deployed and functional
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              HOMEHARBOR ARCHITECTURE                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────┐         ┌──────────────────────────────────────────┐    │
+│   │   Frontend   │         │              AWS Cloud                   │    │
+│   │              │         │                                          │    │
+│   │ React SPA    │◄───────►│  ┌─────────────────────────────────┐    │    │
+│   │ (GitHub      │  HTTPS  │  │         API Gateway             │    │    │
+│   │  Pages)      │         │  └──────────────┬──────────────────┘    │    │
+│   │              │         │                 │                        │    │
+│   └──────────────┘         │                 ▼                        │    │
+│                            │  ┌─────────────────────────────────┐    │    │
+│   User: "Show me           │  │     Lambda Functions (6)        │    │    │
+│   3BR homes under          │  │  ┌─────────┐ ┌─────────────┐   │    │    │
+│   $400k in Hartford"       │  │  │  Chat   │ │ Properties  │   │    │    │
+│         │                  │  │  │Function │ │  (Socrata)  │   │    │    │
+│         ▼                  │  │  └────┬────┘ └──────┬──────┘   │    │    │
+│   ┌──────────────┐         │  │       │             │          │    │    │
+│   │ AI extracts: │         │  │  ┌────▼────┐ ┌──────▼──────┐   │    │    │
+│   │ beds: 3      │         │  │  │OpenRouter│ │  CT Open    │   │    │    │
+│   │ maxPrice:    │         │  │  │  (LLM)  │ │  Data API   │   │    │    │
+│   │   400000     │         │  │  └─────────┘ └─────────────┘   │    │    │
+│   │ city:        │         │  │                                │    │    │
+│   │   Hartford   │         │  │  ┌─────────┐ ┌─────────────┐   │    │    │
+│   └──────────────┘         │  │  │ Analyze │ │  Describe   │   │    │    │
+│                            │  │  │(Vision) │ │   (Text)    │   │    │    │
+│                            │  │  └─────────┘ └─────────────┘   │    │    │
+│                            │  └─────────────────────────────────┘    │    │
+│                            │                                          │    │
+│                            │  ┌─────────────────────────────────┐    │    │
+│                            │  │         Infrastructure          │    │    │
+│                            │  │  DynamoDB (cache) + S3 (images) │    │    │
+│                            │  │  Secrets Manager (API keys)     │    │    │
+│                            │  └─────────────────────────────────┘    │    │
+│                            └──────────────────────────────────────────┘    │
+│                                                                             │
+│   External Data Source (Free & Legal)                                       │
+│   ┌─────────────────────────────────────────────────────────────────┐      │
+│   │ CT Open Data Portal (Socrata API) — 211K+ property sales        │      │
+│   │ Real Connecticut property transaction records from data.ct.gov  │      │
+│   └─────────────────────────────────────────────────────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Decisions
+
+| Decision | Rationale |
+|----------|----------|
+| **Serverless Lambda** | Zero idle cost, auto-scaling, no server management |
+| **OpenRouter for LLM** | Single API for multiple models, built-in fallbacks |
+| **Socrata API (not scraping)** | Legal, reliable, structured government data |
+| **React + Vanilla HTML** | SPA for rich UX, plus file:// option for demos |
+| **GitHub Pages hosting** | Free, reliable, CI/CD via Actions |
 
 ---
 
 ## 📊 What We Built
 
-### Data Pipeline (Complete ✅)
-- **5 Lambda Functions** for data ingestion, processing, and AI enhancement
+### Deployed & Working ✅
+- **6 Lambda Functions** — Properties, Cities, Metadata, Chat, Analyze, Describe
 - **CT Open Data Socrata API** — real-time queries to 211K+ property records
-- **S3 + CloudFront** pipeline for image storage and delivery
-- **EventBridge Schedules** for automated data updates
 - **AI-powered search** — natural language queries extract filters automatically
+- **React SPA** — deployed to GitHub Pages with CI/CD
 - **Production UAT testing** — automated Playwright tests against GitHub Pages
 
-### Data Sources (100% Legal & Free)
-| Source | Purpose | Records |
-|--------|---------|---------|
-| CT Open Data (Socrata) | Property transactions | 211K+ properties |
-| Redfin Data Center | Market analytics | 50K+ metrics |
-| Google Street View | Property photos | 500+ images |
-| OpenRouter AI | Vision + chat | Unlimited |
+### Core Data Source
+| Source | Purpose | Status |
+|--------|---------|--------|
+| CT Open Data (Socrata) | Property transactions | ✅ **Live** — 211K+ records |
+| OpenRouter AI | Chat + Filter extraction | ✅ **Live** — Free tier |
+
+### Code Written, Not Yet Deployed 📝
+| Feature | Lambda File | Status |
+|---------|-------------|--------|
+| Redfin Market Data | `redfin-ingestion.ts` | Code exists, not in SAM template |
+| Street View Photos | `street-view-fetch.ts` | Code exists, not in SAM template |
 
 ### Cost: $0.00/month (100% Free Tier)
-- AWS Services: $0.00 (Lambda, DynamoDB, S3, CloudFront — all free tier)
-- External APIs: $0.00 (OpenRouter, Google Maps — all free tier)
+- AWS Services: $0.00 (Lambda, DynamoDB, S3 — all free tier)
+- External APIs: $0.00 (OpenRouter free tier)
 
 ---
 
@@ -166,13 +236,14 @@ home-harbor/
 ├── 📂 infrastructure/                # AWS provisioning
 │   └── aws-setup.sh                 # One-command setup
 │
-├── 📂 lambda/                        # Serverless functions (10 TypeScript files)
+├── 📂 lambda/                        # Serverless functions
 │   ├── src/
-│   │   ├── redfin-ingestion.ts     # Market data ETL
-│   │   ├── ct-socrata-etl.ts       # Property data ETL
-│   │   ├── street-view-fetch.ts    # Google photos
-│   │   ├── ai-vision-analysis.ts   # Molmo 72B vision
-│   │   └── ai-description-generator.ts  # Llama 3.3 LLM
+│   │   ├── properties-socrata.ts   # ✅ Property search API
+│   │   ├── chat.ts                 # ✅ AI chat/filter extraction
+│   │   ├── analyze.ts              # ✅ AI vision analysis
+│   │   ├── describe.ts             # ✅ AI descriptions
+│   │   ├── redfin-ingestion.ts     # 📝 (Not deployed)
+│   │   └── street-view-fetch.ts    # 📝 (Not deployed)
 │   └── scripts/
 │       ├── package-lambdas.sh      # Build packages
 │       └── deploy-lambdas.sh       # Deploy to AWS
@@ -197,35 +268,43 @@ Each listing includes a "🔍 Find on Google → Realtor.com" link that uses Goo
 
 ## 🧪 Lambda Functions
 
-### 1. Redfin Ingestion (`redfin-ingestion.ts`)
+### Deployed & Working ✅
+
+#### 1. Properties (Socrata) — `properties-socrata.ts`
+Real-time property search via CT Open Data Portal
+- **Endpoints:** GET /properties, GET /cities, GET /metadata
+- **Features:** Filter by city, price range, property type
+- **Data:** 211K+ Connecticut property transactions
+
+#### 2. Chat — `chat.ts`
+AI-powered natural language search
+- **Endpoint:** POST /chat
+- **Features:** Extracts search filters from conversational queries
+- **Model:** OpenRouter → Llama 3.3 70B with fallbacks
+
+#### 3. Analyze — `analyze.ts`
+AI vision analysis of property photos
+- **Endpoint:** POST /analyze
+- **Features:** Style detection, condition scoring
+- **Model:** OpenRouter → Molmo 72B vision
+
+#### 4. Describe — `describe.ts`
+AI-generated property descriptions
+- **Endpoint:** POST /describe
+- **Features:** SEO copy, market positioning
+- **Model:** OpenRouter → Llama 3.3 70B
+
+### Code Written, Not Yet Deployed 📝
+
+#### Redfin Ingestion — `redfin-ingestion.ts` (291 lines)
 Downloads monthly market data from Redfin Data Center
-- **Trigger:** EventBridge (monthly)
-- **Output:** 50K+ market metrics for 1000+ cities
-- **Runtime:** 3-5 minutes
+- **Status:** Code complete, not in SAM template
+- **Purpose:** Market analytics for 1000+ cities
 
-### 2. CT Socrata ETL (`ct-socrata-etl.ts`)
-Fetches Connecticut property transactions via Socrata API
-- **Trigger:** EventBridge (weekly)
-- **Output:** 5K+ property records
-- **Runtime:** 10-15 minutes
-
-### 3. Street View Fetch (`street-view-fetch.ts`)
-Retrieves Google Street View property photos
-- **Trigger:** API Gateway (on-demand)
-- **Caching:** S3 with CloudFront CDN
-- **Cost:** Free (25K requests/month)
-
-### 4. AI Vision Analysis (`ai-vision-analysis.ts`)
-Analyzes property photos using Molmo 72B vision model
-- **Trigger:** API Gateway (on-demand)
-- **Features:** Style detection, condition scoring, feature extraction
-- **Caching:** DynamoDB (90-day TTL)
-
-### 5. AI Description Generator (`ai-description-generator.ts`)
-Generates compelling property descriptions with Llama 3.3 70B
-- **Trigger:** API Gateway (on-demand)
-- **Features:** SEO-optimized copy, market positioning, storytelling
-- **Caching:** DynamoDB (30-day TTL)
+#### Street View Fetch — `street-view-fetch.ts` (294 lines)
+Google Street View property exterior photos
+- **Status:** Code complete, not in SAM template
+- **Purpose:** Property image enrichment
 
 ---
 
@@ -265,28 +344,47 @@ Generates compelling property descriptions with Llama 3.3 70B
 
 ---
 
-## 🎤 Interview Demo
+## 🧠 Technical Deep Dive
 
-**5-Minute Technical Showcase**
+### AI-Powered Search (The Interesting Part)
 
-1. **Architecture Overview** (1 min)
-   - Serverless pipeline with 5 Lambda functions
-   - Multi-source data ingestion (Redfin, CT, Google)
-   - AI enhancement with vision + LLM
+The most interesting technical challenge was converting natural language queries into structured database filters:
 
-2. **Live Data Ingestion** (1 min)
-   - Invoke Redfin Lambda → Show CloudWatch logs
-   - Query DynamoDB → Display market metrics
+```
+User: "Show me 3 bedroom homes under $400k near Hartford"
+         │
+         ▼
+┌─────────────────────────────────────────┐
+│  Lambda Chat Function                   │
+│  ┌───────────────────────────────────┐  │
+│  │ Prompt Engineering:               │  │
+│  │ - CT town knowledge embedded      │  │
+│  │ - Handle ambiguous queries        │  │
+│  │ - Extract multiple filter types   │  │
+│  └───────────────────────────────────┘  │
+│                  │                      │
+│                  ▼                      │
+│  ┌───────────────────────────────────┐  │
+│  │ OpenRouter API (with fallbacks):  │  │
+│  │ 1. Try: meta-llama/llama-3.3-70b │  │
+│  │ 2. Fall: google/gemini-flash     │  │
+│  │ 3. Fall: anthropic/claude-haiku  │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+         │
+         ▼
+Extracted: { beds: 3, maxPrice: 400000, city: "Hartford" }
+```
 
-3. **AI Features** (2 min)
-   - Fetch Street View photo
-   - Generate vision analysis (architectural style, condition)
-   - Show AI-generated property description
+### Cost Optimization Strategy
 
-4. **Cost & Scalability** (1 min)
-   - $0.00/month total cost (100% free tier)
-   - Auto-scaling to 10K+ concurrent users
-   - Production-ready monitoring
+Achieving $0.00/month required careful architecture:
+
+- **Lambda**: Only pay for execution time (free tier: 1M requests/month)
+- **DynamoDB**: On-demand capacity (free tier: 25 GB storage)
+- **S3**: Intelligent tiering (free tier: 5 GB)
+- **OpenRouter**: Free tier models with cascading fallbacks
+- **No always-on servers**: Everything is event-driven
 
 ---
 
@@ -366,7 +464,17 @@ The UAT suite verifies the same workflow you'd test manually:
 
 ## 🤝 Contributing
 
-This is a portfolio project for a Realtor.com job application. Not accepting external contributions at this time.
+This is a personal portfolio project. While not accepting external contributions, feel free to fork and adapt for your own learning!
+
+---
+
+## 👤 About the Author
+
+**Curtis Franks** — Full-stack software engineer specializing in serverless AWS architecture and AI integration.
+
+- 🌐 Portfolio: [curtisfranks.com](https://curtisfranks.com)
+- 💼 LinkedIn: [linkedin.com/in/curtisfranks](https://linkedin.com/in/curtisfranks)
+- 📧 Contact: Available on portfolio site
 
 ---
 
@@ -376,4 +484,4 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Built by Curtis Franks** | **For Realtor.com Staff SWE Position** | **February 2026**
+**Built with ☕ and curiosity** | **February 2026**

@@ -54,19 +54,21 @@ This document outlines the complete technology stack, tools, and engineering pra
 ### Object Storage
 - **S3 Buckets**:
   - `home-harbor-data-sources-dev`: Raw CSV datasets
-  - `home-harbor-images-dev`: Street View property photos
+  - `home-harbor-images-dev`: Property images (infrastructure ready)
 - **Lifecycle**: Automatic deletion of temporary files
 
 ### Content Delivery
-- **CloudFront**: Global CDN for property images
+- **CloudFront**: Global CDN for property images (infrastructure ready)
 - **Origins**: S3 buckets with optimized caching
 - **Price Class**: Use Only (US, Canada, Europe) for cost control
 
-### Event Scheduling
-- **EventBridge**: Cron-based triggers for data ingestion
-- **Schedules**:
-  - Redfin ingestion: Monthly (market data updates)
-  - CT property ETL: Weekly (new transactions)
+### Event Scheduling (Planned)
+> Note: EventBridge schedules are defined but not actively used. Currently, data is queried real-time via Socrata API.
+
+- **EventBridge**: Cron-based triggers for data ingestion (planned)
+- **Planned Schedules**:
+  - Redfin ingestion: Monthly (code written, not deployed)
+  - CT property ETL: Weekly (code written, uses real-time Socrata instead)
 
 ### Monitoring & Observability
 - **CloudWatch**: Logs, metrics, and alarms
@@ -83,24 +85,33 @@ This document outlines the complete technology stack, tools, and engineering pra
 ## AI & Machine Learning
 
 ### LLM Provider
-- **OpenRouter**: Free-tier AI model orchestration
+- **OpenRouter**: Free-tier AI model orchestration ✅ Deployed
 - **Models**:
   - Vision: AllenAI Molmo 72B (property photo analysis)
-  - Text: Meta Llama 3.3 70B (property descriptions)
+  - Text: Meta Llama 3.3 70B (property descriptions, chat)
 - **Fallback**: Intelligent cascading to next-best free model
 - **Caching**: DynamoDB TTL to reduce API costs
 
-### External APIs
+### External APIs (Planned)
+> Note: Google Street View integration code is written but not yet deployed.
+
 - **Google Street View**: Static API for property exterior photos
 - **Free Tier**: 25,000 requests/month
 - **Caching**: S3 storage with CloudFront delivery
+- **Status**: Code in `street-view-fetch.ts`, not in SAM template
 
 ## Data Sources
 
-### Primary Datasets
-- **Redfin Data Center**: Monthly market analytics CSV
+### Active Data Source ✅
 - **CT Open Data Portal**: Real estate transactions (Socrata API)
-- **License**: Public domain, no usage restrictions
+  - 211K+ property records
+  - Real-time queries
+  - License: Public domain
+
+### Planned Data Sources 📝
+- **Redfin Data Center**: Monthly market analytics CSV
+  - Code in `redfin-ingestion.ts`, not yet deployed
+  - License: Public domain
 
 ### Data Processing
 - **CSV Parsing**: Streaming processing for large files
