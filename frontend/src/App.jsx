@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// HomeHarbor React App - v3.0.0 - Chat-Centric Fullscreen with Swipeable Results
+// HomeHarbor React App - v4.0.0 - CSS Grid Architecture
 import Header from './components/Header';
 import ChatCentricView from './components/ChatCentricView';
 import HelpModal from './components/HelpModal';
@@ -8,7 +8,7 @@ import { PropertyProvider } from './hooks/usePropertySearch';
 import { AIProvider } from './hooks/useAIChat';
 
 /**
- * Chat-Centric Fullscreen Layout v3.0
+ * Chat-Centric Fullscreen Layout v4.0 - CSS Grid Architecture
  * 
  * UX Research Insights Applied (February 2026):
  * - Nielsen Norman: 57% of viewing time above fold → fit everything in viewport
@@ -16,17 +16,19 @@ import { AIProvider } from './hooks/useAIChat';
  * - Miller's Law: One card at a time reduces cognitive load
  * - Hick's Law: Fewer visible options = faster decisions
  * - App Shell Pattern: Fixed UI shell with dynamic content
- * - Tinder-style Swiping: Proven pattern for browsing items
+ * - Ionic Framework Pattern: CSS Grid with explicit track sizing
  * 
- * Layout:
- * ┌─────────────────────────────┐
- * │ Minimal Header (40px)       │
- * ├─────────────────────────────┤
- * │ Chat + Swipeable Results    │
- * │ (fills remaining viewport)  │
- * ├─────────────────────────────┤
- * │ Fixed Chat Input (56px)     │
- * └─────────────────────────────┘
+ * CSS Grid Layout (bulletproof mobile):
+ * ┌──────────────────────────────┐
+ * │ Header (auto)                │  row 1: auto-sized
+ * ├──────────────────────────────┤
+ * │ Content (1fr)                │  row 2: fills remaining space
+ * │   ┌────────────────────────┐ │  (contains its own grid)
+ * │   │ Toggle (auto)          │ │
+ * │   │ Chat/Results (1fr)     │ │
+ * │   │ Input (auto)           │ │
+ * │   └────────────────────────┘ │
+ * └──────────────────────────────┘
  */
 function App() {
   return (
@@ -34,25 +36,29 @@ function App() {
       <PropertyProvider>
         <AIProvider>
           {/* 
-            Fixed viewport container using dvh (dynamic viewport height)
-            - Prevents iOS Safari address bar issues
-            - No body scroll - all scroll contained within components
+            CSS Grid container with explicit row tracks
+            - grid-template-rows: auto 1fr
+            - Header is auto-sized (content height)
+            - Content area gets all remaining space (1fr)
+            - Content has overflow:hidden to contain children
           */}
           <div 
-            className="flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900 overflow-hidden"
+            className="grid bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900"
             style={{ 
               height: '100dvh',
-              minHeight: '-webkit-fill-available', // iOS Safari fallback
+              minHeight: '-webkit-fill-available',
+              gridTemplateRows: 'auto 1fr',
+              gridTemplateColumns: '1fr',
               fontFamily: "'Inter', sans-serif" 
             }}
           >
-            {/* Compact Header - 48px fixed */}
+            {/* Row 1: Header (auto height) */}
             <Header compact />
             
-            {/* Main Content - Fills remaining space */}
-            <main className="flex-1 min-h-0 flex flex-col">
+            {/* Row 2: Main Content (1fr - fills all remaining space) */}
+            <main className="overflow-hidden relative">
               <ErrorBoundary fallback={({ retry }) => (
-                <div className="flex-1 flex items-center justify-center p-8">
+                <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="text-center bg-white rounded-2xl shadow-lg p-8 max-w-md">
                     <h3 className="text-lg font-semibold text-red-600 mb-4">Something went wrong</h3>
                     <p className="text-gray-600 mb-4">We couldn't load the app. Please try again.</p>

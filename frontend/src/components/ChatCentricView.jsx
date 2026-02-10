@@ -1,5 +1,5 @@
 /**
- * @fileoverview Chat-Centric View Component
+ * @fileoverview Chat-Centric View Component - CSS Grid Architecture
  * @description Full-screen chat interface with integrated swipeable property results
  * 
  * UX Design Pattern: "Search → Browse" Workflow
@@ -7,10 +7,14 @@
  * - Results appear as swipeable cards inline
  * - No page navigation needed - everything in one view
  * 
- * Inspired by:
- * - ChatGPT/Claude: Conversation-first interface
- * - Tinder/Bumble: Swipeable card browsing
- * - Airbnb: Contextual property cards in search
+ * CSS Grid Layout (nested inside App's main grid cell):
+ * ┌──────────────────────────────┐
+ * │ Toggle (auto - conditional)  │  row 1: only when hasResults
+ * ├──────────────────────────────┤
+ * │ Content (1fr)                │  row 2: chat or results view
+ * ├──────────────────────────────┤
+ * │ Input (auto)                 │  row 3: chat input bar
+ * └──────────────────────────────┘
  */
 
 import React, { useCallback, useState, useRef, useEffect } from 'react';
@@ -19,9 +23,6 @@ import { useAISearch } from '../hooks/useAISearch';
 import AIChatMessages from './AIChatMessages';
 import SwipeablePropertyCards from './SwipeablePropertyCards';
 
-/**
- * View modes for the interface
- */
 const VIEW_MODES = {
   CHAT: 'chat',
   RESULTS: 'results',
@@ -76,7 +77,7 @@ function ChatCentricView() {
     if (!message || chatLoading) return;
 
     setInputValue('');
-    setViewMode(VIEW_MODES.CHAT); // Show chat while processing
+    setViewMode(VIEW_MODES.CHAT);
     await sendMessage(message);
   };
 
@@ -95,11 +96,20 @@ function ChatCentricView() {
   const hasResults = results.length > 0;
   const hasMessages = messages.length > 0;
 
+  // Dynamic grid rows based on whether we have results (and thus show toggle)
+  const gridRows = hasResults ? 'auto 1fr auto' : '1fr auto';
+
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-      {/* View Toggle - Only show when we have results */}
+    <div 
+      className="absolute inset-0 grid"
+      style={{ 
+        gridTemplateRows: gridRows,
+        gridTemplateColumns: '1fr'
+      }}
+    >
+      {/* Row 1: View Toggle (auto height) - Only when we have results */}
       {hasResults && (
-        <div className="flex-shrink-0 px-4 py-2 bg-white border-b border-slate-100 z-10">
+        <div className="px-4 py-2 bg-white border-b border-slate-100">
           <div className="flex items-center justify-center gap-1 bg-slate-100 rounded-xl p-1 max-w-xs mx-auto">
             <button
               onClick={() => setViewMode(VIEW_MODES.CHAT)}
@@ -125,8 +135,8 @@ function ChatCentricView() {
         </div>
       )}
 
-      {/* Main Content Area - Must be overflow hidden to contain absolute children */}
-      <div className="flex-1 min-h-0 relative overflow-hidden">
+      {/* Row 2: Main Content Area (1fr - fills remaining space) */}
+      <div className="relative overflow-hidden">
         {/* Chat View */}
         <div 
           className={`absolute inset-0 flex flex-col transition-transform duration-300 ${
@@ -219,8 +229,8 @@ function ChatCentricView() {
         )}
       </div>
 
-      {/* Fixed Input Area */}
-      <div className="flex-shrink-0 border-t border-slate-200 bg-white p-3 safe-area-inset-bottom">
+      {/* Row 3: Input Area (auto height) */}
+      <div className="border-t border-slate-200 bg-white p-3 safe-area-inset-bottom">
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
           <div className="flex items-end gap-2">
             {/* Clear Button */}
