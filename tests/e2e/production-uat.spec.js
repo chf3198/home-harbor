@@ -98,10 +98,10 @@ test.describe('Production UAT - GitHub Pages', () => {
     const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
     
-    // Wait for search results to appear
-    // Look for "Search Results" heading or "properties found" text
-    const resultsIndicator = page.locator('text=Search Results').or(
-      page.locator('text=properties found')
+    // Wait for search results to appear in swipeable card UI
+    // New UI shows "X of Y" pattern (e.g., "1 of 25")
+    const resultsIndicator = page.locator('text=/\\d+ of \\d+/').or(
+      page.locator('text=total matches')
     );
     
     await expect(resultsIndicator.first()).toBeVisible({ timeout: SEARCH_TIMEOUT });
@@ -113,17 +113,15 @@ test.describe('Production UAT - GitHub Pages', () => {
     await chatInput.fill('Find properties in West Hartford');
     await page.locator('button[type="submit"]').first().click();
     
-    // Wait for "properties found" text indicating results loaded
-    await expect(page.locator('text=properties found')).toBeVisible({ timeout: SEARCH_TIMEOUT });
+    // Wait for swipeable card results ("X of Y" pattern)
+    await expect(page.locator('text=/\\d+ of \\d+/')).toBeVisible({ timeout: SEARCH_TIMEOUT });
     
     // Verify property data is displayed (price format or CT addresses)
     const propertyInfo = page.locator('text=/\\$[0-9,]+/').or(
-      page.locator('text=/[0-9]+ bed/i').or(
-        page.locator('text=/, CT/')
-      )
+      page.locator('text=/, CT/')
     );
     
-    // Should have at least one property displayed
+    // Should have at least one property displayed on swipeable card
     await expect(propertyInfo.first()).toBeVisible({ timeout: 10_000 });
   });
 
