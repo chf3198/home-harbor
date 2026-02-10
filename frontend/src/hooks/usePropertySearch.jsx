@@ -92,10 +92,10 @@ export function PropertyProvider({ children }) {
       
       // Save results to localStorage for page refresh recovery
       // Handle both API formats: { data: [...] } (Socrata) and { properties: [...] } (Lambda)
-      const resultsToSave = data.data || data.properties;
-      if (resultsToSave && resultsToSave.length > 0) {
-        saveResults(resultsToSave);
-      }
+      // Always save (even empty array) to keep localStorage in sync with current state
+      const resultsToSave = data.data || data.properties || [];
+      saveResults(resultsToSave);
+      saveFilters(cleanFilters);  // Also save the filters that produced these results
     } catch (error) {
       console.error('[usePropertySearch] Error:', error);
       dispatch({ type: PropertyActionTypes.SET_ERROR, payload: error.message });
