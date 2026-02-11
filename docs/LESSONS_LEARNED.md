@@ -93,7 +93,12 @@ useEffect(() => {
 - **Test Result**: ✅ Successfully enriched "496 Bell St, Glastonbury" with CAMA data
 - Response: beds=4, baths=3, sqft=3006, yearBuilt=2024, style="Modern Colonial", assessed=$562,600, photo URL
 
-**Next**: Update frontend to call `/prod/enrich`, merge to main, deploy to GitHub Pages for UAT.
+**Next**: ✅ **COMPLETE - Ready for UAT on GitHub Pages**
+- Merged `feat/cama-integration` → `main`
+- Pushed to GitHub (auto-deploys to https://chf3198.github.io/home-harbor/)
+- Frontend now calls `/prod/enrich` when viewing property details
+- Property cards enriched with: beds, baths, sqft, lot size, year built, style, HVAC, photos
+- Next phase: User acceptance testing, then plan Cloudflare migration to reduce AWS costs
 
 ---
 
