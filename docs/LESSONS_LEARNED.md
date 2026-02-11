@@ -84,7 +84,15 @@ useEffect(() => {
 
 **Deployment Strategy**: Deploy via AWS CLI (SAM not installed on Chromebook)
 
-**Next**: Test enrichment, then plan Cloudflare migration to stop AWS credit consumption.
+**Deployment Success** (February 10, 2026):
+- Created deployment package: `zip enrich.zip enrich-handler.js cama-service.js` (3.6KB)
+- Deployed to AWS: `aws lambda create-function --function-name home-harbor-enrich`
+- Region: us-east-2 (Ohio)
+- Runtime: nodejs20.x, Memory: 256MB, Timeout: 15s
+- **Test Result**: ✅ Successfully enriched "496 Bell St, Glastonbury" with CAMA data
+- Response: beds=4, baths=3, sqft=3006, yearBuilt=2024, style="Modern Colonial", assessed=$562,600
+
+**Next**: Integrate `/enrich` endpoint into frontend, then plan Cloudflare migration to stop AWS credit consumption.
 
 ---
 
