@@ -147,6 +147,21 @@ Resources:
             Path: /chat
             Method: POST
 
+  EnrichFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: enrich-handler.handler
+      Description: Enrich property with CAMA data (beds, baths, sqft, etc.)
+      Timeout: 15
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /enrich
+            Method: GET
+
   PropertiesTable:
     Type: AWS::DynamoDB::Table
     Properties:

@@ -517,9 +517,97 @@ getSingleFolderWorkspaceIdentifier(): createHash('md5').update(path).update(ctim
 - **Impact**: -8KB bundle size, improved reliability, reduced maintenance burden
 - **Validation**: All Lambda functions updated, error handling patterns consistent
 
-**Last Updated**: February 4, 2026  
-**Status**: Data pipeline complete, frontend in progress  
-**Next**: API Gateway integration and React UI completion
+**Last Updated**: February 10, 2026  
+**Status**: CAMA integration in progress  
+**Next**: Implement CAMA data enrichment for beds/baths/sqft
 
-See [ARCHIVED_LESSONS_LEARNED.md](ARCHIVED_LESSONS_LEARNED.md) for detailed session logs and historical decisions.</content>
+See [ARCHIVED_LESSONS_LEARNED.md](ARCHIVED_LESSONS_LEARNED.md) for detailed session logs and historical decisions.
+
+---
+
+## CAMA Data Integration Research (February 10, 2026)
+
+### Problem Statement
+Current property search only returns Sales API data (address, sale_amount, assessed_value, sale_date, property_type). Users need structural attributes like beds, baths, sqft, year_built for meaningful property comparisons.
+
+### Research Findings
+
+**CT Open Data Portal has TWO complementary datasets:**
+
+| Dataset | ID | Records | Key Fields | Update Frequency |
+|---------|-----|---------|------------|------------------|
+| **Sales API** (current) | `5mzw-sjtu` | 1.1M | address, town, sale_amount, assessed_value, sale_date, lat/lon | Annually |
+| **CAMA Data** (new) | `rny9-6ak2` | 1.36M | 138 fields including beds, baths, sqft, year_built, lot_size, style, condition | Annually |
+
+**CAMA Key Fields for Property Enrichment:**
+```
+number_of_bedroom     - Bedrooms count
+number_of_baths       - Full bathrooms  
+number_of_half_baths  - Half baths
+living_area           - Square footage (living space)
+gross_area_of_primary_building - Total building sqft
+land_acres            - Lot size in acres
+ayb                   - Actual Year Built
+eyb                   - Effective Year Built
+style_desc            - Colonial, Ranch, Cape, etc.
+condition_description - Excellent, Good, Average, Fair, Poor
+stories               - Number of stories
+total_rooms           - Total room count
+basement_type         - Full, Partial, None
+heat_type_description - Gas, Oil, Electric, etc.
+ac_type_description   - Central, Window, None
+building_photo        - URL to property photo!
+```
+
+### Join Strategy Analysis
+
+**Challenge**: Sales and CAMA datasets don't share a common key.
+- Sales: `serialnumber` (unique per sale)
+- CAMA: `link` or `gis_tag` (parcel-based)
+
+**Solution**: Fuzzy match on `address + town`
+- Both datasets have `address`/`location` and `town`/`property_city`
+- Normalize: uppercase, remove punctuation, standardize street suffixes (ST→STREET)
+- Match tolerance: Allow for minor variations (123 Main vs 123 MAIN ST)
+
+### Integration Architecture Decision
+
+**Rejected Approach**: Join at query time (too slow, API doesn't support cross-dataset joins)
+
+**Selected Approach**: Lazy enrichment with cache
+1. User searches → Query Sales API (existing, fast)
+2. Display results with sale data immediately
+3. Background: For each property, check CAMA cache
+4. Cache miss → Query CAMA API by address+town → Cache result
+5. Update UI when enrichment arrives
+
+**Cache Strategy**:
+- DynamoDB (current AWS) or D1 (future Cloudflare)
+- Key: normalized `{town}_{address}` 
+- TTL: 90 days (CAMA updates annually)
+- Attributes stored: beds, baths, sqft, year_built, lot_acres, style, condition, photo_url
+
+### Cost Analysis
+
+**Socrata API**: Free, no app token required for light usage
+- With app token: Higher rate limits, no throttling
+- Register at: https://data.ct.gov/profile/edit/developer_settings
+
+**AWS Lambda + DynamoDB** (current): Consuming $200 credits
+**Cloudflare Workers + D1** (future): $0/month on free tier
+- 100K requests/day, 5M reads/day, 100K writes/day, 5GB storage
+
+### Implementation Plan
+
+1. **Phase 1**: Add CAMA service module (parallel to socrata-service.ts)
+2. **Phase 2**: Create enrichment Lambda that accepts address+town, returns CAMA data
+3. **Phase 3**: Add DynamoDB cache layer
+4. **Phase 4**: Update frontend to display enriched attributes
+5. **Phase 5**: (Future) Migrate to Cloudflare Workers + D1
+
+### Validation Criteria
+- [ ] CAMA query returns beds/baths/sqft for Glastonbury test address
+- [ ] Enrichment Lambda responds in <500ms (cached)
+- [ ] Frontend displays enriched data when available
+- [ ] Graceful degradation when CAMA data unavailable</content>
 <parameter name="filePath">/mnt/chromeos/removable/SSD Drive/usb_backup_2026-02-02/repos/home-harbor/docs/LESSONS_LEARNED.md
