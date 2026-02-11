@@ -98,7 +98,18 @@ useEffect(() => {
 - Pushed to GitHub (auto-deploys to https://chf3198.github.io/home-harbor/)
 - Frontend now calls `/prod/enrich` when viewing property details
 - Property cards enriched with: beds, baths, sqft, lot size, year built, style, HVAC, photos
-- Next phase: User acceptance testing, then plan Cloudflare migration to reduce AWS costs
+
+**UX Integration Complete** (February 10, 2026):
+- Created `propertyEnrichmentService.js` to call CAMA API
+- Integrated auto-enrichment into `usePropertySearch` hook
+- Properties are enriched **automatically** after each search (3 concurrent requests)
+- **Property Cards** now show: beds, baths, sqft (when available)
+- **Details Modal** shows: all CAMA fields including lot size, year built, style, HVAC systems, property photos
+- Graceful degradation: if enrichment fails, base property data still displays
+
+**GitHub Pages Deployment**: Changes auto-deploy to https://chf3198.github.io/home-harbor/
+
+**Next**: User acceptance testing, gather feedback, then plan Cloudflare migration to reduce AWS costs
 
 ---
 
