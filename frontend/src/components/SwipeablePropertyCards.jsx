@@ -190,13 +190,42 @@ function PropertyDetailModal({ property, onClose }) {
             {property.metadata?.bathrooms && (
               <div className="bg-slate-50 rounded-xl p-3">
                 <p className="text-xs text-slate-500 uppercase tracking-wide">Bathrooms</p>
-                <p className="text-lg font-bold text-slate-700">{property.metadata.bathrooms}</p>
+                <p className="text-lg font-bold text-slate-700">
+                  {property.metadata.bathrooms}
+                  {property.metadata.halfBathrooms > 0 && ` + ${property.metadata.halfBathrooms} half`}
+                </p>
               </div>
             )}
             {property.metadata?.squareFeet && (
               <div className="bg-slate-50 rounded-xl p-3">
                 <p className="text-xs text-slate-500 uppercase tracking-wide">Square Feet</p>
                 <p className="text-lg font-bold text-slate-700">{property.metadata.squareFeet.toLocaleString()}</p>
+              </div>
+            )}
+            {property.metadata?.lotSize && (
+              <div className="bg-slate-50 rounded-xl p-3">
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Lot Size</p>
+                <p className="text-lg font-bold text-slate-700">{property.metadata.lotSize} acres</p>
+              </div>
+            )}
+            {property.metadata?.yearBuilt && (
+              <div className="bg-slate-50 rounded-xl p-3">
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Year Built</p>
+                <p className="text-lg font-bold text-slate-700">{property.metadata.yearBuilt}</p>
+              </div>
+            )}
+            {property.metadata?.style && (
+              <div className="bg-slate-50 rounded-xl p-3">
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Style</p>
+                <p className="text-lg font-bold text-slate-700">{property.metadata.style}</p>
+              </div>
+            )}
+            {(property.metadata?.heating || property.metadata?.cooling) && (
+              <div className="bg-slate-50 rounded-xl p-3">
+                <p className="text-xs text-slate-500 uppercase tracking-wide">HVAC</p>
+                <p className="text-lg font-bold text-slate-700">
+                  {[property.metadata.heating, property.metadata.cooling].filter(Boolean).join(' / ')}
+                </p>
               </div>
             )}
             {property.metadata?.propertyType && (
@@ -206,6 +235,18 @@ function PropertyDetailModal({ property, onClose }) {
               </div>
             )}
           </div>
+
+          {/* Photo Link */}
+          {property.metadata?.photoUrl && (
+            <a
+              href={property.metadata.photoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-center font-semibold rounded-xl transition-colors"
+            >
+              📷 View Property Photo
+            </a>
+          )}
 
           {/* External Link */}
           <a

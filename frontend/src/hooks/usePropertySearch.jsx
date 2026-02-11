@@ -10,6 +10,7 @@ import { createContext, useContext, useReducer, useCallback } from 'react';
 import { PropertyActionTypes, initialState } from './propertySearchTypes.js';
 import { propertyReducer } from './propertySearchReducer.js';
 import { saveFilters, loadFilters, saveResults, loadResults } from './aiSearchStorage.js';
+import { enrichProperties } from '../services/propertyEnrichmentService.js';
 
 /**
  * Get initial state with persisted data from localStorage
@@ -103,14 +104,28 @@ export function PropertyProvider({ children }) {
 
       const data = await response.json();
       console.log('[usePropertySearch] Response data:', data);
-      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: data });
+      
+      // Extract properties from response
+      const rawProperties = data.data || data.properties || [];
+      console.log('[usePropertySearch] Raw properties count:', rawProperties.length);
+      
+      // Enrich properties with CAMA data (beds, baths, sqft, etc.)
+      const enrichedProperties = await enrichProperties(rawProperties);
+      console.log('[usePropertySearch] Enriched properties count:', enrichedProperties.length);
+      
+      // Update data object with enriched properties
+      const enrichedData = {
+        ...data,
+        data: data.data ? enrichedProperties : undefined,
+        properties: data.properties ? enrichedProperties : undefined,
+      };
+      
+      dispatch({ type: PropertyActionTypes.SET_RESULTS, payload: enrichedData });
       
       // Save results to localStorage for page refresh recovery
-      // Handle both API formats: { data: [...] } (Socrata) and { properties: [...] } (Lambda)
       // Always save (even empty array) to keep localStorage in sync with current state
-      const resultsToSave = data.data || data.properties || [];
-      console.log('[usePropertySearch] Saving to localStorage:', resultsToSave.length, 'results');
-      saveResults(resultsToSave);
+      console.log('[usePropertySearch] Saving to localStorage:', enrichedProperties.length, 'results');
+      saveResults(enrichedProperties);
       saveFilters(cleanFilters);
       
       // Verify save worked
