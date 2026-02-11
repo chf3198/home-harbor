@@ -49,6 +49,45 @@ useEffect(() => {
 
 ---
 
+### CAMA Data Integration (February 10, 2026)
+
+**Context**: Multi-source property enrichment to fill critical attribute gaps.
+
+**Current Data Gaps**: 
+- CT Sales API provides: address, town, sale_amount, assessed_value, sale_date, property_type, lat/lon
+- Missing: beds, baths, sqft, year_built, lot_size, building_type, style, photos
+
+**CAMA API Discovery**:
+- Dataset ID: `pqrn-qghw` (2024 Parcel/CAMA Data) with 138 columns
+- Key fields: `property_address`, `property_city`, `bedrooms`, `full_bath`, `half_bath`, `living_area`, `year_built`, `style`, `photo_url`
+- API endpoint: `https://data.ct.gov/resource/pqrn-qghw.json`
+- Join strategy: Match on normalized address + town (case-insensitive)
+- Query pattern: `upper(property_city) = 'GLASTONBURY' AND upper(property_address) LIKE '%496 BELL%'`
+
+**Implementation**:
+- `lambda/src/cama-service.ts`: Socrata API client with address normalization
+- `lambda/src/enrich-handler.ts`: GET `/enrich?address=X&town=Y` endpoint
+- Added `EnrichFunction` to SAM template
+- Returns merged property with all CAMA attributes
+
+**exFAT Build Workaround**:
+- **Problem**: npm symlinks fail on exFAT USB drive
+- **Solution**: Use globally installed TypeScript compiler (`tsc`) directly
+- **Command**: `cd lambda && tsc` (no npm needed)
+- **Output**: Successfully compiled `enrich-handler.js`, `cama-service.js` → `dist/`
+
+**AWS CLI Pager Hang Fix** (CRITICAL):
+- **Problem**: AWS CLI commands hang forever waiting for pager (e.g., `less`) input
+- **Solution**: Disable pager globally: `export AWS_PAGER=""` (added to `~/.bashrc`)
+- **Impact**: All AWS CLI commands now return immediately without interactive pager
+- **Commands that were hanging**: `aws lambda create-function`, `aws cloudformation describe-stacks`, etc.
+
+**Deployment Strategy**: Deploy via AWS CLI (SAM not installed on Chromebook)
+
+**Next**: Test enrichment, then plan Cloudflare migration to stop AWS credit consumption.
+
+---
+
 ### Chat-Centric Fullscreen with Swipeable Cards (February 9, 2026)
 
 **UX Research Applied**:
