@@ -103,6 +103,18 @@ useEffect(() => {
 - Created `propertyEnrichmentService.js` to call CAMA API
 - Integrated auto-enrichment into `usePropertySearch` hook
 - Properties are enriched **automatically** after each search (3 concurrent requests)
+
+**Deployment Status**:
+- ✅ Code pushed to `origin/main` (commit `300c945`)
+- ✅ GitHub Actions workflow triggered on push (builds frontend automatically)
+- ⏳ GitHub Pages deployment in progress (wait 2-5 minutes after push)
+- 🔍 To verify: Open browser DevTools Console and check for `[enrichProperty]` logs
+- 🐛 **If enrichment not showing**: Check Console for errors; enrichment fails silently if API returns error
+
+**Troubleshooting**:
+- If properties show without beds/baths/sqft: Clear browser cache and hard refresh (Ctrl+Shift+R)
+- Check Console for `[enrichProperty] API error` or `[enrichProperty] No enrichment data`
+- Verify API is working: `curl "https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod/enrich?address=2760%20HEBRON%20AVE&town=Glastonbury"`
 - **Property Cards** now show: beds, baths, sqft (when available)
 - **Details Modal** shows: all CAMA fields including lot size, year built, style, HVAC systems, property photos
 - Graceful degradation: if enrichment fails, base property data still displays
