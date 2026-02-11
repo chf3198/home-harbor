@@ -86,13 +86,14 @@ useEffect(() => {
 
 **Deployment Success** (February 10, 2026):
 - Created deployment package: `zip enrich.zip enrich-handler.js cama-service.js` (3.6KB)
-- Deployed to AWS: `aws lambda create-function --function-name home-harbor-enrich`
-- Region: us-east-2 (Ohio)
+- Deployed to AWS us-east-1: `aws lambda create-function --function-name home-harbor-enrich`
 - Runtime: nodejs20.x, Memory: 256MB, Timeout: 15s
+- **Integrated with API Gateway**: `GET /prod/enrich?address=X&town=Y`
+- **Public Endpoint**: `https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod/enrich`
 - **Test Result**: ✅ Successfully enriched "496 Bell St, Glastonbury" with CAMA data
-- Response: beds=4, baths=3, sqft=3006, yearBuilt=2024, style="Modern Colonial", assessed=$562,600
+- Response: beds=4, baths=3, sqft=3006, yearBuilt=2024, style="Modern Colonial", assessed=$562,600, photo URL
 
-**Next**: Integrate `/enrich` endpoint into frontend, then plan Cloudflare migration to stop AWS credit consumption.
+**Next**: Update frontend to call `/prod/enrich`, merge to main, deploy to GitHub Pages for UAT.
 
 ---
 
