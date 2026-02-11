@@ -3,7 +3,7 @@
  */
 
 import { getApiBase } from './configUtils.js';
-import { fetchPropertyDetail } from './propertyDetail.js';
+import { fetchPropertyDetail, enrichProperty } from './propertyDetail.js';
 
 export function setupCardEvents(elements, property, aiReady) {
   const { detailButton, detailPanel, aiPanel, visionButton, descriptionButton } = elements;
@@ -17,17 +17,39 @@ export function setupCardEvents(elements, property, aiReady) {
 
     detailButton.textContent = 'Loading...';
     const detailResult = await fetchPropertyDetail(property.id);
+    
+    // Also fetch CAMA enrichment data
+    const enrichResult = await enrichProperty(property.address, property.city);
 
     if (!detailResult.ok) {
       detailPanel.textContent = detailResult.error || 'Failed to load details';
     } else {
       const detailData = detailResult.data;
-      detailPanel.innerHTML = `
+      let detailHTML = `
         <p><strong>Address:</strong> ${detailData.address}</p>
         <p><strong>Sale Date:</strong> ${detailData.metadata?.saleDate || 'N/A'}</p>
         <p><strong>Residential Type:</strong> ${detailData.metadata?.residentialType || 'N/A'}</p>
         <p><strong>Serial Number:</strong> ${detailData.metadata?.serialNumber || 'N/A'}</p>
       `;
+      
+      // Add CAMA enrichment data if available
+      if (enrichResult.ok && enrichResult.data) {
+        const e = enrichResult.data;
+        detailHTML += `
+          <hr class="my-2" />
+          <p class="text-emerald-700 font-semibold">Property Details:</p>
+          ${e.beds ? `<p><strong>Bedrooms:</strong> ${e.beds}</p>` : ''}
+          ${e.baths ? `<p><strong>Bathrooms:</strong> ${e.baths}${e.halfBaths ? ` + ${e.halfBaths} half` : ''}</p>` : ''}
+          ${e.sqft ? `<p><strong>Living Area:</strong> ${e.sqft.toLocaleString()} sqft</p>` : ''}
+          ${e.lotAcres ? `<p><strong>Lot Size:</strong> ${e.lotAcres} acres</p>` : ''}
+          ${e.yearBuilt ? `<p><strong>Year Built:</strong> ${e.yearBuilt}</p>` : ''}
+          ${e.style ? `<p><strong>Style:</strong> ${e.style}</p>` : ''}
+          ${e.heating || e.cooling ? `<p><strong>HVAC:</strong> ${[e.heating, e.cooling].filter(Boolean).join(' / ')}</p>` : ''}
+          ${e.photoUrl ? `<p><a href="${e.photoUrl}" target="_blank" class="text-emerald-600 hover:underline">View Photo</a></p>` : ''}
+        `;
+      }
+      
+      detailPanel.innerHTML = detailHTML;
     }
 
     detailPanel.hidden = false;
