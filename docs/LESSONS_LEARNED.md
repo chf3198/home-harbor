@@ -115,6 +115,23 @@ useEffect(() => {
 - If properties show without beds/baths/sqft: Clear browser cache and hard refresh (Ctrl+Shift+R)
 - Check Console for `[enrichProperty] API error` or `[enrichProperty] No enrichment data`
 - Verify API is working: `curl "https://n5hclfza8a.execute-api.us-east-1.amazonaws.com/prod/enrich?address=2760%20HEBRON%20AVE&town=Glastonbury"`
+
+**CAMA Data Coverage Limitation** (CRITICAL):
+- **Issue**: UAT revealed only ~25% of properties are in CAMA database (3/12 in West Hartford test)
+- **Root Cause**: CAMA dataset (`pqrn-qghw`) is incomplete - not all municipalities submit data annually
+- **Example**: "65 WHITE AVENUE, West Hartford" not found in 2024 OR 2025 CAMA datasets
+- **Success Rate**: Glastonbury has good coverage; West Hartford/other towns have gaps
+- **User Impact**: Enriched attributes (beds, baths, sqft) only show for ~25-40% of properties
+- **Console Logs**: `[enrichProperties] Successfully enriched 3/12 properties` is EXPECTED behavior
+- **UX Behavior**: Properties without CAMA data show gracefully with just sales data (price, assessed value)
+
+**Options to Improve Coverage**:
+1. **Add fallback datasets**: Try 2023, 2022 CAMA datasets if 2024/2025 miss
+2. **Use Vision API**: Extract beds/baths from property photos using AI vision
+3. **Multi-source scraping**: Google SERP → Realtor.com/Zillow snippets (legal under hiQ v. LinkedIn)
+4. **Accept limitation**: Document that enrichment is "best effort" for portfolio showcase
+
+**Current Status**: Enrichment working as designed; CAMA coverage is the limiting factor, not code bugs.
 - **Property Cards** now show: beds, baths, sqft (when available)
 - **Details Modal** shows: all CAMA fields including lot size, year built, style, HVAC systems, property photos
 - Graceful degradation: if enrichment fails, base property data still displays
