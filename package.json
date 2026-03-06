@@ -4,7 +4,7 @@
   "private": true,
   "description": "AI-powered real estate search platform - AWS Lambda + React + Socrata API",
   "author": "Curtis Franks",
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "keywords": [
     "real-estate",
     "aws-lambda",
