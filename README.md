@@ -1,7 +1,7 @@
 # HomeHarbor
 
 <div align="center">
-  <img src=".github/banner.svg" alt="HomeHarbor Banner" width="100%">
+  <img src=".github/assets/home-harbor-banner.png" alt="HomeHarbor Banner" width="100%">
 
   <p>
     <a href="https://chf3198.github.io/home-harbor/"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-Try%20It!-10b981?style=for-the-badge" alt="Live Demo"></a>
