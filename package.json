@@ -43,7 +43,7 @@
     "csv-parse": "^6.1.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.4",
-    "express": "^4.19.2",
+    "express": "^4.22.2",
     "joi": "^17.13.0",
     "neverthrow": "^6.1.0"
   },
