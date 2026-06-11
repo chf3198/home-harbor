@@ -44,7 +44,7 @@
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.4",
     "express": "^4.19.2",
-    "joi": "^17.13.0",
+    "joi": "^18.2.1",
     "neverthrow": "^6.1.0"
   },
   "engines": {
